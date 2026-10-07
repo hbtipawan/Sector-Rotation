@@ -113,6 +113,32 @@ svg text{fill:var(--muted);font:500 13px "IBM Plex Sans",sans-serif}
 .empty{padding:14px 16px;color:var(--muted)}
 .err{padding:20px;border:2px solid var(--down);border-radius:8px;background:var(--panel)}
 
+/* VPCI screener */
+.vbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:12px}
+.vbar a{color:var(--sel);font-weight:600}
+.subtabs{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 12px}
+.subtabs button{background:var(--panel);border:1.5px solid var(--rule);border-radius:6px;padding:8px 12px;cursor:pointer;font-weight:600;font-size:16px}
+.subtabs button[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin-bottom:12px}
+.metric{padding:10px 14px}
+.metric .k{color:var(--muted);font-size:15px}
+.metric .v{font-size:30px;line-height:1.2}
+.badges{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}
+.badge{display:inline-block;padding:3px 12px;border-radius:14px;font-size:15px;font-weight:600;border:1.5px solid var(--up);color:var(--up)}
+.badge.off{border-color:var(--down);color:var(--down)}
+.caption{color:var(--muted);font-size:16px;margin:0 2px 12px;max-width:78ch}
+.vt td,.vt th{font-size:15px;padding:7px 9px}
+.vt td.b-t{color:var(--up);font-weight:700}.vt td.b-f{color:var(--down)}
+.vt td.sym{text-align:left}
+.vt td.txt{text-align:left;white-space:normal;min-width:120px;max-width:340px}
+details.exp{margin:12px 0;background:var(--panel);border:1.5px solid var(--rule);border-radius:8px}
+details.exp>summary{cursor:pointer;padding:10px 14px;font-weight:600}
+details.exp>div{padding:0 0 8px}
+.dl{background:none;border:1.5px solid var(--rule);border-radius:6px;padding:6px 12px;cursor:pointer;font-weight:600;margin:8px 0}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cols2 h4{margin:4px 0 6px;font-size:18px}
+.warnbox{border:2px solid var(--warn);border-radius:8px;padding:10px 14px;margin-bottom:12px;background:var(--panel)}
+@media (max-width:800px){.cols2{grid-template-columns:1fr}}
 @media (max-width:640px){
   :root{--fs:16px}
   h1{font-size:26px}
@@ -144,6 +170,7 @@ svg text{fill:var(--muted);font:500 13px "IBM Plex Sans",sans-serif}
     <button role="tab" data-v="br" aria-selected="false">Breadth</button>
     <button role="tab" data-v="rs" aria-selected="false">RS ranking</button>
     <button role="tab" data-v="sc" aria-selected="false">Scanners</button>
+    <button role="tab" data-v="vp" aria-selected="false">VPCI Screener</button>
   </nav>
   <main id="view"></main>
 </div>
@@ -369,13 +396,140 @@ function renderSc(){
   $("#view").innerHTML=h;
 }
 
+/* ---------- VPCI screener (Pawan's Streamlit app, precomputed nightly) ---------- */
+const VP={mode:"completed",tab:"fresh",cache:{},rot:null,sort:{},show:{}};
+const VTABS=[["fresh","🔥 Fresh Signals"],["buy","★ Buyable (7/7)"],["watch","◉ Watchlist (6/7)"],["all","All Results"],
+  ["rank","🏆 Ranked"],["g4","🎯 G4 Pending"],["young","🌱 New Listings"],["sect","🏭 Sector Leadership"],["rotn","📈 Sector Rotation"]];
+async function vpLoad(mode){
+  if(window.EMBED_VP)return window.EMBED_VP[mode];
+  if(!VP.cache[mode]){const r=await fetch(`data/vpci/${mode}.json?v=${Date.now()}`);if(!r.ok)throw new Error(`vpci/${mode}.json ${r.status}`);VP.cache[mode]=await r.json();}
+  return VP.cache[mode];
+}
+async function vpRot(){
+  if(window.EMBED_VP)return window.EMBED_VP.rotation;
+  if(!VP.rot){const r=await fetch(`data/vpci/rotation.json?v=${Date.now()}`);VP.rot=r.ok?await r.json():{weeks:0,table:{columns:[],rows:[]}};}
+  return VP.rot;
+}
+const tvx=(sym,ex)=>`https://in.tradingview.com/chart/?symbol=${encodeURIComponent((ex||"NSE")+":"+sym)}`;
+function toObjs(t){return (t?.rows||[]).map(r=>Object.fromEntries(t.columns.map((c,i)=>[c,r[i]])))}
+function fmtCell(c,v){
+  if(v===null||v===undefined||v==="")return ["","–"];
+  if(typeof v==="boolean")return [v?"b-t":"b-f",v?"✓":"✗"];
+  if(typeof v==="number"){
+    const d=/^score_|composite/.test(c)?3:(c==="vpci"||c==="vpci_signal")?4:Number.isInteger(v)?0:2;
+    return ["num",d===0&&Math.abs(v)>=1000?v.toLocaleString("en-IN"):v.toFixed(d)];
+  }
+  return ["txt",String(v)];
+}
+function vtable(id,rows,cols,opts={}){
+  if(!rows.length)return `<div class="empty">${esc(opts.empty||"No rows.")}</div>`;
+  cols=cols||Object.keys(rows[0]);
+  const s=VP.sort[id];
+  if(s){rows=[...rows].sort((a,b)=>{const A=a[s.k],B=b[s.k];if(A==null)return 1;if(B==null)return -1;return typeof A==="string"?s.d*A.localeCompare(B):s.d*(A-B)})}
+  const lim=VP.show[id]||100,vis=rows.slice(0,lim);
+  let h=`<div class="tscroll vt"><table data-tid="${id}"><thead><tr>${cols.map(c=>`<th class="${c==="symbol"||c==="Company Name"||c==="status"?"l":""}" data-k="${esc(c)}" tabindex="0">${esc(c)}${s&&s.k===c?(s.d<0?" ▼":" ▲"):""}</th>`).join("")}</tr></thead><tbody>`;
+  for(const r of vis){h+="<tr>"+cols.map(c=>{
+    if(c==="symbol")return `<td class="sym"><a href="${tvx(r.symbol,r.exchange)}" target="_blank" rel="noopener">${esc(r.symbol)}</a></td>`;
+    const [k,t]=fmtCell(c,r[c]);return `<td class="${k}">${esc(t)}</td>`}).join("")+"</tr>"}
+  h+=`</tbody></table></div>`;
+  if(rows.length>lim)h+=`<button class="more" type="button" data-more="${id}">Show ${Math.min(100,rows.length-lim)} more of ${rows.length-lim} remaining</button>`;
+  h+=`<button class="dl" type="button" data-dl="${id}">📥 Download CSV (${rows.length} rows)</button>`;
+  VP.tables=VP.tables||{};VP.tables[id]={rows,cols};
+  return h;
+}
+function csvOf(id){const {rows,cols}=VP.tables[id];const q=v=>v==null?"":/[",\n]/.test(String(v))?`"${String(v).replace(/"/g,'""')}"`:String(v);
+  return [cols.join(",")].concat(rows.map(r=>cols.map(c=>q(r[c])).join(","))).join("\n")}
+function lead(rows,first){const all=rows.length?Object.keys(rows[0]):[];return first.filter(c=>all.includes(c)).concat(all.filter(c=>!first.includes(c)))}
+function uiCols(rows){ // app.py: Market Cap moved right after Company Name
+  let c=rows.length?Object.keys(rows[0]):[];if(c.includes("Market Cap")){c=c.filter(x=>x!=="Market Cap");const i=c.includes("Company Name")?c.indexOf("Company Name")+1:c.indexOf("symbol")+1;c.splice(i,0,"Market Cap")}return c}
+async function renderVp(){
+  const v=$("#view");
+  v.innerHTML=`<div class="vbar"><div><span class="ctl-label">Weekly candle</span>${seg("vpmode",["completed","running"],VP.mode,{completed:"Completed weeks (app default after close)",running:"Running week, live candle"})}</div>
+    <a href="https://pkcvpc.streamlit.app/" target="_blank" rel="noopener">Open the live Streamlit app ↗</a></div><div id="vpBody"><div class="empty">Loading scan…</div></div>`;
+  let d;try{d=await vpLoad(VP.mode)}catch(e){$("#vpBody").innerHTML=`<div class="err"><b>VPCI results are not available yet.</b><br>${esc(e.message)}. They are created by the evening job; run “Daily update” once from the Actions tab.</div>`;return}
+  const res=toObjs(d.results),yng=toObjs(d.young),failed=d.failed||[];
+  const buyN=res.filter(r=>r.full_entry).length;
+  let h="";
+  if(!d.live&&d.bar_week&&d.bar_week.unfinished)h+=`<div class="warnbox">ℹ️ As in your app, this mode uses Upstox's weekly candle, which already contains this unfinished week. The engine keeps that bar for stocks whose week-so-far volume is at least 25% of last week's (most stocks by mid-week), without pro-rating the volume. Quieter stocks fall back to last week's completed bar.</div>`;
+  if(d.live)h+=`<div class="warnbox">⚠️ Signals on the running week are <b>provisional</b> — they can flip before Friday's close. Weigh them by the <code>week_confidence</code> column. Partial-week volume is pro-rated to a full week.</div>`;
+  h+=`<p class="caption">Scan run ${esc(d.scan_time)} on ${esc(d.universe_file)} · latest weekly bar: ${d.bar_week?`week of ${esc(d.bar_week.monday)} to ${esc(d.bar_week.friday)}${d.bar_week.unfinished?" (week not finished yet)":""}`:esc(d.week_ending||"–")} · settings: Upstox → Yahoo, relaxed mode off.</p>
+  <div class="metrics">
+    <div class="panel metric"><div class="k">Total Symbols Analyzed</div><div class="v num">${d.total}</div></div>
+    <div class="panel metric"><div class="k">✅ Candidates Found</div><div class="v num">${res.length}</div></div>
+    <div class="panel metric"><div class="k">⚠️ No Data / Excluded</div><div class="v num">${failed.length}</div></div>
+    <div class="panel metric"><div class="k">★ Buyable (7/7)</div><div class="v num">${buyN}</div></div></div>
+  <div class="badges"><b>Data coverage:</b>${Object.entries(d.source_counts||{}).map(([k,n])=>`<span class="badge">${esc(k)}: ${n.toLocaleString("en-IN")}</span>`).join("")}
+    ${Object.entries(d.exchange_counts||{}).map(([k,n])=>`<span class="badge">🏛 ${esc(k)}: ${n.toLocaleString("en-IN")}</span>`).join("")}
+    ${failed.length?`<span class="badge off">Not found anywhere: ${failed.length}</span>`:""}</div>`;
+  if(failed.length)h+=`<details class="exp"><summary>⚠️ ${failed.length} symbols not found on any source (Upstox → Kite → Yahoo)</summary><div style="padding:6px 14px 10px">${failed.map(esc).join(", ")}</div></details>`;
+  h+=`<div class="subtabs" role="group" aria-label="Screener views">${VTABS.map(([k,l])=>`<button type="button" data-vtab="${k}" aria-pressed="${VP.tab===k}">${l}</button>`).join("")}</div><div id="vpTab"></div>`;
+  $("#vpBody").innerHTML=h;
+  await vpTab(d,res,yng);
+}
+async function vpTab(d,res,yng){
+  const t=VP.tab,box=$("#vpTab");let h="";
+  const st_=s=>res.filter(r=>s.includes(r.status));
+  if(t==="fresh"){
+    h+=`<p class="caption"><b>Fresh = a genuinely NEW entry.</b> All 7 gates open this week AND the stock has no open prior position — either it never signalled before, or its last position was closed by a SELL (weekly close below the 3×ATR trailing stop). Stocks that merely re-passed 7/7 while an old buy is still live are excluded (they show as 📌 CONTINUING in All Results). <code>position_state</code> tells you which case each one is.</p>`;
+    const f=st_(["🔥 FRESH BUY","🔥 FRESH EXT"]);
+    h+=f.length?vtable("fresh",f,lead(f,["symbol","Company Name","Market Cap","close","status","position_state","last_exit_date","vpci","rs_return","pct_from_52w","trail_stop","init_sl","risk_pct","vol_ratio","scenario","source","exchange"]))
+      :`<div class="empty panel">No genuinely fresh signals this week (first-ever, or first after a sell).</div>`;
+    const c=st_(["📌 CONTINUING (7/7)"]);
+    if(c.length)h+=`<details class="exp"><summary>📌 ${c.length} stocks re-showing 7/7 inside an OPEN position (old engine wrongly called these fresh)</summary><div>${vtable("cont",c,uiCols(c))}</div></details>`;
+  }else if(t==="buy"){const r=st_(["★ BUYABLE (7/7)","📌 CONTINUING (7/7)"]);h+=r.length?vtable("buy",r,uiCols(r)):`<div class="empty panel">No stocks passed all 7 criteria.</div>`;}
+  else if(t==="watch"){const r=st_(["★ RELAXED (6/7)","◉ WATCHLIST (6/7)"]);h+=r.length?vtable("watch",r,uiCols(r)):`<div class="empty panel">No watchlist candidates found.</div>`;}
+  else if(t==="all"){h+=vtable("all",res,uiCols(res));}
+  else if(t==="rank"){const r=toObjs(d.ranked);
+    h+=`<h3>All Ranked Buyable Candidates</h3><p class="caption">Composite score: VPCI 25% + RS 25% + 52wH 20% + Tight base 15% + Volume 10% + Mcap fit 5%</p>`;
+    h+=r.length?vtable("rank",r,["rank","symbol","Company Name","Market Cap","close","composite_score","score_vpci","score_rs","score_52w","score_tight","score_vol","score_mcap","source","exchange","status"].filter(c=>c in r[0]))+`<p class="caption">Total ranked: ${r.length} stocks. Top 5 typically have score &gt; 0.80. Score gap from #1 to #5 indicates conviction strength.</p>`
+      :`<div class="empty panel">No 7/7 stocks to rank this week. Try the Watchlist tab for 6/7 candidates.</div>`;}
+  else if(t==="g4"){const r=toObjs(d.g4);
+    h+=`<h3>🎯 G4 Pending — Pre-Breakout Watchlist</h3><p class="caption">All 6 other gates passing; only the G4 breakout above the 13-week high is missing. Watch these for the breakout.</p>`;
+    h+=r.length?vtable("g4",r,["rank","symbol","Company Name","Market Cap","close","composite_score","score_vpci","score_rs","score_52w","score_tight","score_vol","score_mcap","score_proximity","source","exchange","status"].filter(c=>c in r[0]))+`<p class="caption">Total G4-pending: ${r.length} stocks. Click any symbol to open its chart and watch for the breakout above the 13w high.</p>`
+      :`<div class="empty panel">No stocks meet the strict G4-pending criteria this week (all 6 other gates passing, only G4 missing).</div>`;}
+  else if(t==="young"){
+    h+=`<h3>🌱 New Listings — Early VPCI Accumulation Watch</h3><p class="caption">Stocks with 22–41 weekly bars — too young for the full 7-gate scan (needs the 40-week SMA), but old enough for the exact same VPCI 5/20 computation. <b>Accumulating = the engine's G5 condition</b> (VPCI &gt; 0, above its signal line, and rising). These are candidates to track until they mature into the main scan — not buy signals.</p>`;
+    if(!yng.length)h+=`<div class="empty panel">No recently listed stocks with enough bars for a VPCI read were found this scan.</div>`;
+    else{const acc=yng.filter(r=>r.accumulating);
+      h+=`<div class="metrics"><div class="panel metric"><div class="k">🌱 Young stocks scanned</div><div class="v num">${yng.length}</div></div><div class="panel metric"><div class="k">✅ Accumulating (G5-style)</div><div class="v num">${acc.length}</div></div><div class="panel metric"><div class="k">📈 Above 13w EMA</div><div class="v num">${yng.filter(r=>r.above_13ema).length}</div></div></div>`;
+      h+=`<h4>✅ Accumulating — VPCI &gt; 0, above signal, rising</h4>`+(acc.length?vtable("yacc",acc):`<div class="empty panel">None of the young listings show VPCI accumulation this week.</div>`);
+      h+=`<details class="exp"><summary>All young listings (including non-accumulating)</summary><div>${vtable("yall",yng)}</div></details>`;}
+  }else if(t==="sect"){
+    const S=d.sector||{},both=toObjs(S.sector_both),ind=toObjs(S.industry_both);
+    h+=`<h3>🏭 Leading Sectors &amp; Industries — G5 (VPCI) + G6 (Leader RS) + G7 (Above 40w)</h3><p class="caption">Sectors and industries ranked by the count of stocks where the institutional confirmation gates fire together. G5 = VPCI accumulation; G6 = leader RS positive vs index; G7 = price above the 40-week MA (Stage 2 trend). When several constituents of the same sector pass all three, accumulation, relative strength and trend are aligned — the highest-conviction sector for fresh capital this week.</p>`;
+    const tot=both.reduce((a,r)=>a+(r.stocks_passing||0),0);
+    if(!both.length||!tot)h+=`<div class="empty panel">No stocks pass G5, G6 and G7 together in this scan.</div>`;
+    else{h+=`<div class="metrics"><div class="panel metric"><div class="k">Stocks passing G5 ∧ G6 ∧ G7</div><div class="v num">${tot}</div></div><div class="panel metric"><div class="k">Sectors with ≥1 leader</div><div class="v num">${both.filter(r=>r.stocks_passing>0).length}</div></div><div class="panel metric"><div class="k">Top sector</div><div class="v" style="font-size:22px">${esc(both[0].sector)}</div><div class="k">${both[0].stocks_passing} stocks</div></div></div>`;
+      h+=`<div class="cols2"><div><h4>🥇 Sectors — G5 ∧ G6 ∧ G7 (strict)</h4><p class="caption">All three gates passing — institutional confirmation cut.</p>${vtable("sb",both.slice(0,20))}</div>
+        <div><h4>🏷️ Industries — G5 ∧ G6 ∧ G7 (strict)</h4><p class="caption">Drill-down within sectors — the actual sub-theme leading.</p>${vtable("ib",ind.slice(0,20))}</div></div>`;
+      h+=`<details class="exp"><summary>📊 Broader breadth — Sectors / Industries with G5 ∨ G6 ∨ G7 firing</summary><div><p class="caption" style="padding:0 14px">A wider net for early sector accumulation: stocks passing any of the three institutional gates — spots sectors just starting to rotate.</p><div class="cols2"><div>${vtable("se",toObjs(S.sector_either).slice(0,20))}</div><div>${vtable("ie",toObjs(S.industry_either).slice(0,20))}</div></div></div></details>`;
+      h+=`<details class="exp"><summary>🔬 Stock-level view — every passer with sector tags</summary><div>${vtable("stk",toObjs(S.stock_table))}</div></details>`;}
+  }else if(t==="rotn"){
+    const R=await vpRot();
+    h+=`<h3>📈 Sector Rotation — Week-Over-Week History</h3><p class="caption">Counts of stocks passing G5 ∧ G6 ∧ G7 per sector across saved weekly snapshots. A sector accelerating from 2 → 5 → 9 leaders over three weeks is rotating in; a decaying one is rotating out. One snapshot is saved per week by the evening job.</p>`;
+    const rows=toObjs(R.table);
+    if(!rows.length)h+=`<div class="empty panel">No history yet. Each week adds a column here.</div>`;
+    else{const cols=R.table.columns,weeks=cols.slice(1),mx=Math.max(1,...rows.flatMap(r=>weeks.map(w=>r[w]||0)));
+      h+=`<p class="caption">Loaded ${R.weeks} weekly snapshot(s).</p><div class="tscroll vt panel"><table><thead><tr><th class="l">sector</th>${weeks.map(w=>`<th>${esc(w)}</th>`).join("")}</tr></thead><tbody>`+
+        rows.map(r=>`<tr><td class="l">${esc(r.sector)}</td>${weeks.map(w=>{const v=r[w]||0,f=v/mx;return `<td class="num" style="${v>0?`background:color-mix(in srgb,var(--up) ${Math.round(15+60*f)}%,transparent);font-weight:700`:""}">${v}</td>`}).join("")}</tr>`).join("")+`</tbody></table></div>`;
+      if(R.rot_in||R.rot_out)h+=`<div class="cols2" style="margin-top:12px"><div class="panel" style="padding:10px 14px"><h4>🚀 Rotating IN (week-over-week)</h4>${(R.rot_in||[]).map(([s,v])=>`<div>${esc(s)} <b class="up">+${v}</b></div>`).join("")||"–"}</div><div class="panel" style="padding:10px 14px"><h4>🪂 Rotating OUT (week-over-week)</h4>${(R.rot_out||[]).map(([s,v])=>`<div>${esc(s)} <b class="down">${v}</b></div>`).join("")||"–"}</div></div>`;}
+  }
+  box.innerHTML=h;
+  box.querySelectorAll("th[data-k]").forEach(th=>{const tid=th.closest("table").dataset.tid;const go=()=>{const k=th.dataset.k,s=VP.sort[tid];VP.sort[tid]={k,d:s&&s.k===k?-s.d:-1};vpTab(d,res,yng)};th.addEventListener("click",go);th.addEventListener("keydown",e=>{if(e.key==="Enter")go()})});
+  box.querySelectorAll("[data-more]").forEach(b=>b.addEventListener("click",()=>{VP.show[b.dataset.more]=(VP.show[b.dataset.more]||100)+100;vpTab(d,res,yng)}));
+  box.querySelectorAll("[data-dl]").forEach(b=>b.addEventListener("click",()=>{const blob=new Blob([csvOf(b.dataset.dl)],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`vpci_${VP.mode}_${b.dataset.dl}_${(d.scan_time||"").slice(0,10)}.csv`;document.body.appendChild(a);a.click();a.remove()}));
+}
+
 /* ---------- wiring ---------- */
-function render(){renderHead();({rot:renderRot,br:renderBr,rs:renderRs,sc:renderSc})[st.tab]()}
+function render(){renderHead();({rot:renderRot,br:renderBr,rs:renderRs,sc:renderSc,vp:renderVp})[st.tab]()}
 $("#tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;st.tab=b.dataset.v;
   document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));render()});
 $("#view").addEventListener("click",e=>{
   const s=e.target.closest("[data-seg]");
+  if(s&&s.dataset.seg==="vpmode"){VP.mode=s.dataset.val;VP.sort={};VP.show={};renderVp();return;}
   if(s){st[s.dataset.seg]=s.dataset.val;if(s.dataset.seg==="group")st.open=null;render();return;}
+  const vt=e.target.closest("[data-vtab]");if(vt){VP.tab=vt.dataset.vtab;document.querySelectorAll("[data-vtab]").forEach(b=>b.setAttribute("aria-pressed",b===vt));vpLoad(VP.mode).then(d=>vpTab(d,toObjs(d.results),toObjs(d.young)));return;}
+  if(e.target.closest("#vpBody"))return;
   if(e.target.closest(".members"))return;
   const r=e.target.closest(".brow");if(r){st.open=st.open===r.dataset.g?null:r.dataset.g;renderRot();}
 });

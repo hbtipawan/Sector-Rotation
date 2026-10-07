@@ -6,6 +6,7 @@ A free, ScreeningMantis-style dashboard for NSE stocks:
 - **Breadth** – % of stocks above 20/50/200 DMA, advance/decline, 52-week highs/lows, 4% movers, one year of history.
 - **RS ranking** – every stock ranked 1–99 by relative strength, filterable by sector, theme, Stage 2, Minervini trend template.
 - **Scanners** – 52-week closing highs, Darvas box breakouts, volume spikes, 20/50 EMA crossovers, leaders near highs, trend template.
+- **VPCI Screener** – your Streamlit screener (`vpci/` folder, files unchanged) run every evening: Fresh Signals, Buyable, Watchlist, All Results, Ranked, G4 Pending, New Listings, Sector Leadership, Sector Rotation — for both completed weeks and the running week.
 
 **No broker login, no API key, no password.** Prices come from Upstox's public historical-candle service, which answers without an account. Today's candle is added from NSE's official bhavcopy. Yahoo Finance is wired in as a backup.
 
@@ -79,6 +80,14 @@ python scripts\pc_bse_industry.py
 Upload the `config/industry_bse.csv` it writes to `config/` on GitHub. From the next run you get an **Industry** tab covering all stocks, and stocks below ₹500 Cr are dropped. Re-run monthly.
 
 Without it, the universe is filtered by liquidity: price ≥ ₹20 and median daily turnover ≥ ₹1 Cr over 50 days (about 1,550 stocks).
+
+## VPCI Screener
+
+`vpci/` holds your screener exactly as in the `rojiroti` repo (`app.py`, `vpci_engine.py`, `data_sources.py`, `signal_history.py`, `sector_history.py`, `Stock_List.csv`). `scripts/vpci_app_run.py` does what clicking **Run Market Scan** does, with the app's defaults (Upstox → Yahoo, relaxed off, 12 workers), twice: once with "Screen the RUNNING week" off and once on (volume pro-rated). It reads its functions straight from `vpci/app.py`, so when you change the screener, copy the new files into `vpci/` and the website follows.
+
+Checked against the real app: running `app.py` through Streamlit's test harness on 140 stocks gave identical values in every column, the same statuses and the same market caps.
+
+Kite isn't used here (it needs a fresh token every day). Sector-rotation history is saved as one snapshot per week in `docs/data/vpci/history/`.
 
 ## Settings
 

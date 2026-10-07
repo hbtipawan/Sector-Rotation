@@ -60,9 +60,29 @@ def build_universe():
     r.raise_for_status()
     ins = json.loads(gzip.decompress(r.content))
     allowed = set(SETTINGS["include_series"])
+    # Keep only listed companies (NSE's equity list excludes ETFs, which Upstox also tags EQ).
+    companies = None
+    try:
+        e = requests.get("https://archives.nseindia.com/content/equities/EQUITY_L.csv",
+                         headers={"User-Agent": UA}, timeout=60)
+        e.raise_for_status()
+        eq = pd.read_csv(io.StringIO(e.text))
+        eq.columns = [c.strip() for c in eq.columns]
+        companies = set(eq["ISIN NUMBER"].astype(str).str.strip())
+        (CACHE / "equity_l.csv").write_text(e.text)
+    except Exception as ex:
+        cached = CACHE / "equity_l.csv"
+        if cached.exists():
+            eq = pd.read_csv(cached)
+            eq.columns = [c.strip() for c in eq.columns]
+            companies = set(eq["ISIN NUMBER"].astype(str).str.strip())
+        print(f"WARN NSE equity list not downloaded ({ex}); "
+              f"{'using cached copy' if companies else 'ETFs may be included'}")
     rows, seen = [], set()
     for x in ins:
         if x.get("segment") != "NSE_EQ" or x.get("instrument_type") not in allowed:
+            continue
+        if companies is not None and x.get("isin") not in companies:
             continue
         sym = x.get("trading_symbol")
         if not sym or sym in seen:
