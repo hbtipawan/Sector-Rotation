@@ -4,15 +4,16 @@ Nothing in vpci/ is modified. This script does what clicking "🚀 Run Market
 Scan" in app.py does, with the app's default settings:
   data sources : Upstox → (Kite skipped, needs a daily token) → Yahoo fallback
   relaxed mode : off           parallel workers : 12
-It runs the scan twice:
-  completed : "Screen the RUNNING week" toggle OFF (the app's default after market close)
-  running   : toggle ON with "Pro-rate partial-week volume" ON
+It runs the scan three times, one per combination of the app's sidebar toggles:
+  completed   : "Screen the RUNNING week" OFF (the app's default after market close)
+  running     : "Screen the RUNNING week" ON,  "Pro-rate partial-week volume" ON
+  running_raw : "Screen the RUNNING week" ON,  "Pro-rate partial-week volume" OFF
 
 The functions it calls (process_symbol, status_label, rank_stocks,
 rank_g4_pending, market-cap enrichment ...) are read straight out of
 vpci/app.py at run time, so edits to app.py carry over automatically.
 
-Writes docs/data/vpci/{completed,running}.json, plus a weekly sector-leadership
+Writes docs/data/vpci/{completed,running,running_raw}.json, plus a weekly sector-leadership
 snapshot in docs/data/vpci/history/ (one file per week, the app's own format).
 
 Run:  python scripts/vpci_app_run.py            (both modes)
@@ -94,13 +95,13 @@ def split(df):
     return {"columns": j["columns"], "rows": j["data"]}
 
 
-def run_scan(live, symbols, workers=12):
+def run_scan(live, symbols, project_volume=True, workers=12):
     """Mirror of the `if run_scan:` block in app.py (checkpointing omitted)."""
     params = {**DEFAULT_PARAMS, "relaxed": False}
     results, young, failed = [], [], []
     t0 = time.time()
     with ThreadPoolExecutor(max_workers=workers) as ex:
-        futs = {ex.submit(process_symbol, s, params, ["Upstox", "Kite", "Yahoo"], live, True): s
+        futs = {ex.submit(process_symbol, s, params, ["Upstox", "Kite", "Yahoo"], live, project_volume): s
                 for s in symbols}
         for n, f in enumerate(as_completed(futs), 1):
             sym = futs[f]
@@ -159,7 +160,7 @@ def enrich(df_sorted, mcap_dict, upath):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=0)
-    ap.add_argument("--modes", default="completed,running")
+    ap.add_argument("--modes", default="completed,running,running_raw")
     a = ap.parse_args()
 
     OUT.mkdir(parents=True, exist_ok=True)
@@ -173,7 +174,10 @@ def main():
 
     scans = {}
     for mode in a.modes.split(","):
-        df, young, failed, secs = run_scan(mode == "running", symbols)
+        # running     = "Screen the RUNNING week" ON, "Pro-rate partial-week volume" ON
+        # running_raw = "Screen the RUNNING week" ON, "Pro-rate partial-week volume" OFF
+        df, young, failed, secs = run_scan(mode.startswith("running"), symbols,
+                                           project_volume=(mode != "running_raw"))
         scans[mode] = (df, young, failed, secs)
         print(f"{mode}: {len(df)} analysed, {len(young)} young, {len(failed)} failed, {secs}s")
 
@@ -199,7 +203,7 @@ def main():
     sector_map = load_sector_map(upath)
     now = datetime.now(IST)
     for mode, (df, young, failed, secs) in scans.items():
-        out = {"mode": mode, "live": mode == "running",
+        out = {"mode": mode, "live": mode.startswith("running"), "project_volume": mode != "running_raw",
                "scan_time": now.strftime("%Y-%m-%d %H:%M IST"), "seconds": secs,
                "universe_file": Path(upath).name, "total": len(df) + len(failed), "failed": sorted(failed)}
         if len(df) == 0:
@@ -212,7 +216,7 @@ def main():
             lead = build_sector_leadership(attach_sector_columns(df, sector_map)) if not sector_map.empty else None
             out.update({
                 "week_ending": str(df["week_ending"].mode().iloc[0]) if "week_ending" in df else None,
-                "bar_week": bar_week(df, mode == "running"),
+                "bar_week": bar_week(df, mode.startswith("running")),
                 "source_counts": df["source"].value_counts().to_dict() if "source" in df else {},
                 "exchange_counts": df["exchange"].value_counts().to_dict() if "exchange" in df else {},
                 "results": split(df),
