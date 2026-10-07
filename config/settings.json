@@ -1,0 +1,22 @@
+{
+  "_comment": "Edit these to change the universe and behaviour. Turnover is in Rs crore.",
+  "history_calendar_days": 760,
+  "min_price": 20,
+  "min_median_turnover_cr": 1.0,
+  "min_market_cap_cr": 500,
+  "min_bars": 60,
+  "min_group_size": 3,
+  "include_series": [
+    "EQ",
+    "BE"
+  ],
+  "benchmark": "NIFTY 500",
+  "extra_indices": [
+    "NIFTY 50",
+    "NIFTY MIDCAP 150",
+    "NIFTY SMLCAP 250",
+    "NIFTY MICROCAP250"
+  ],
+  "breadth_history_days": 260,
+  "upstox_requests_per_second": 10
+}

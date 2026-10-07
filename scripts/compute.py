@@ -1,0 +1,263 @@
+"""Turn cache/prices.csv.gz into the small JSON files the website reads.
+
+Writes docs/data/:
+  meta.json     date, source, universe counts
+  stocks.json   one row per stock: returns for every period (now and 1 week ago),
+                RS rating, 52W distance, DMA flags, trend template, stage, turnover, volume ratio
+  groups.json   membership lists for Themes / Sectors / NSE Indices
+  breadth.json  daily market-breadth history
+  scans.json    today's scanner hits
+
+Theme/sector averages are computed in the browser from stocks.json, so every
+period x grouping x (mean/median) combination is available without extra files.
+
+Run:  python scripts/compute.py
+"""
+import json
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+ROOT = Path(__file__).resolve().parents[1]
+CACHE, CFG, OUT = ROOT / "cache", ROOT / "config", ROOT / "docs" / "data"
+S = json.loads((CFG / "settings.json").read_text())
+PERIODS = {"1D": 1, "1W": 5, "1M": 21, "3M": 63, "6M": 126, "YTD": None, "1Y": 252}
+LAG = 5  # "1 week ago" snapshot for rank-change arrows
+
+
+def r2(x, nd=2):
+    if x is None or (isinstance(x, float) and not np.isfinite(x)):
+        return None
+    return round(float(x), nd)
+
+
+def load():
+    p = pd.read_csv(CACHE / "prices.csv.gz", dtype={"symbol": str, "date": str})
+    u = pd.read_csv(CACHE / "universe.csv", dtype={"symbol": str})
+    bench = S["benchmark"]
+    cal = sorted(p.loc[p.symbol == bench, "date"].unique()) or sorted(p.date.unique())
+    # Use the benchmark's trading calendar; drop stray non-session dates.
+    p = p[p.date.isin(set(cal))]
+    wide = {f: p.pivot_table(index="date", columns="symbol", values=f, aggfunc="last").reindex(cal)
+            for f in ["open", "high", "low", "close", "volume"]}
+    return wide, u
+
+
+def period_return(C, n, end=-1):
+    """Return over n sessions ending at row `end` (negative index)."""
+    if len(C) < n + 1 - end:
+        return pd.Series(np.nan, index=C.columns)
+    return C.iloc[end] / C.iloc[end - n] - 1
+
+
+def ytd_return(C, end=-1):
+    d = C.index[end]
+    prev = C.index[C.index < f"{d[:4]}-01-01"]
+    if not len(prev):
+        return pd.Series(np.nan, index=C.columns)
+    return C.iloc[end] / C.loc[prev[-1]] - 1
+
+
+def rs_score(C, end=-1):
+    """IBD-style: 40% weight on last quarter, 20% each on the three before."""
+    parts, w = [], [0.4, 0.2, 0.2, 0.2]
+    for n in (63, 126, 189, 252):
+        parts.append(period_return(C, n, end) + 1)
+    sc = sum(wi * pi for wi, pi in zip(w, parts))
+    # Young listings (<1y): use what exists, renormalised.
+    avail = sum(wi * pi.notna() for wi, pi in zip(w, parts))
+    part_sum = sum(wi * pi.fillna(0) for wi, pi in zip(w, parts))
+    sc = sc.fillna(part_sum / avail.replace(0, np.nan))
+    return sc
+
+
+def pct_rank(s):
+    return (s.rank(pct=True) * 98 + 1).round()
+
+
+def main():
+    OUT.mkdir(parents=True, exist_ok=True)
+    W, u = load()
+    bench = S["benchmark"]
+    stocks = u[u.kind == "stock"].set_index("symbol")
+    syms = [s for s in stocks.index if s in W["close"].columns]
+    C = W["close"][syms].ffill(limit=3)
+    H, L, V = W["high"][syms], W["low"][syms], W["volume"][syms].fillna(0)
+    raw_close = W["close"][syms]
+    dates = C.index
+    last = dates[-1]
+
+    # ---------------- universe filter (as of today)
+    bars = raw_close.notna().sum()
+    turnover = (raw_close * V / 1e7)  # Rs crore
+    med_to = turnover.iloc[-50:].median()
+    traded_recently = raw_close.iloc[-3:].notna().any()
+    keep = (C.iloc[-1] >= S["min_price"]) & (med_to >= S["min_median_turnover_cr"]) \
+        & (bars >= S["min_bars"]) & traded_recently
+    # Optional industry + market cap from BSE (made on your PC by pc_bse_industry.py)
+    ind = pd.Series(dtype=str)
+    mcap = None
+    bse = CFG / "industry_bse.csv"
+    if bse.exists() and "isin" in stocks.columns:
+        b = pd.read_csv(bse).drop_duplicates("ISIN").set_index("ISIN")
+        isin = stocks["isin"].reindex(syms)
+        ind = isin.map(b["Industry"]).dropna()
+        mc = isin.map(b["MarketCapCr"])
+        if mc.notna().sum() > 0.5 * len(syms):
+            mcap = mc
+    mcap_file = CFG / "mcap.csv"  # optional manual override: Symbol,MarketCapCr
+    if mcap_file.exists():
+        mcap = pd.read_csv(mcap_file).set_index("Symbol")["MarketCapCr"]
+    if mcap is not None:
+        # stocks missing from the file are kept (new listings), only known small caps are dropped
+        keep &= mcap.reindex(C.columns).fillna(1e12) >= S["min_market_cap_cr"]
+    U = [s for s in syms if keep.get(s, False)]
+    print(f"{len(syms)} stocks with data -> {len(U)} pass filters (as of {last})")
+
+    Cu, Hu, Lu, Vu = C[U], H[U], L[U], V[U]
+
+    # ---------------- indicators
+    sma = {n: Cu.rolling(n, min_periods=n).mean() for n in (20, 50, 150, 200)}
+    ema20, ema50 = Cu.ewm(span=20, adjust=False).mean(), Cu.ewm(span=50, adjust=False).mean()
+    hi52 = Hu.rolling(252, min_periods=60).max()
+    lo52 = Lu.rolling(252, min_periods=60).min()
+    avgv50 = Vu.rolling(50, min_periods=20).mean().shift(1)
+
+    rets = {k: (ytd_return(Cu) if n is None else period_return(Cu, n)) for k, n in PERIODS.items()}
+    rets_prev = {k: (ytd_return(Cu, -1 - LAG) if n is None else period_return(Cu, n, -1 - LAG))
+                 for k, n in PERIODS.items()}
+    rs_now, rs_prev = pct_rank(rs_score(Cu)), pct_rank(rs_score(Cu, -1 - LAG))
+
+    sma200_up = sma[200].iloc[-1] > sma[200].iloc[-22]
+    slope150 = sma[150].iloc[-1] / sma[150].iloc[-21] - 1
+    c = Cu.iloc[-1]
+    tt = ((c > sma[150].iloc[-1]) & (c > sma[200].iloc[-1]) & (sma[150].iloc[-1] > sma[200].iloc[-1])
+          & sma200_up & (sma[50].iloc[-1] > sma[150].iloc[-1]) & (sma[50].iloc[-1] > sma[200].iloc[-1])
+          & (c > sma[50].iloc[-1]) & (c >= 1.3 * lo52.iloc[-1]) & (c >= 0.75 * hi52.iloc[-1])
+          & (rs_now >= 70))
+
+    def stage(s):
+        sl, px, m = slope150.get(s), c.get(s), sma[150].iloc[-1].get(s)
+        if pd.isna(sl) or pd.isna(m):
+            return None
+        if px > m and sl > 0.01:
+            return 2
+        if px < m and sl < -0.01:
+            return 4
+        return 3 if px >= m else 1
+
+    # sectors / names
+    sec = pd.read_csv(CFG / "sectors.csv").set_index("Symbol")["Sector"] if (CFG / "sectors.csv").exists() else pd.Series(dtype=str)
+
+    rows = []
+    vr = Vu.iloc[-1] / avgv50.iloc[-1]
+    for s in U:
+        rows.append({
+            "s": s, "n": str(stocks.loc[s, "name"])[:40], "sec": sec.get(s), "ind": ind.get(s),
+            "px": r2(c[s]), "r": {k: r2(v[s] * 100) for k, v in rets.items()},
+            "rp": {k: r2(v[s] * 100) for k, v in rets_prev.items()},
+            "rs": None if pd.isna(rs_now[s]) else int(rs_now[s]),
+            "rs1w": None if pd.isna(rs_prev.get(s)) else int(rs_prev[s]),
+            "h52": r2((c[s] / hi52.iloc[-1][s] - 1) * 100, 1),
+            "l52": r2((c[s] / lo52.iloc[-1][s] - 1) * 100, 1),
+            "a20": bool(c[s] > sma[20].iloc[-1][s]) if pd.notna(sma[20].iloc[-1][s]) else None,
+            "a50": bool(c[s] > sma[50].iloc[-1][s]) if pd.notna(sma[50].iloc[-1][s]) else None,
+            "a200": bool(c[s] > sma[200].iloc[-1][s]) if pd.notna(sma[200].iloc[-1][s]) else None,
+            "tt": bool(tt[s]), "st": stage(s),
+            "to": r2(med_to[s], 1), "vr": r2(vr[s], 1),
+            "mc": r2(mcap.get(s), 0) if mcap is not None else None,
+        })
+
+    # ---------------- groups (membership only; maths happens in the browser)
+    def load_groups(path, key):
+        if not path.exists():
+            return {}
+        g = pd.read_csv(path)
+        return {r[key]: [x for x in str(r["Symbols"]).split() if x in set(U)] for _, r in g.iterrows()}
+
+    uset = set(U)
+    groups = {
+        "Themes": load_groups(CFG / "themes.csv", "Theme"),
+        "Sector": {k: [s for s in sec.index[sec == k] if s in uset] for k in sorted(sec.dropna().unique())},
+        "NSE Index": load_groups(CFG / "indices.csv", "Index"),
+    }
+    if len(ind):
+        iu = ind[ind.index.isin(uset)]
+        groups["Industry"] = {k: list(iu.index[iu == k]) for k in sorted(iu.unique())}
+
+    # ---------------- breadth history (current universe)
+    nb = S["breadth_history_days"]
+    dchg = Cu.pct_change(fill_method=None)
+    valid = raw_close[U].notna()
+    hiC = Cu.rolling(252, min_periods=200).max()
+    loC = Cu.rolling(252, min_periods=200).min()
+
+    def pct(mask, base):
+        return (mask.sum(axis=1) / base.sum(axis=1).replace(0, np.nan) * 100)
+
+    b = pd.DataFrame({
+        "a20": pct((Cu > sma[20]) & valid, sma[20].notna() & valid),
+        "a50": pct((Cu > sma[50]) & valid, sma[50].notna() & valid),
+        "a200": pct((Cu > sma[200]) & valid, sma[200].notna() & valid),
+        "adv": ((dchg > 0) & valid).sum(axis=1), "dec": ((dchg < 0) & valid).sum(axis=1),
+        "nh": ((Cu >= hiC) & hiC.notna() & valid).sum(axis=1),
+        "nl": ((Cu <= loC) & loC.notna() & valid).sum(axis=1),
+        "up4": ((dchg >= 0.04) & valid).sum(axis=1), "dn4": ((dchg <= -0.04) & valid).sum(axis=1),
+    }).iloc[-nb:]
+    bench_close = W["close"][bench].reindex(b.index) if bench in W["close"] else pd.Series(np.nan, index=b.index)
+    breadth = {"dates": list(b.index), "bench": [r2(x) for x in bench_close], "bench_name": bench}
+    for col in b.columns:
+        breadth[col] = [r2(x, 1) for x in b[col]] if col in ("a20", "a50", "a200") else [int(x) for x in b[col]]
+
+    indices = {}
+    for name in [bench] + S["extra_indices"]:
+        if name in W["close"]:
+            ci = W["close"][name].ffill()
+            indices[name] = {"px": r2(ci.iloc[-1]),
+                             "r": {k: r2(((ytd_return(ci.to_frame()) if n is None else period_return(ci.to_frame(), n)).iloc[0]) * 100)
+                                   for k, n in PERIODS.items()}}
+
+    # ---------------- scanners
+    def last_k_cross(a, b_, k=3, up=True):
+        cond = (a > b_) & (a.shift(1) <= b_.shift(1)) if up else (a < b_) & (a.shift(1) >= b_.shift(1))
+        return cond.iloc[-k:].any()
+
+    box_top = Hu.iloc[-21:-1].max()
+    box_bot = Lu.iloc[-21:-1].min()
+    prior_hi52 = Cu.iloc[-253:-1].max()
+    dch = dchg.iloc[-1]
+    scans = {
+        "ema_up": list(c.index[last_k_cross(ema20, ema50) & (c > ema20.iloc[-1])]),
+        "ema_down": list(c.index[last_k_cross(ema20, ema50, up=False) & (c < ema20.iloc[-1])]),
+        "vol_spike": list(c.index[(vr >= 3) & (dch >= 0.02)]),
+        "high52": list(c.index[(c > prior_hi52) & (Cu.notna().sum() >= 200)]),
+        "darvas": list(c.index[((box_top / box_bot - 1) <= 0.15) & (c > box_top) & (vr >= 1.5)]),
+        "trend_template": list(c.index[tt]),
+        "leaders": list(c.index[(rs_now >= 90) & (c >= 0.95 * hi52.iloc[-1])]),
+    }
+
+    ist = timezone(timedelta(hours=5, minutes=30))
+    fm = json.loads((CACHE / "fetch_meta.json").read_text()) if (CACHE / "fetch_meta.json").exists() else {}
+    meta = {"asof": last, "generated": datetime.now(ist).strftime("%Y-%m-%d %H:%M IST"),
+            "source": fm.get("source"), "stocks_with_data": len(syms), "universe": len(U),
+            "failed": fm.get("failed_count"), "indices": indices,
+            "filters": {"min_price": S["min_price"], "min_median_turnover_cr": S["min_median_turnover_cr"],
+                        "min_market_cap_cr": S["min_market_cap_cr"] if mcap is not None else None},
+            "min_group_size": S["min_group_size"]}
+
+    def dump(name, obj):
+        (OUT / name).write_text(json.dumps(obj, separators=(",", ":"), allow_nan=False))
+    dump("meta.json", meta)
+    dump("stocks.json", rows)
+    dump("groups.json", groups)
+    dump("breadth.json", breadth)
+    dump("scans.json", {k: sorted(v) for k, v in scans.items()})
+    print("scans: " + ", ".join(f"{k}={len(v)}" for k, v in scans.items()))
+    print(f"breadth today: >50DMA {breadth['a50'][-1]}%  >200DMA {breadth['a200'][-1]}%  "
+          f"A/D {breadth['adv'][-1]}/{breadth['dec'][-1]}")
+
+
+if __name__ == "__main__":
+    main()

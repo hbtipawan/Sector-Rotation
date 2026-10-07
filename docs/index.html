@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PKC Sector Radar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E3E6E9; --panel:#F6F7F8; --ink:#11161B; --muted:#47505A; --rule:#B9C0C7; --track:#D3D8DD;
+  --up:#0B7A3B; --down:#B42318; --sel:#1F4E79; --sel-ink:#fff; --warn:#8A5A00; --focus:#1F4E79;
+  --fs:17px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1B2026; --panel:#252B32; --ink:#F3F5F7; --muted:#B4BCC5; --rule:#3E4650; --track:#323941;
+    --up:#46C978; --down:#FF7B6E; --sel:#7FB2E5; --sel-ink:#0E1823; --warn:#F2C14E; --focus:#7FB2E5; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1B2026; --panel:#252B32; --ink:#F3F5F7; --muted:#B4BCC5; --rule:#3E4650; --track:#323941;
+  --up:#46C978; --down:#FF7B6E; --sel:#7FB2E5; --sel-ink:#0E1823; --warn:#F2C14E; --focus:#7FB2E5; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 var(--fs)/1.45 "IBM Plex Sans",system-ui,sans-serif}
+.num{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-variant-numeric:tabular-nums;font-weight:600}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:14px}
+h1{font-size:30px;line-height:1.1;margin:0;font-weight:700;letter-spacing:-.01em}
+.asof{color:var(--muted);font-size:16px;margin-top:4px}
+.theme-btn{background:var(--panel);border:1.5px solid var(--rule);border-radius:6px;padding:7px 14px;cursor:pointer}
+
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin:0 0 16px}
+.ro{background:var(--panel);border:1.5px solid var(--rule);border-radius:6px;padding:9px 12px}
+.ro .k{font-size:15px;color:var(--muted)}
+.ro .v{font-size:22px}
+
+nav.tabs{display:flex;gap:0;border-bottom:2px solid var(--rule);margin-bottom:16px;overflow-x:auto}
+nav.tabs button{background:none;border:0;padding:12px 18px;font-size:19px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:4px solid transparent;margin-bottom:-2px;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--sel)}
+
+.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:14px}
+.seg{display:inline-flex;border:1.5px solid var(--rule);border-radius:6px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;background:none;padding:8px 13px;cursor:pointer;font-weight:500;border-right:1px solid var(--rule)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);font-weight:600}
+.ctl-label{color:var(--muted);font-size:15px;margin-right:6px}
+
+.panel{background:var(--panel);border:1.5px solid var(--rule);border-radius:8px}
+.note{color:var(--muted);font-size:15px;margin:10px 2px 0}
+
+/* rotation bars — the one bold element */
+.bars{padding:6px 0}
+.brow{display:grid;grid-template-columns:minmax(150px,1.3fr) 2.2fr 90px 64px;align-items:center;gap:12px;padding:7px 16px;cursor:pointer;border-top:1px solid var(--track)}
+.brow:first-child{border-top:0}
+.brow:hover,.brow[aria-expanded="true"]{background:color-mix(in srgb,var(--sel) 9%,transparent)}
+.bname{font-weight:600;font-size:18px;line-height:1.25}
+.bname .cnt{color:var(--muted);font-weight:400;font-size:15px;margin-left:6px}
+.btrack{position:relative;height:26px;background:var(--track);border-radius:3px}
+.btrack .zero{position:absolute;left:50%;top:-4px;bottom:-4px;width:2px;background:var(--ink);opacity:.55}
+.btrack .fill{position:absolute;top:3px;bottom:3px;border-radius:2px}
+.bval{text-align:right;font-size:20px}
+.up{color:var(--up)} .down{color:var(--down)}
+.fill.up{background:var(--up)} .fill.down{background:var(--down)}
+.rk{font-size:15px;text-align:right;color:var(--muted)}
+.rk.gain{color:var(--up)} .rk.loss{color:var(--down)}
+.bsub{grid-column:1/-1;font-size:15px;color:var(--muted);margin-top:-4px}
+.members{grid-column:1/-1;padding:6px 0 10px;cursor:default}
+
+table{border-collapse:collapse;width:100%}
+th,td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--track)}
+th{font-size:15px;color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--panel);cursor:pointer;user-select:none}
+th:first-child,td:first-child,th.l,td.l{text-align:left}
+td.sym a{color:var(--ink);font-weight:700;text-decoration:none;border-bottom:1.5px solid var(--rule)}
+td.sym a:hover{border-bottom-color:var(--sel)}
+td .nm{display:block;font-size:14px;color:var(--muted);font-weight:400;max-width:230px;overflow:hidden;text-overflow:ellipsis}
+.tscroll{overflow-x:auto;max-height:72vh}
+.pill{display:inline-block;padding:1px 8px;border-radius:4px;font-size:14px;font-weight:600;border:1.5px solid currentColor}
+.st2{color:var(--up)} .st4{color:var(--down)} .st1,.st3{color:var(--muted)}
+.more{display:block;margin:12px auto;padding:9px 20px;background:var(--panel);border:1.5px solid var(--rule);border-radius:6px;cursor:pointer;font-weight:600}
+
+.filters{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:12px}
+.filters input[type=search],.filters select{background:var(--panel);border:1.5px solid var(--rule);border-radius:6px;padding:8px 10px;min-width:0}
+.filters input[type=search]{width:220px}
+.filters label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.filters input[type=checkbox]{width:20px;height:20px;accent-color:var(--sel)}
+
+/* breadth */
+.gauges{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.gauge{padding:12px 14px}
+.gauge .k{color:var(--muted);font-size:15px}
+.gauge .v{font-size:34px;line-height:1.15}
+.gauge .d{font-size:15px}
+.gbar{height:10px;background:var(--track);border-radius:2px;margin-top:8px;position:relative}
+.gbar i{position:absolute;inset:0 auto 0 0;background:var(--sel);border-radius:2px}
+.chart{padding:12px 12px 6px;margin-bottom:14px}
+.chart h3{margin:2px 4px 6px;font-size:19px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:15px;color:var(--muted);margin:0 4px 6px}
+.legend span::before{content:"";display:inline-block;width:18px;height:4px;margin-right:6px;vertical-align:middle;background:var(--c)}
+svg text{fill:var(--muted);font:500 13px "IBM Plex Sans",sans-serif}
+
+/* scans */
+.scan{margin-bottom:16px}
+.scan-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;padding:12px 16px 4px}
+.scan-h h3{margin:0;font-size:21px}
+.scan-h .c{font-size:18px}
+.scan-h p{margin:0;color:var(--muted);font-size:15px;flex-basis:100%}
+.empty{padding:14px 16px;color:var(--muted)}
+.err{padding:20px;border:2px solid var(--down);border-radius:8px;background:var(--panel)}
+
+@media (max-width:640px){
+  :root{--fs:16px}
+  h1{font-size:26px}
+  .brow{grid-template-columns:1fr 78px 52px;gap:6px 10px;padding:9px 12px}
+  .btrack{grid-column:1/-1;grid-row:2}
+  .bname{font-size:17px}
+  nav.tabs button{padding:10px 12px;font-size:17px}
+  .filters input[type=search]{width:100%}
+  .gauges{grid-template-columns:1fr 1fr}
+  .seg button{padding:8px 10px}
+  .controls>div{max-width:100%}
+  .gauge .v{font-size:28px}
+}
+@media (prefers-reduced-motion:no-preference){ .fill{transition:width .35s ease, left .35s ease} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>PKC Sector Radar</h1>
+      <div class="asof" id="asof">Loading data…</div>
+    </div>
+    <button class="theme-btn" id="themeBtn" type="button">Switch theme</button>
+  </header>
+  <div class="readouts" id="readouts"></div>
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-v="rot" aria-selected="true">Rotation</button>
+    <button role="tab" data-v="br" aria-selected="false">Breadth</button>
+    <button role="tab" data-v="rs" aria-selected="false">RS ranking</button>
+    <button role="tab" data-v="sc" aria-selected="false">Scanners</button>
+  </nav>
+  <main id="view"></main>
+</div>
+
+<script>
+const PERIODS=["1D","1W","1M","3M","6M","YTD","1Y"];
+const PLABEL={"1D":"Today","1W":"1W","1M":"1M","3M":"3M","6M":"6M","YTD":"YTD","1Y":"1Y"};
+const st={tab:"rot",period:"1M",group:"Themes",agg:"mean",sort:"ret",open:null,
+  rs:{q:"",sec:"",theme:"",min:0,tt:false,s2:false,a50:false,key:"rs",dir:-1,show:100}};
+let D={};
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=(v,d=2,sign=true)=>v==null||!isFinite(v)?"–":(sign&&v>0?"+":"")+v.toFixed(d)+"%";
+const cls=v=>v==null?"":v>0?"up":v<0?"down":"";
+const tv=s=>`https://www.tradingview.com/chart/?symbol=NSE:${encodeURIComponent(s)}`;
+const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+const median=a=>{const b=[...a].sort((x,y)=>x-y),m=b.length>>1;return b.length%2?b[m]:(b[m-1]+b[m])/2};
+function seg(name,opts,cur,labels){
+  return `<div class="seg" role="group" aria-label="${name}">`+opts.map(o=>
+    `<button type="button" data-seg="${name}" data-val="${o}" aria-pressed="${o===cur}">${esc(labels?labels[o]:o)}</button>`).join("")+`</div>`;
+}
+
+/* ---------- data ---------- */
+async function load(){
+  if(window.EMBED){D=window.EMBED;return;}
+  const get=n=>fetch(`data/${n}.json?v=${Date.now()}`).then(r=>{if(!r.ok)throw new Error(n+".json "+r.status);return r.json()});
+  const [meta,stocks,groups,breadth,scans]=await Promise.all(["meta","stocks","groups","breadth","scans"].map(get));
+  D={meta,stocks,groups,breadth,scans};
+}
+function index(){
+  D.by=Object.fromEntries(D.stocks.map(s=>[s.s,s]));
+  D.themesOf={};
+  for(const [t,syms] of Object.entries(D.groups.Themes||{})) for(const s of syms)(D.themesOf[s]=D.themesOf[s]||[]).push(t);
+}
+
+/* ---------- header ---------- */
+function renderHead(){
+  const m=D.meta;
+  $("#asof").textContent=`Prices as of ${m.asof} · updated ${m.generated} · ${m.universe} stocks in universe · source ${m.source==="upstox"?"Upstox":m.source==="yahoo"?"Yahoo (backup)":m.source}`;
+  $("#readouts").innerHTML=Object.entries(m.indices||{}).map(([k,v])=>{
+    const r=v.r[st.period];
+    return `<div class="ro"><div class="k">${esc(k)} · ${PLABEL[st.period]}</div><div class="v num ${cls(r)}">${fmt(r)}</div></div>`;
+  }).join("");
+}
+
+/* ---------- rotation ---------- */
+function groupStats(prev){
+  const g=D.groups[st.group]||{},key=prev?"rp":"r",out=[];
+  for(const [name,syms] of Object.entries(g)){
+    const vals=syms.map(s=>D.by[s]?.[key]?.[st.period]).filter(v=>v!=null&&isFinite(v));
+    if(vals.length<(D.meta.min_group_size||3))continue;
+    const live=syms.filter(s=>D.by[s]);
+    const a50=live.filter(s=>D.by[s].a50!=null);
+    out.push({name,n:vals.length,v:st.agg==="mean"?mean(vals):median(vals),
+      adv:vals.filter(v=>v>0).length/vals.length*100,
+      br:a50.length?a50.filter(s=>D.by[s].a50).length/a50.length*100:null,syms:live});
+  }
+  return out;
+}
+function renderRot(){
+  const now=groupStats(false),prev=groupStats(true);
+  const prank={};[...prev].sort((a,b)=>b.v-a.v).forEach((g,i)=>prank[g.name]=i+1);
+  const ranked=[...now].sort((a,b)=>b.v-a.v);ranked.forEach((g,i)=>g.rank=i+1);
+  let rows=ranked;
+  if(st.sort==="name")rows=[...now].sort((a,b)=>a.name.localeCompare(b.name));
+  if(st.sort==="br")rows=[...now].sort((a,b)=>(b.br??-1)-(a.br??-1));
+  const mx=Math.max(1,...now.map(g=>Math.abs(g.v)));
+  const showRank=st.period!=="1D";
+  let h=`<div class="controls">
+    <div><span class="ctl-label">Period</span>${seg("period",PERIODS,st.period,PLABEL)}</div>
+    <div><span class="ctl-label">Group by</span>${seg("group",Object.keys(D.groups),st.group)}</div>
+    <div><span class="ctl-label">Average</span>${seg("agg",["mean","median"],st.agg,{mean:"Mean",median:"Median"})}</div>
+    <div><span class="ctl-label">Sort</span>${seg("sort",["ret","br","name"],st.sort,{ret:"Return",br:"Breadth",name:"A–Z"})}</div>
+  </div><div class="panel bars">`;
+  if(!rows.length)h+=`<div class="empty">No group has ${D.meta.min_group_size}+ stocks with data for this period.</div>`;
+  for(const g of rows){
+    const w=Math.abs(g.v)/mx*50,left=g.v>=0?50:50-w;
+    const pr=prank[g.name],dr=pr?pr-g.rank:0;
+    const rk=!showRank||!pr?"":dr>0?`<span class="rk gain" title="Rank 1 week ago: ${pr}">▲${dr}</span>`:dr<0?`<span class="rk loss" title="Rank 1 week ago: ${pr}">▼${-dr}</span>`:`<span class="rk" title="Rank unchanged">=</span>`;
+    const open=st.open===g.name;
+    h+=`<div class="brow" tabindex="0" role="button" aria-expanded="${open}" data-g="${esc(g.name)}">
+      <div class="bname">${esc(g.name)}<span class="cnt">${g.n}</span></div>
+      <div class="btrack"><div class="zero"></div><div class="fill ${cls(g.v)}" style="left:${left}%;width:${w}%"></div></div>
+      <div class="bval num ${cls(g.v)}">${fmt(g.v)}</div>${rk||"<span></span>"}
+      ${open?`<div class="bsub">${g.adv.toFixed(0)}% of stocks up over ${PLABEL[st.period]} · ${g.br==null?"–":g.br.toFixed(0)+"%"} above 50 DMA</div><div class="members">${memberTable(g.syms)}</div>`:""}
+    </div>`;
+  }
+  h+=`</div><p class="note">Bars are the ${st.agg} return of the stocks in each group. Arrows show rank change against the same calculation one week ago. Click a group to see its stocks.</p>`;
+  $("#view").innerHTML=h;
+}
+function memberTable(syms){
+  const rows=syms.map(s=>D.by[s]).sort((a,b)=>(b.r[st.period]??-999)-(a.r[st.period]??-999));
+  return `<div class="tscroll"><table><thead><tr><th class="l">Stock</th><th>${PLABEL[st.period]}</th><th>Price</th><th>RS</th><th>From 52W high</th><th>Stage</th><th>Vol ×</th></tr></thead><tbody>`+
+  rows.map(x=>`<tr><td class="sym"><a href="${tv(x.s)}" target="_blank" rel="noopener">${esc(x.s)}</a><span class="nm">${esc(x.n)}</span></td>
+    <td class="num ${cls(x.r[st.period])}">${fmt(x.r[st.period])}</td><td class="num">${x.px?.toLocaleString("en-IN")}</td>
+    <td class="num">${x.rs??"–"}</td><td class="num ${cls(x.h52)}">${fmt(x.h52,1)}</td><td>${stagePill(x.st)}</td><td class="num">${x.vr==null?"–":x.vr.toFixed(1)}</td></tr>`).join("")+
+  `</tbody></table></div>`;
+}
+const secOf=x=>x.ind||x.sec||"–";
+function stagePill(s){return s?`<span class="pill st${s}">${s===2?"Stage 2":s===4?"Stage 4":s===1?"Base":"Top/basing"}</span>`:"–"}
+
+/* ---------- breadth ---------- */
+function lineChart(series,opts){
+  const W=1000,H=opts.h||300,pl=44,pr=opts.right?58:14,pt=12,pb=28;
+  const n=D.breadth.dates.length,x=i=>pl+i*(W-pl-pr)/(n-1);
+  const y=(v,lo,hi)=>pt+(1-(v-lo)/(hi-lo))*(H-pt-pb);
+  let g="";
+  for(const t of opts.ticks){g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(t,opts.lo,opts.hi)}" y2="${y(t,opts.lo,opts.hi)}" stroke="var(--track)" stroke-width="${t===opts.mid?2:1}"/><text x="${pl-6}" y="${y(t,opts.lo,opts.hi)+4}" text-anchor="end">${t}${opts.unit||""}</text>`}
+  const step=Math.ceil(n/6);
+  for(let i=0;i<n;i+=step)g+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle">${D.breadth.dates[i].slice(2,7)}</text>`;
+  for(const s of series){
+    const lo=s.lo??opts.lo,hi=s.hi??opts.hi;
+    if(s.bars){const bw=Math.max(1,(W-pl-pr)/n-1),y0=y(0,lo,hi);
+      s.data.forEach((v,i)=>{if(v==null)return;const yy=y(v,lo,hi);g+=`<rect x="${x(i)-bw/2}" y="${Math.min(yy,y0)}" width="${bw}" height="${Math.abs(yy-y0)}" fill="${v>=0?"var(--up)":"var(--down)"}"/>`});continue;}
+    const pts=s.data.map((v,i)=>v==null?null:`${x(i).toFixed(1)},${y(v,lo,hi).toFixed(1)}`).filter(Boolean).join(" ");
+    g+=`<polyline points="${pts}" fill="none" stroke="${s.c}" stroke-width="${s.w||2.5}" ${s.dash?'stroke-dasharray="6 5"':""} stroke-linejoin="round"/>`;
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(opts.label)}">${g}</svg>`;
+}
+function renderBr(){
+  const b=D.breadth,L=b.dates.length-1,P=Math.max(0,L-5);
+  const tile=(k,lab)=>{const v=b[k][L],d=v-b[k][P];
+    return `<div class="panel gauge"><div class="k">${lab}</div><div class="v num">${v.toFixed(1)}%</div>
+    <div class="d num ${cls(d)}">${d>0?"+":""}${d.toFixed(1)} pts vs 1W ago</div><div class="gbar"><i style="width:${v}%"></i></div></div>`};
+  const sum=k=>b[k].slice(-5).reduce((x,y)=>x+y,0);
+  let h=`<div class="gauges">${tile("a20","Above 20 DMA")}${tile("a50","Above 50 DMA")}${tile("a200","Above 200 DMA")}
+    <div class="panel gauge"><div class="k">Advance / decline today</div><div class="v num"><span class="up">${b.adv[L]}</span> / <span class="down">${b.dec[L]}</span></div>
+      <div class="d">Ratio ${(b.adv[L]/Math.max(1,b.dec[L])).toFixed(2)} · 5-day ${sum("adv")} / ${sum("dec")}</div></div>
+    <div class="panel gauge"><div class="k">52W highs / lows today</div><div class="v num"><span class="up">${b.nh[L]}</span> / <span class="down">${b.nl[L]}</span></div>
+      <div class="d">5-day ${sum("nh")} / ${sum("nl")}</div></div>
+    <div class="panel gauge"><div class="k">Up 4%+ / down 4%+ today</div><div class="v num"><span class="up">${b.up4[L]}</span> / <span class="down">${b.dn4[L]}</span></div>
+      <div class="d">5-day ${sum("up4")} / ${sum("dn4")}</div></div></div>`;
+  const bv=b.bench.filter(v=>v!=null),blo=Math.min(...bv),bhi=Math.max(...bv);
+  h+=`<div class="panel chart"><h3>Share of stocks above moving averages</h3>
+    <div class="legend"><span style="--c:var(--sel)">Above 50 DMA</span><span style="--c:var(--warn)">Above 200 DMA</span><span style="--c:var(--muted)">${esc(b.bench_name)} (scaled, dashed)</span></div>
+    ${lineChart([{data:b.bench,c:"var(--muted)",lo:blo-(bhi-blo)*.05,hi:bhi+(bhi-blo)*.05,dash:1,w:2},{data:b.a50,c:"var(--sel)"},{data:b.a200,c:"var(--warn)"}],
+      {lo:0,hi:100,ticks:[0,20,50,80,100],mid:50,unit:"%",label:"Percent of stocks above 50 and 200 day moving averages"})}</div>`;
+  const net=b.nh.map((v,i)=>v-b.nl[i]),nlo=Math.min(0,...net),nhi=Math.max(1,...net);
+  const tk=[nlo,0,nhi].map(Math.round).filter((v,i,a)=>a.indexOf(v)===i);
+  h+=`<div class="panel chart"><h3>Net new 52-week highs (highs minus lows)</h3>
+    ${lineChart([{data:net,bars:1}],{lo:nlo,hi:nhi,ticks:tk,mid:0,label:"Net new 52 week highs per day",h:220})}</div>`;
+  const last=[];for(let i=L;i>=Math.max(0,L-14);i--)last.push(i);
+  h+=`<div class="panel"><div class="tscroll"><table><thead><tr><th class="l">Date</th><th>&gt;20 DMA</th><th>&gt;50 DMA</th><th>&gt;200 DMA</th><th>Adv</th><th>Dec</th><th>Highs</th><th>Lows</th><th>Up 4%</th><th>Down 4%</th><th>${esc(b.bench_name)}</th></tr></thead><tbody>`+
+    last.map(i=>`<tr><td class="l">${b.dates[i]}</td><td class="num">${b.a20[i]}%</td><td class="num">${b.a50[i]}%</td><td class="num">${b.a200[i]}%</td>
+    <td class="num up">${b.adv[i]}</td><td class="num down">${b.dec[i]}</td><td class="num up">${b.nh[i]}</td><td class="num down">${b.nl[i]}</td>
+    <td class="num up">${b.up4[i]}</td><td class="num down">${b.dn4[i]}</td><td class="num">${b.bench[i]?.toLocaleString("en-IN")??"–"}</td></tr>`).join("")+`</tbody></table></div></div>
+    <p class="note">Breadth uses today's ${D.meta.universe}-stock universe across the whole history, so stocks that left the list earlier are not counted.</p>`;
+  $("#view").innerHTML=h;
+}
+
+/* ---------- RS ranking ---------- */
+const RSCOLS=[["s","Stock","l"],["rs","RS"],["drs","RS Δ1W"],["px","Price"],["r.1D","1D"],["r.1W","1W"],["r.1M","1M"],["r.3M","3M"],["r.6M","6M"],["r.1Y","1Y"],
+  ["h52","From 52W high"],["st","Stage"],["vr","Vol ×"],["to","Turnover ₹Cr"],["sec","Sector / industry","l"]];
+const val=(x,k)=>k==="drs"?(x.rs!=null&&x.rs1w!=null?x.rs-x.rs1w:null):k.startsWith("r.")?x.r[k.slice(2)]:x[k];
+function rsRows(){
+  const f=st.rs,q=f.q.trim().toUpperCase();
+  let a=D.stocks.filter(x=>(!q||x.s.includes(q)||x.n.toUpperCase().includes(q))&&(!f.sec||x.sec===f.sec||x.ind===f.sec)
+    &&(!f.theme||(D.themesOf[x.s]||[]).includes(f.theme))&&(x.rs??0)>=f.min&&(!f.tt||x.tt)&&(!f.s2||x.st===2)&&(!f.a50||x.a50));
+  a.sort((p,q)=>{const A=val(p,f.key),B=val(q,f.key);if(A==null)return 1;if(B==null)return -1;
+    return typeof A==="string"?f.dir*A.localeCompare(B):f.dir*(A-B)});
+  return a;
+}
+function renderRs(){
+  const f=st.rs,secs=[...new Set(D.stocks.flatMap(x=>[x.sec,x.ind]).filter(Boolean))].sort(),ths=Object.keys(D.groups.Themes||{}).sort();
+  const opt=(arr,cur)=>arr.map(o=>`<option ${o===cur?"selected":""}>${esc(o)}</option>`).join("");
+  $("#view").innerHTML=`<div class="filters">
+    <input type="search" id="q" placeholder="Search symbol or name" value="${esc(f.q)}" aria-label="Search stocks">
+    <select id="fsec" aria-label="Sector"><option value="">All sectors and industries</option>${opt(secs,f.sec)}</select>
+    <select id="fth" aria-label="Theme"><option value="">All themes</option>${opt(ths,f.theme)}</select>
+    <select id="fmin" aria-label="Minimum RS">${[0,50,70,80,90].map(v=>`<option value="${v}" ${v==f.min?"selected":""}>${v?"RS ≥ "+v:"Any RS"}</option>`).join("")}</select>
+    <label><input type="checkbox" id="ftt" ${f.tt?"checked":""}>Trend template</label>
+    <label><input type="checkbox" id="fs2" ${f.s2?"checked":""}>Stage 2</label>
+    <label><input type="checkbox" id="fa50" ${f.a50?"checked":""}>Above 50 DMA</label>
+  </div><div class="panel" id="rsTable"></div>
+  <p class="note">RS is a 1–99 percentile of weighted 3/6/9/12-month performance (40% on the latest quarter). Trend template is Minervini's 8 conditions with RS ≥ 70. Click a column to sort; click a symbol to open its TradingView chart.</p>`;
+  const bind=(id,k,fn=v=>v)=>$(id).addEventListener(id==="#q"?"input":"change",e=>{f[k]=fn(e.target.type==="checkbox"?e.target.checked:e.target.value);f.show=100;drawRs()});
+  bind("#q","q");bind("#fsec","sec");bind("#fth","theme");bind("#fmin","min",Number);bind("#ftt","tt");bind("#fs2","s2");bind("#fa50","a50");
+  drawRs();
+}
+function drawRs(){
+  const f=st.rs,rows=rsRows(),vis=rows.slice(0,f.show);
+  const ar=k=>f.key===k?(f.dir<0?" ▼":" ▲"):"";
+  let h=`<div class="tscroll"><table><thead><tr>${RSCOLS.map(([k,l,c])=>`<th class="${c||""}" data-k="${k}" tabindex="0" aria-sort="${f.key===k?(f.dir<0?"descending":"ascending"):"none"}">${l}${ar(k)}</th>`).join("")}</tr></thead><tbody>`;
+  h+=vis.map(x=>{const d=val(x,"drs");return `<tr><td class="sym"><a href="${tv(x.s)}" target="_blank" rel="noopener">${esc(x.s)}</a><span class="nm">${esc(x.n)}</span></td>
+    <td class="num">${x.rs??"–"}</td><td class="num ${cls(d)}">${d==null?"–":(d>0?"+":"")+d}</td><td class="num">${x.px?.toLocaleString("en-IN")}</td>
+    ${["1D","1W","1M","3M","6M","1Y"].map(p=>`<td class="num ${cls(x.r[p])}">${fmt(x.r[p],1)}</td>`).join("")}
+    <td class="num">${fmt(x.h52,1)}</td><td>${stagePill(x.st)}</td><td class="num">${x.vr==null?"–":x.vr.toFixed(1)}</td><td class="num">${x.to??"–"}</td>
+    <td class="l">${esc(secOf(x))}</td></tr>`}).join("");
+  h+=`</tbody></table></div>`;
+  if(!rows.length)h+=`<div class="empty">No stocks match these filters. Loosen the RS minimum or clear a checkbox.</div>`;
+  if(rows.length>f.show)h+=`<button class="more" id="more" type="button">Show ${Math.min(100,rows.length-f.show)} more of ${rows.length-f.show} remaining</button>`;
+  else if(rows.length)h+=`<p class="note" style="padding:0 12px 10px">${rows.length} stocks</p>`;
+  $("#rsTable").innerHTML=h;
+  $("#rsTable").querySelectorAll("th").forEach(th=>{const go=()=>{const k=th.dataset.k;f.dir=f.key===k?-f.dir:(k==="s"||k==="sec"?1:-1);f.key=k;drawRs()};
+    th.addEventListener("click",go);th.addEventListener("keydown",e=>{if(e.key==="Enter")go()})});
+  $("#more")?.addEventListener("click",()=>{f.show+=100;drawRs()});
+}
+
+/* ---------- scanners ---------- */
+const SCANS=[
+  ["high52","New 52-week closing high","Closed above the highest close of the previous 252 sessions."],
+  ["darvas","Darvas box breakout","20-day range no wider than 15%, closed above the box top on 1.5× average volume."],
+  ["vol_spike","Volume spike up","Volume at least 3× the 50-day average and price up 2% or more today."],
+  ["ema_up","20 EMA crossed above 50 EMA","Bullish crossover in the last 3 sessions, price above the 20 EMA."],
+  ["leaders","Leaders near highs","RS 90 or above and within 5% of the 52-week high."],
+  ["trend_template","Trend template","Passes all 8 Minervini trend conditions with RS ≥ 70."],
+  ["ema_down","20 EMA crossed below 50 EMA","Bearish crossover in the last 3 sessions, price below the 20 EMA. Use as an exit check on holdings."],
+];
+function renderSc(){
+  let h="";
+  for(const [k,t,d] of SCANS){
+    const rows=(D.scans[k]||[]).map(s=>D.by[s]).filter(Boolean).sort((a,b)=>(b.rs??0)-(a.rs??0));
+    h+=`<section class="panel scan"><div class="scan-h"><h3>${t}</h3><span class="c num">${rows.length} stocks</span><p>${d}</p></div>`;
+    h+=rows.length?`<div class="tscroll" style="max-height:420px"><table><thead><tr><th class="l">Stock</th><th class="l">Sector</th><th>Price</th><th>1D</th><th>1M</th><th>Vol ×</th><th>RS</th><th>From 52W high</th><th class="l">Themes</th></tr></thead><tbody>`+
+      rows.map(x=>`<tr><td class="sym"><a href="${tv(x.s)}" target="_blank" rel="noopener">${esc(x.s)}</a><span class="nm">${esc(x.n)}</span></td><td class="l">${esc(secOf(x))}</td>
+      <td class="num">${x.px?.toLocaleString("en-IN")}</td><td class="num ${cls(x.r["1D"])}">${fmt(x.r["1D"],1)}</td><td class="num ${cls(x.r["1M"])}">${fmt(x.r["1M"],1)}</td>
+      <td class="num">${x.vr==null?"–":x.vr.toFixed(1)}</td><td class="num">${x.rs??"–"}</td><td class="num">${fmt(x.h52,1)}</td><td class="l">${esc((D.themesOf[x.s]||[]).join(", ")||"–")}</td></tr>`).join("")+`</tbody></table></div>`
+      :`<div class="empty">No stocks triggered today.</div>`;
+    h+=`</section>`;
+  }
+  $("#view").innerHTML=h;
+}
+
+/* ---------- wiring ---------- */
+function render(){renderHead();({rot:renderRot,br:renderBr,rs:renderRs,sc:renderSc})[st.tab]()}
+$("#tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;st.tab=b.dataset.v;
+  document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));render()});
+$("#view").addEventListener("click",e=>{
+  const s=e.target.closest("[data-seg]");
+  if(s){st[s.dataset.seg]=s.dataset.val;if(s.dataset.seg==="group")st.open=null;render();return;}
+  if(e.target.closest(".members"))return;
+  const r=e.target.closest(".brow");if(r){st.open=st.open===r.dataset.g?null:r.dataset.g;renderRot();}
+});
+$("#view").addEventListener("keydown",e=>{const r=e.target.closest?.(".brow");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();st.open=st.open===r.dataset.g?null:r.dataset.g;renderRot();
+  document.querySelector(`.brow[data-g="${CSS.escape(r.dataset.g)}"]`)?.focus()}});
+$("#themeBtn").addEventListener("click",()=>{const d=document.documentElement,cur=d.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  d.dataset.theme=cur==="dark"?"light":"dark";try{localStorage.setItem("radar-theme",d.dataset.theme)}catch(e){}});
+try{const t=localStorage.getItem("radar-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+
+load().then(()=>{index();render()}).catch(err=>{
+  $("#asof").textContent="";
+  $("#view").innerHTML=`<div class="err"><b>Data files could not be loaded.</b><br>${esc(err.message)}. The daily job may not have run yet. Open the Actions tab on GitHub, run “Daily update” once, then reload this page.</div>`;
+});
+</script>
+</body>
+</html>
