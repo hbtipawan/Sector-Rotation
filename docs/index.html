@@ -397,7 +397,7 @@ function renderSc(){
 }
 
 /* ---------- VPCI screener (Pawan's Streamlit app, precomputed nightly) ---------- */
-const VP={mode:"completed",tab:"fresh",cache:{},rot:null,sort:{},show:{}};
+const VP={mode:"completed",prorate:true,tab:"fresh",cache:{},rot:null,sort:{},show:{}};
 const VTABS=[["fresh","🔥 Fresh Signals"],["buy","★ Buyable (7/7)"],["watch","◉ Watchlist (6/7)"],["all","All Results"],
   ["rank","🏆 Ranked"],["g4","🎯 G4 Pending"],["young","🌱 New Listings"],["sect","🏭 Sector Leadership"],["rotn","📈 Sector Rotation"]];
 async function vpLoad(mode){
@@ -444,14 +444,17 @@ function uiCols(rows){ // app.py: Market Cap moved right after Company Name
   let c=rows.length?Object.keys(rows[0]):[];if(c.includes("Market Cap")){c=c.filter(x=>x!=="Market Cap");const i=c.includes("Company Name")?c.indexOf("Company Name")+1:c.indexOf("symbol")+1;c.splice(i,0,"Market Cap")}return c}
 async function renderVp(){
   const v=$("#view");
+  const file=VP.mode==="running"&&!VP.prorate?"running_raw":VP.mode;
   v.innerHTML=`<div class="vbar"><div><span class="ctl-label">Weekly candle</span>${seg("vpmode",["completed","running"],VP.mode,{completed:"Completed weeks (app default after close)",running:"Running week, live candle"})}</div>
+    ${VP.mode==="running"?`<div><span class="ctl-label">Pro-rate partial-week volume</span>${seg("vpprorate",["on","off"],VP.prorate?"on":"off",{on:"On",off:"Off"})}</div>`:""}
     <a href="https://pkcvpc.streamlit.app/" target="_blank" rel="noopener">Open the live Streamlit app ↗</a></div><div id="vpBody"><div class="empty">Loading scan…</div></div>`;
-  let d;try{d=await vpLoad(VP.mode)}catch(e){$("#vpBody").innerHTML=`<div class="err"><b>VPCI results are not available yet.</b><br>${esc(e.message)}. They are created by the evening job; run “Daily update” once from the Actions tab.</div>`;return}
+  let d;try{d=await vpLoad(file)}catch(e){$("#vpBody").innerHTML=`<div class="err"><b>VPCI results are not available yet.</b><br>${esc(e.message)}. They are created by the evening job; run “Daily update” once from the Actions tab.</div>`;return}
   const res=toObjs(d.results),yng=toObjs(d.young),failed=d.failed||[];
   const buyN=res.filter(r=>r.full_entry).length;
   let h="";
   if(!d.live&&d.bar_week&&d.bar_week.unfinished)h+=`<div class="warnbox">ℹ️ As in your app, this mode uses Upstox's weekly candle, which already contains this unfinished week. The engine keeps that bar for stocks whose week-so-far volume is at least 25% of last week's (most stocks by mid-week), without pro-rating the volume. Quieter stocks fall back to last week's completed bar.</div>`;
-  if(d.live)h+=`<div class="warnbox">⚠️ Signals on the running week are <b>provisional</b> — they can flip before Friday's close. Weigh them by the <code>week_confidence</code> column. Partial-week volume is pro-rated to a full week.</div>`;
+  if(d.live)h+=`<div class="warnbox">⚠️ Signals on the running week are <b>provisional</b> — they can and do flip before Friday's close. Weigh them by the <code>week_confidence</code> column.</div>`;
+  if(d.live&&d.project_volume===false)h+=`<div class="err" style="margin-bottom:12px">🚨 <b>Pro-rate is OFF.</b> The running week holds only part of a week's volume, so <code>VM = SMA_V(5)/SMA_V(20)</code> and <code>VPR</code> collapse, VPCI goes negative, <b>G5 fails and your 7/7 count will crater</b>. This is arithmetic, not signal. Turn it ON unless you are deliberately inspecting raw volume.</div>`;
   h+=`<p class="caption">Scan run ${esc(d.scan_time)} on ${esc(d.universe_file)} · latest weekly bar: ${d.bar_week?`week of ${esc(d.bar_week.monday)} to ${esc(d.bar_week.friday)}${d.bar_week.unfinished?" (week not finished yet)":""}`:esc(d.week_ending||"–")} · settings: Upstox → Yahoo, relaxed mode off.</p>
   <div class="metrics">
     <div class="panel metric"><div class="k">Total Symbols Analyzed</div><div class="v num">${d.total}</div></div>
@@ -517,7 +520,7 @@ async function vpTab(d,res,yng){
   box.innerHTML=h;
   box.querySelectorAll("th[data-k]").forEach(th=>{const tid=th.closest("table").dataset.tid;const go=()=>{const k=th.dataset.k,s=VP.sort[tid];VP.sort[tid]={k,d:s&&s.k===k?-s.d:-1};vpTab(d,res,yng)};th.addEventListener("click",go);th.addEventListener("keydown",e=>{if(e.key==="Enter")go()})});
   box.querySelectorAll("[data-more]").forEach(b=>b.addEventListener("click",()=>{VP.show[b.dataset.more]=(VP.show[b.dataset.more]||100)+100;vpTab(d,res,yng)}));
-  box.querySelectorAll("[data-dl]").forEach(b=>b.addEventListener("click",()=>{const blob=new Blob([csvOf(b.dataset.dl)],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`vpci_${VP.mode}_${b.dataset.dl}_${(d.scan_time||"").slice(0,10)}.csv`;document.body.appendChild(a);a.click();a.remove()}));
+  box.querySelectorAll("[data-dl]").forEach(b=>b.addEventListener("click",()=>{const blob=new Blob([csvOf(b.dataset.dl)],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`vpci_${d.mode}_${b.dataset.dl}_${(d.scan_time||"").slice(0,10)}.csv`;document.body.appendChild(a);a.click();a.remove()}));
 }
 
 /* ---------- wiring ---------- */
@@ -527,8 +530,9 @@ $("#tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b
 $("#view").addEventListener("click",e=>{
   const s=e.target.closest("[data-seg]");
   if(s&&s.dataset.seg==="vpmode"){VP.mode=s.dataset.val;VP.sort={};VP.show={};renderVp();return;}
+  if(s&&s.dataset.seg==="vpprorate"){VP.prorate=s.dataset.val==="on";VP.sort={};VP.show={};renderVp();return;}
   if(s){st[s.dataset.seg]=s.dataset.val;if(s.dataset.seg==="group")st.open=null;render();return;}
-  const vt=e.target.closest("[data-vtab]");if(vt){VP.tab=vt.dataset.vtab;document.querySelectorAll("[data-vtab]").forEach(b=>b.setAttribute("aria-pressed",b===vt));vpLoad(VP.mode).then(d=>vpTab(d,toObjs(d.results),toObjs(d.young)));return;}
+  const vt=e.target.closest("[data-vtab]");if(vt){VP.tab=vt.dataset.vtab;document.querySelectorAll("[data-vtab]").forEach(b=>b.setAttribute("aria-pressed",b===vt));vpLoad(VP.mode==="running"&&!VP.prorate?"running_raw":VP.mode).then(d=>vpTab(d,toObjs(d.results),toObjs(d.young)));return;}
   if(e.target.closest("#vpBody"))return;
   if(e.target.closest(".members"))return;
   const r=e.target.closest(".brow");if(r){st.open=st.open===r.dataset.g?null:r.dataset.g;renderRot();}
