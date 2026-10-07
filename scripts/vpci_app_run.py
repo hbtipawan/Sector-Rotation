@@ -157,6 +157,18 @@ def enrich(df_sorted, mcap_dict, upath):
     return df_sorted
 
 
+def with_sector(df, sector_map):
+    """Display-only: add Sector / Industry from Stock_List.csv to each result row."""
+    if sector_map is None or sector_map.empty or "symbol" not in df:
+        return df
+    m = sector_map.set_index("symbol")
+    out = df.copy()
+    key = out["symbol"].astype(str).str.strip().str.upper()
+    out["Sector"] = key.map(m["sector"]).fillna("")
+    out["Industry"] = key.map(m["industry"]).fillna("")
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=0)
@@ -219,7 +231,7 @@ def main():
                 "bar_week": bar_week(df, mode.startswith("running")),
                 "source_counts": df["source"].value_counts().to_dict() if "source" in df else {},
                 "exchange_counts": df["exchange"].value_counts().to_dict() if "exchange" in df else {},
-                "results": split(df),
+                "results": split(with_sector(df, sector_map)),
                 "young": split(young.sort_values(["accumulating", "vpci"], ascending=[False, False])
                                if len(young) else young),
                 "ranked": split(ranked), "g4": split(g4),

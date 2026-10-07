@@ -20,6 +20,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+import scanners as SC
+
 ROOT = Path(__file__).resolve().parents[1]
 CACHE, CFG, OUT = ROOT / "cache", ROOT / "config", ROOT / "docs" / "data"
 S = json.loads((CFG / "settings.json").read_text())
@@ -117,6 +119,7 @@ def main():
     print(f"{len(syms)} stocks with data -> {len(U)} pass filters (as of {last})")
 
     Cu, Hu, Lu, Vu = C[U], H[U], L[U], V[U]
+    Ou = W["open"][syms][U].fillna(C[U])
 
     # ---------------- indicators
     sma = {n: Cu.rolling(n, min_periods=n).mean() for n in (20, 50, 150, 200)}
@@ -219,24 +222,16 @@ def main():
                              "r": {k: r2(((ytd_return(ci.to_frame()) if n is None else period_return(ci.to_frame(), n)).iloc[0]) * 100)
                                    for k, n in PERIODS.items()}}
 
-    # ---------------- scanners
-    def last_k_cross(a, b_, k=3, up=True):
-        cond = (a > b_) & (a.shift(1) <= b_.shift(1)) if up else (a < b_) & (a.shift(1) >= b_.shift(1))
-        return cond.iloc[-k:].any()
-
-    box_top = Hu.iloc[-21:-1].max()
-    box_bot = Lu.iloc[-21:-1].min()
-    prior_hi52 = Cu.iloc[-253:-1].max()
-    dch = dchg.iloc[-1]
-    scans = {
-        "ema_up": list(c.index[last_k_cross(ema20, ema50) & (c > ema20.iloc[-1])]),
-        "ema_down": list(c.index[last_k_cross(ema20, ema50, up=False) & (c < ema20.iloc[-1])]),
-        "vol_spike": list(c.index[(vr >= 3) & (dch >= 0.02)]),
-        "high52": list(c.index[(c > prior_hi52) & (Cu.notna().sum() >= 200)]),
-        "darvas": list(c.index[((box_top / box_bot - 1) <= 0.15) & (c > box_top) & (vr >= 1.5)]),
-        "trend_template": list(c.index[tt]),
-        "leaders": list(c.index[(rs_now >= 90) & (c >= 0.95 * hi52.iloc[-1])]),
-    }
+    # ---------------- scanners (library in scanners.py)
+    bench_s = W["close"][bench].reindex(Cu.index).ffill() if bench in W["close"] else Cu.mean(axis=1)
+    sc_meta, sc_hits, sc_metric, per_stock = SC.run_all({
+        "O": Ou, "H": Hu, "L": Lu, "C": Cu, "V": Vu, "bench": bench_s, "sma": sma,
+        "ema20": ema20, "ema50": ema50, "rs_now": rs_now, "rs_prev": rs_prev.reindex(U),
+        "hi52": hi52, "lo52": lo52, "avgv50": avgv50, "vr": vr, "tt": tt})
+    for r in rows:
+        for k, ser in per_stock.items():
+            r[k] = r2(ser.get(r["s"]), 1)
+    scans = {"cats": SC.CATS, "meta": sc_meta, "hits": sc_hits, "metric": sc_metric}
 
     ist = timezone(timedelta(hours=5, minutes=30))
     fm = json.loads((CACHE / "fetch_meta.json").read_text()) if (CACHE / "fetch_meta.json").exists() else {}
@@ -253,8 +248,8 @@ def main():
     dump("stocks.json", rows)
     dump("groups.json", groups)
     dump("breadth.json", breadth)
-    dump("scans.json", {k: sorted(v) for k, v in scans.items()})
-    print("scans: " + ", ".join(f"{k}={len(v)}" for k, v in scans.items()))
+    dump("scans.json", scans)
+    print("scans: " + ", ".join(f"{k}={len(v)}" for k, v in scans["hits"].items()))
     print(f"breadth today: >50DMA {breadth['a50'][-1]}%  >200DMA {breadth['a200'][-1]}%  "
           f"A/D {breadth['adv'][-1]}/{breadth['dec'][-1]}")
 
