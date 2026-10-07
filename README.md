@@ -5,7 +5,7 @@ A free, ScreeningMantis-style dashboard for NSE stocks:
 - **Rotation** – theme / sector / NSE-index returns for Today, 1W, 1M, 3M, 6M, YTD, 1Y, with mean or median, rank change vs last week, and a click-through list of the stocks in each group.
 - **Breadth** – % of stocks above 20/50/200 DMA, advance/decline, 52-week highs/lows, 4% movers, one year of history.
 - **RS ranking** – every stock ranked 1–99 by relative strength, filterable by sector, theme, Stage 2, Minervini trend template.
-- **Scanners** – 52-week closing highs, Darvas box breakouts, volume spikes, 20/50 EMA crossovers, leaders near highs, trend template.
+- **Scanners** – 36 scans in 7 groups (`scripts/scanners.py`): 4% breakout day, momentum burst, gap-up, RS jump, 52-week / 2-year highs, Darvas, Bollinger and Stage-2 breakouts, VCP, volume spike, pocket pivot, dry-up, Minervini trend template, golden cross, EMA crossovers, 20 EMA / 50 DMA pullbacks, Supertrend flip, ADX, NR7, inside day, RSI, MACD, squeeze, RS-line leaders, and weakness scans.
 - **VPCI Screener** – your Streamlit screener (`vpci/` folder, files unchanged) run every evening: Fresh Signals, Buyable, Watchlist, All Results, Ranked, G4 Pending, New Listings, Sector Leadership, Sector Rotation — for both completed weeks and the running week.
 
 **No broker login, no API key, no password.** Prices come from Upstox's public historical-candle service, which answers without an account. Today's candle is added from NSE's official bhavcopy. Yahoo Finance is wired in as a backup.
