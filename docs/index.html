@@ -2,550 +2,824 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>PKC Sector Radar</title>
+<meta name="theme-color" content="#10233D">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* Layout: navy market band (brand + pulse hero) on top, sticky tab bar (bottom bar on phones),
+   white working cards on a cool-grey desk. One accent (marigold) marks the active place. */
 :root{
-  --bg:#E3E6E9; --panel:#F6F7F8; --ink:#11161B; --muted:#47505A; --rule:#B9C0C7; --track:#D3D8DD;
-  --up:#0B7A3B; --down:#B42318; --sel:#1F4E79; --sel-ink:#fff; --warn:#8A5A00; --focus:#1F4E79;
-  --fs:17px;
+  --desk:#EEF1F5; --card:#FFFFFF; --soft:#F5F7FA; --ink:#0F1A2A; --muted:#4D5868; --line:#D6DCE4; --track:#E4E9EF;
+  --band:#10233D; --band2:#183253; --band-ink:#FFFFFF; --band-muted:#B9C6D8; --band-line:#2B4468;
+  --accent:#E3A13A; --accent-ink:#8A5A00;
+  --sel:#10233D; --sel-ink:#FFFFFF;
+  --up:#0E8A6E; --down:#D4462C; --up-t:#0B6E58; --down-t:#B33A22;
+  --s1:#1F5FAE; --s2:#C77D0A; --warn:#8A5A00; --warn-bg:#FFF6E3;
+  --shadow:0 1px 2px rgba(15,26,42,.06),0 4px 14px rgba(15,26,42,.05);
+  --display:"Archivo","Arial Narrow",Arial,sans-serif; --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --fs:17px; --r:10px;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#1B2026; --panel:#252B32; --ink:#F3F5F7; --muted:#B4BCC5; --rule:#3E4650; --track:#323941;
-    --up:#46C978; --down:#FF7B6E; --sel:#7FB2E5; --sel-ink:#0E1823; --warn:#F2C14E; --focus:#7FB2E5; color-scheme:dark;
-  }
-}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --desk:#0B111B; --card:#141E2C; --soft:#1A2638; --ink:#EDF1F6; --muted:#A9B6C8; --line:#263347; --track:#223044;
+  --band:#0A1524; --band2:#112035; --band-ink:#EDF1F6; --band-muted:#9FB0C6; --band-line:#22344F;
+  --accent:#F0B456; --accent-ink:#F0B456; --sel:#DCE7F5; --sel-ink:#0B111B;
+  --up:#1FA184; --down:#E35A3A; --up-t:#45C4A6; --down-t:#FF8A6E;
+  --s1:#4C8BD8; --s2:#BF7F25; --warn:#F2C14E; --warn-bg:#2A2312;
+  --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark;}}
 :root[data-theme="dark"]{
-  --bg:#1B2026; --panel:#252B32; --ink:#F3F5F7; --muted:#B4BCC5; --rule:#3E4650; --track:#323941;
-  --up:#46C978; --down:#FF7B6E; --sel:#7FB2E5; --sel-ink:#0E1823; --warn:#F2C14E; --focus:#7FB2E5; color-scheme:dark;
-}
+  --desk:#0B111B; --card:#141E2C; --soft:#1A2638; --ink:#EDF1F6; --muted:#A9B6C8; --line:#263347; --track:#223044;
+  --band:#0A1524; --band2:#112035; --band-ink:#EDF1F6; --band-muted:#9FB0C6; --band-line:#22344F;
+  --accent:#F0B456; --accent-ink:#F0B456; --sel:#DCE7F5; --sel-ink:#0B111B;
+  --up:#1FA184; --down:#E35A3A; --up-t:#45C4A6; --down-t:#FF8A6E;
+  --s1:#4C8BD8; --s2:#BF7F25; --warn:#F2C14E; --warn-bg:#2A2312;
+  --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark;}
+
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 var(--fs)/1.45 "IBM Plex Sans",system-ui,sans-serif}
-.num{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-variant-numeric:tabular-nums;font-weight:600}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:70px}
+body{margin:0;background:var(--desk);color:var(--ink);font:400 var(--fs)/1.5 var(--body);-webkit-font-smoothing:antialiased}
 button,select,input{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
-.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.wrap{max-width:1260px;margin:0 auto;padding-inline:20px}
+.up{color:var(--up-t)} .down{color:var(--down-t)}
+h1,h2,h3,h4{font-family:var(--display);font-stretch:108%;margin:0;line-height:1.15;text-wrap:balance}
+[hidden]{display:none!important}
 
-header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:14px}
-h1{font-size:30px;line-height:1.1;margin:0;font-weight:700;letter-spacing:-.01em}
-.asof{color:var(--muted);font-size:16px;margin-top:4px}
-.theme-btn{background:var(--panel);border:1.5px solid var(--rule);border-radius:6px;padding:7px 14px;cursor:pointer}
+/* ── Band: brand + market pulse ─────────────────────────── */
+.band{background:linear-gradient(180deg,var(--band) 0%,var(--band2) 100%);color:var(--band-ink);padding-top:env(safe-area-inset-top,0px)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px 6px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.brand svg{flex:none}
+.brand b{font-family:var(--display);font-weight:800;font-stretch:118%;font-size:24px;letter-spacing:.01em}
+.brand span{display:block;font-size:14px;color:var(--band-muted);font-weight:500;margin-top:1px}
+.iconbtn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 14px;border-radius:999px;border:1.5px solid var(--band-line);background:transparent;color:var(--band-ink);cursor:pointer;font-size:15px;font-weight:600}
+.iconbtn:hover{border-color:var(--band-muted)}
+.pulse{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1.6fr);gap:18px;padding-block:14px 22px}
+.hero-idx{background:rgba(255,255,255,.04);border:1px solid var(--band-line);border-radius:14px;padding:16px 18px 10px;min-width:0}
+.hero-idx .lab{display:flex;justify-content:space-between;gap:8px;color:var(--band-muted);font-size:15px;font-weight:600}
+.hero-idx .val{font-family:var(--display);font-weight:800;font-stretch:112%;font-size:44px;line-height:1.05;margin-top:6px}
+.hero-idx .chg{font-size:20px;font-weight:700;margin-left:10px}
+.band .up{color:#5FD6B3} .band .down{color:#FF9479}
+.spark{display:block;width:100%;height:76px;margin-top:6px}
+.spark path.l{fill:none;stroke:var(--accent);stroke-width:2}
+.spark path.a{fill:var(--accent);opacity:.12}
+.minis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.mini{display:flex;justify-content:space-between;gap:6px;font-size:15px;color:var(--band-muted);border-top:1px solid var(--band-line);padding-top:7px}
+.mini b{color:var(--band-ink);font-weight:600}
+.health{background:rgba(255,255,255,.04);border:1px solid var(--band-line);border-radius:14px;padding:16px 18px;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 22px;align-content:start}
+.verdict{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.verdict .k{color:var(--band-muted);font-size:15px;font-weight:600}
+.verdict .v{font-family:var(--display);font-weight:800;font-stretch:112%;font-size:30px}
+.verdict .why{color:var(--band-muted);font-size:15px}
+.hm .k{display:flex;justify-content:space-between;font-size:15px;color:var(--band-muted)}
+.hm .k b{color:var(--band-ink);font-size:17px}
+.meter{position:relative;height:10px;border-radius:5px;background:var(--band-line);margin-top:7px;overflow:hidden}
+.meter i{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:5px}
+.meter.split i{background:#33B892} .meter.split i+i{left:auto;right:0;background:#F06A4D}
+.meter .tick{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--band-ink);opacity:.55}
 
-.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin:0 0 16px}
-.ro{background:var(--panel);border:1.5px solid var(--rule);border-radius:6px;padding:9px 12px}
-.ro .k{font-size:15px;color:var(--muted)}
-.ro .v{font-size:22px}
+/* ── Tabs ─────────────────────────────────────────────── */
+.tabbar{position:sticky;top:0;z-index:30;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+.tabbar .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tabbar .wrap::-webkit-scrollbar{display:none}
+.tab{display:flex;align-items:center;gap:9px;padding:15px 16px 13px;border:0;background:none;cursor:pointer;color:var(--muted);font-weight:600;font-size:17px;white-space:nowrap;border-bottom:3px solid transparent}
+.tab svg{width:21px;height:21px;flex:none}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab:hover{color:var(--ink)}
+.tab .cnt{font-size:13px;font-weight:700;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:0 7px;color:var(--muted)}
 
-nav.tabs{display:flex;gap:0;border-bottom:2px solid var(--rule);margin-bottom:16px;overflow-x:auto}
-nav.tabs button{background:none;border:0;padding:12px 18px;font-size:19px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:4px solid transparent;margin-bottom:-2px;white-space:nowrap}
-nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--sel)}
+main.wrap{padding-block:22px 40px;min-height:60vh}
+.sec-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 16px;margin-bottom:14px}
+.sec-head h2{font-size:28px;font-weight:800}
+.sec-head p{margin:4px 0 0;color:var(--muted);font-size:16px;max-width:72ch}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.pad{padding:16px 18px}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:flex-end;padding:14px 16px;margin-bottom:14px}
+.ctl{display:flex;flex-direction:column;gap:5px;min-width:0}
+.ctl>span{font-size:14px;font-weight:600;color:var(--muted)}
+.seg{display:inline-flex;flex-wrap:wrap;background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:3px;gap:2px;max-width:100%}
+.seg button{border:0;background:none;padding:7px 12px;border-radius:7px;cursor:pointer;font-weight:600;font-size:16px;color:var(--muted);white-space:nowrap}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.select,.search{background:var(--card);border:1.5px solid var(--line);border-radius:9px;padding:8px 12px;min-height:42px;max-width:100%}
+.search{width:240px}
+.check{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:500;min-height:42px}
+.check input{width:20px;height:20px;accent-color:var(--sel)}
+.note{color:var(--muted);font-size:15px;margin:12px 2px 0;max-width:90ch}
+.empty{padding:22px 18px;color:var(--muted)}
+.err{padding:18px 20px;border:2px solid var(--down);border-radius:var(--r);background:var(--card)}
+.warnbox{border:1.5px solid var(--warn);background:var(--warn-bg);border-radius:var(--r);padding:12px 16px;margin-bottom:12px}
 
-.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:14px}
-.seg{display:inline-flex;border:1.5px solid var(--rule);border-radius:6px;overflow:hidden;background:var(--panel)}
-.seg button{border:0;background:none;padding:8px 13px;cursor:pointer;font-weight:500;border-right:1px solid var(--rule)}
-.seg button:last-child{border-right:0}
-.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);font-weight:600}
-.ctl-label{color:var(--muted);font-size:15px;margin-right:6px}
+/* pills */
+.pill{display:inline-block;padding:1px 9px;border-radius:999px;font-size:14px;font-weight:700;white-space:nowrap;border:1.5px solid currentColor;line-height:1.5}
+.p-up{color:var(--up-t)} .p-down{color:var(--down-t)} .p-mut{color:var(--muted)} .p-acc{color:var(--accent-ink)}
+.rs{display:inline-block;min-width:38px;text-align:center;padding:1px 6px;border-radius:6px;font-weight:700;font-size:15px}
+.rs-a{background:var(--up);color:#fff} .rs-b{background:color-mix(in srgb,var(--up) 22%,transparent);color:var(--up-t)} .rs-c{background:var(--soft);color:var(--muted)} .rs-d{background:color-mix(in srgb,var(--down) 18%,transparent);color:var(--down-t)}
 
-.panel{background:var(--panel);border:1.5px solid var(--rule);border-radius:8px}
-.note{color:var(--muted);font-size:15px;margin:10px 2px 0}
-
-/* rotation bars — the one bold element */
-.bars{padding:6px 0}
-.brow{display:grid;grid-template-columns:minmax(150px,1.3fr) 2.2fr 90px 64px;align-items:center;gap:12px;padding:7px 16px;cursor:pointer;border-top:1px solid var(--track)}
+/* ── Rotation ─────────────────────────────────────────── */
+.rows{padding:4px 0}
+.brow{display:grid;grid-template-columns:minmax(170px,1.25fr) minmax(0,2.3fr) 92px 58px;align-items:center;gap:6px 14px;padding:10px 18px;cursor:pointer;border-top:1px solid var(--track)}
 .brow:first-child{border-top:0}
-.brow:hover,.brow[aria-expanded="true"]{background:color-mix(in srgb,var(--sel) 9%,transparent)}
-.bname{font-weight:600;font-size:18px;line-height:1.25}
-.bname .cnt{color:var(--muted);font-weight:400;font-size:15px;margin-left:6px}
-.btrack{position:relative;height:26px;background:var(--track);border-radius:3px}
-.btrack .zero{position:absolute;left:50%;top:-4px;bottom:-4px;width:2px;background:var(--ink);opacity:.55}
-.btrack .fill{position:absolute;top:3px;bottom:3px;border-radius:2px}
-.bval{text-align:right;font-size:20px}
-.up{color:var(--up)} .down{color:var(--down)}
-.fill.up{background:var(--up)} .fill.down{background:var(--down)}
-.rk{font-size:15px;text-align:right;color:var(--muted)}
-.rk.gain{color:var(--up)} .rk.loss{color:var(--down)}
-.bsub{grid-column:1/-1;font-size:15px;color:var(--muted);margin-top:-4px}
-.members{grid-column:1/-1;padding:6px 0 10px;cursor:default}
+.brow:hover{background:var(--soft)}
+.brow[aria-expanded="true"]{background:var(--soft)}
+.bname{font-weight:600;font-size:17px;line-height:1.25;min-width:0}
+.bname .cnt{color:var(--muted);font-weight:500;font-size:14px;margin-left:6px}
+.bname .lead{display:block;font-weight:400;font-size:14px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btrack{position:relative;height:24px}
+.btrack .zero{position:absolute;left:50%;top:-5px;bottom:-5px;width:1.5px;background:var(--muted);opacity:.6}
+.btrack .fill{position:absolute;top:4px;bottom:4px}
+.fill.pos{background:var(--up);border-radius:0 4px 4px 0} .fill.neg{background:var(--down);border-radius:4px 0 0 4px}
+.bval{text-align:right;font-size:19px;font-weight:700}
+.rk{font-size:15px;font-weight:600;text-align:right;color:var(--muted)}
+.rk.gain{color:var(--up-t)} .rk.loss{color:var(--down-t)}
+.members{grid-column:1/-1;cursor:default;padding:4px 0 8px}
+.members .meta{font-size:15px;color:var(--muted);margin:2px 0 8px}
+.heat{width:100%;border-collapse:separate;border-spacing:0}
+.heat th{font-size:14px;color:var(--muted);font-weight:600;padding:10px 8px;text-align:center;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card);cursor:pointer}
+.heat th:first-child{text-align:left;padding-left:16px}
+.heat td{padding:3px;text-align:center}
+.heat td:first-child{text-align:left;padding:8px 16px;font-weight:600;white-space:nowrap}
+.heat .cell{border-radius:6px;padding:8px 4px;font-weight:600;font-size:15px;min-width:64px}
+.heat tr.hr{cursor:pointer}.heat tr.hr:hover td:first-child{text-decoration:underline}
+.heat th.on{color:var(--ink);box-shadow:inset 0 -3px 0 var(--accent)}
 
-table{border-collapse:collapse;width:100%}
-th,td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--track)}
-th{font-size:15px;color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--panel);cursor:pointer;user-select:none}
-th:first-child,td:first-child,th.l,td.l{text-align:left}
-td.sym a{color:var(--ink);font-weight:700;text-decoration:none;border-bottom:1.5px solid var(--rule)}
-td.sym a:hover{border-bottom-color:var(--sel)}
-td .nm{display:block;font-size:14px;color:var(--muted);font-weight:400;max-width:230px;overflow:hidden;text-overflow:ellipsis}
-.tscroll{overflow-x:auto;max-height:72vh}
-.pill{display:inline-block;padding:1px 8px;border-radius:4px;font-size:14px;font-weight:600;border:1.5px solid currentColor}
-.st2{color:var(--up)} .st4{color:var(--down)} .st1,.st3{color:var(--muted)}
-.more{display:block;margin:12px auto;padding:9px 20px;background:var(--panel);border:1.5px solid var(--rule);border-radius:6px;cursor:pointer;font-weight:600}
+/* ── Tables ───────────────────────────────────────────── */
+.tscroll{overflow:auto;max-height:74vh;-webkit-overflow-scrolling:touch}
+table.dt{border-collapse:separate;border-spacing:0;width:100%;font-size:16px}
+.dt th,.dt td{padding:9px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--track)}
+.dt th{font-size:14px;font-weight:600;color:var(--muted);position:sticky;top:0;background:var(--card);z-index:2;cursor:pointer;user-select:none}
+.dt th:hover{color:var(--ink)}
+.dt th.l,.dt td.l{text-align:left}
+.dt td.wrapcell{white-space:normal;min-width:160px;max-width:300px;text-align:left}
+.dt th:first-child,.dt td:first-child{position:sticky;left:0;background:var(--card);z-index:1;text-align:left;box-shadow:1px 0 0 var(--track)}
+.dt th:first-child{z-index:3}
+.dt tbody tr:hover td{background:var(--soft)}
+.symbtn{border:0;background:none;padding:0;cursor:pointer;text-align:left;font-weight:700;color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px;text-decoration-thickness:2px}
+.symbtn:hover{text-decoration-color:var(--accent)}
+.nm{display:block;font-size:14px;color:var(--muted);font-weight:400;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.tfoot{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;align-items:center;padding:10px 14px;color:var(--muted);font-size:15px;border-top:1px solid var(--track)}
+.ghost{background:none;border:1.5px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:600;font-size:15px}
+.ghost:hover{border-color:var(--muted)}
 
-.filters{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:12px}
-.filters input[type=search],.filters select{background:var(--panel);border:1.5px solid var(--rule);border-radius:6px;padding:8px 10px;min-width:0}
-.filters input[type=search]{width:220px}
-.filters label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
-.filters input[type=checkbox]{width:20px;height:20px;accent-color:var(--sel)}
+/* ── Breadth ──────────────────────────────────────────── */
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.tile{padding:14px 16px}
+.tile .k{color:var(--muted);font-size:15px;font-weight:600}
+.tile .v{font-family:var(--display);font-weight:800;font-stretch:108%;font-size:34px;line-height:1.15;margin-top:2px}
+.tile .d{font-size:15px;margin-top:2px}
+.tile .bar{height:8px;border-radius:4px;background:var(--track);margin-top:10px;position:relative;overflow:hidden}
+.tile .bar i{position:absolute;inset:0 auto 0 0;background:var(--s1);border-radius:4px}
+.chart{padding:14px 14px 8px;margin-bottom:14px;position:relative}
+.chart h3{font-size:19px;margin:2px 4px 4px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:15px;color:var(--muted);margin:4px 4px 6px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:2px;background:var(--c)}
+.legend i.dash{background:repeating-linear-gradient(90deg,var(--c) 0 5px,transparent 5px 9px)}
+svg text{fill:var(--muted);font:500 13px var(--body)}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--card);border-radius:8px;padding:8px 10px;font-size:14px;line-height:1.45;white-space:nowrap;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.tip b{font-weight:700}
 
-/* breadth */
-.gauges{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-.gauge{padding:12px 14px}
-.gauge .k{color:var(--muted);font-size:15px}
-.gauge .v{font-size:34px;line-height:1.15}
-.gauge .d{font-size:15px}
-.gbar{height:10px;background:var(--track);border-radius:2px;margin-top:8px;position:relative}
-.gbar i{position:absolute;inset:0 auto 0 0;background:var(--sel);border-radius:2px}
-.chart{padding:12px 12px 6px;margin-bottom:14px}
-.chart h3{margin:2px 4px 6px;font-size:19px}
-.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:15px;color:var(--muted);margin:0 4px 6px}
-.legend span::before{content:"";display:inline-block;width:18px;height:4px;margin-right:6px;vertical-align:middle;background:var(--c)}
-svg text{fill:var(--muted);font:500 13px "IBM Plex Sans",sans-serif}
+/* ── Scanners ─────────────────────────────────────────── */
+.scan-layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
+.rail{position:sticky;top:72px;max-height:calc(100vh - 90px);overflow:auto;padding:8px 0}
+.rail h4{font-size:14px;font-weight:700;color:var(--muted);font-family:var(--body);padding:12px 16px 4px;letter-spacing:.02em}
+.rail button{display:flex;width:100%;justify-content:space-between;gap:10px;align-items:center;border:0;background:none;padding:8px 16px;text-align:left;cursor:pointer;font-size:16px;color:var(--ink);border-left:3px solid transparent}
+.rail button:hover{background:var(--soft)}
+.rail button[aria-current="true"]{background:var(--soft);border-left-color:var(--accent);font-weight:700}
+.rail button .c{font-size:14px;font-weight:700;min-width:30px;text-align:center;padding:0 7px;border-radius:999px;background:var(--soft);border:1px solid var(--line);color:var(--muted)}
+.rail button .c.z{opacity:.55}
+.scan-pick{display:none}
+.scan-head{padding:16px 18px 12px;border-bottom:1px solid var(--track)}
+.scan-head h3{font-size:24px;font-weight:800}
+.scan-head .cnt{font-family:var(--display);font-weight:800;font-size:24px;color:var(--accent-ink);margin-left:8px}
+.scan-head p{margin:6px 0 0;color:var(--muted);max-width:80ch}
+.catchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 
-/* scans */
-.scan{margin-bottom:16px}
-.scan-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;padding:12px 16px 4px}
-.scan-h h3{margin:0;font-size:21px}
-.scan-h .c{font-size:18px}
-.scan-h p{margin:0;color:var(--muted);font-size:15px;flex-basis:100%}
-.empty{padding:14px 16px;color:var(--muted)}
-.err{padding:20px;border:2px solid var(--down);border-radius:8px;background:var(--panel)}
-
-/* VPCI screener */
-.vbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:12px}
-.vbar a{color:var(--sel);font-weight:600}
-.subtabs{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 12px}
-.subtabs button{background:var(--panel);border:1.5px solid var(--rule);border-radius:6px;padding:8px 12px;cursor:pointer;font-weight:600;font-size:16px}
+/* ── VPCI ─────────────────────────────────────────────── */
+.vstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.funnel{padding:14px 16px;margin-bottom:12px}
+.funnel h3{font-size:19px;margin-bottom:8px}
+.frow{display:grid;grid-template-columns:230px minmax(0,1fr) 64px;gap:10px;align-items:center;padding:4px 0;font-size:15px}
+.frow .bar{height:16px;border-radius:0 4px 4px 0;background:var(--s1)}
+.frow .lbl{color:var(--ink);font-weight:600}
+.frow .lbl small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+.frow .n{text-align:right;font-weight:700}
+.badges{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:2px 0 12px;font-size:15px}
+.badge{display:inline-block;padding:2px 11px;border-radius:999px;font-size:14px;font-weight:600;border:1.5px solid var(--line);color:var(--ink);background:var(--card)}
+.badge.ok{border-color:var(--up);color:var(--up-t)} .badge.off{border-color:var(--down);color:var(--down-t)}
+.subtabs{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;margin:12px 0 12px;scrollbar-width:thin}
+.subtabs button{flex:none;background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:600;font-size:16px;white-space:nowrap}
+.subtabs button .c{font-size:13px;color:var(--muted);margin-left:6px;font-weight:700}
 .subtabs button[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin-bottom:12px}
-.metric{padding:10px 14px}
-.metric .k{color:var(--muted);font-size:15px}
-.metric .v{font-size:30px;line-height:1.2}
-.badges{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}
-.badge{display:inline-block;padding:3px 12px;border-radius:14px;font-size:15px;font-weight:600;border:1.5px solid var(--up);color:var(--up)}
-.badge.off{border-color:var(--down);color:var(--down)}
-.caption{color:var(--muted);font-size:16px;margin:0 2px 12px;max-width:78ch}
-.vt td,.vt th{font-size:15px;padding:7px 9px}
-.vt td.b-t{color:var(--up);font-weight:700}.vt td.b-f{color:var(--down)}
-.vt td.sym{text-align:left}
-.vt td.txt{text-align:left;white-space:normal;min-width:120px;max-width:340px}
-details.exp{margin:12px 0;background:var(--panel);border:1.5px solid var(--rule);border-radius:8px}
-details.exp>summary{cursor:pointer;padding:10px 14px;font-weight:600}
+.subtabs button[aria-pressed="true"] .c{color:inherit;opacity:.8}
+.gates{display:inline-flex;gap:3px;vertical-align:middle}
+.gates i{width:12px;height:12px;border-radius:50%;border:2px solid var(--muted);display:inline-block}
+.gates i.on{background:var(--up);border-color:var(--up)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
+.scard{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.scard .t{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.scard .sym{font-family:var(--display);font-weight:800;font-stretch:108%;font-size:22px}
+.scard .sym .symbtn{font-size:22px}
+.scard .co{color:var(--muted);font-size:15px;line-height:1.3}
+.scard .px{font-family:var(--display);font-weight:700;font-size:22px;text-align:right}
+.scard dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 10px;margin:0}
+.scard dt{font-size:13px;color:var(--muted);font-weight:600}
+.scard dd{margin:0;font-weight:700;font-size:16px}
+.scard .state{font-size:15px;color:var(--muted)}
+.vtools{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-bottom:10px}
+.sbar{display:inline-block;height:8px;border-radius:0 4px 4px 0;background:var(--s1);vertical-align:middle;margin-right:8px}
+.hbar{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,2fr) 90px;gap:10px;align-items:center;padding:6px 0;font-size:15px;border-top:1px solid var(--track)}
+.hbar:first-child{border-top:0}
+.hbar .b{height:14px;border-radius:0 4px 4px 0;background:var(--up)}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+details.exp{margin:12px 0;background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+details.exp>summary{cursor:pointer;padding:12px 16px;font-weight:600}
 details.exp>div{padding:0 0 8px}
-.dl{background:none;border:1.5px solid var(--rule);border-radius:6px;padding:6px 12px;cursor:pointer;font-weight:600;margin:8px 0}
-.cols2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.cols2 h4{margin:4px 0 6px;font-size:18px}
-.warnbox{border:2px solid var(--warn);border-radius:8px;padding:10px 14px;margin-bottom:12px;background:var(--panel)}
-@media (max-width:800px){.cols2{grid-template-columns:1fr}}
-@media (max-width:640px){
-  :root{--fs:16px}
-  h1{font-size:26px}
-  .brow{grid-template-columns:1fr 78px 52px;gap:6px 10px;padding:9px 12px}
-  .btrack{grid-column:1/-1;grid-row:2}
-  .bname{font-size:17px}
-  nav.tabs button{padding:10px 12px;font-size:17px}
-  .filters input[type=search]{width:100%}
-  .gauges{grid-template-columns:1fr 1fr}
-  .seg button{padding:8px 10px}
-  .controls>div{max-width:100%}
-  .gauge .v{font-size:28px}
+
+/* ── Drawer ───────────────────────────────────────────── */
+.scrim{position:fixed;inset:0;background:rgba(5,12,22,.45);z-index:60}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(480px,100%);background:var(--card);z-index:61;box-shadow:-8px 0 30px rgba(0,0,0,.25);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+.drawer header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:18px 20px 12px;border-bottom:1px solid var(--line)}
+.drawer h2{font-size:30px;font-weight:800}
+.drawer .co{color:var(--muted);margin-top:2px}
+.drawer .body{overflow:auto;padding:16px 20px calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:16px}
+.drawer .close{border:1.5px solid var(--line);background:var(--card);border-radius:999px;width:44px;height:44px;cursor:pointer;font-size:22px;flex:none}
+.dgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0}
+.dgrid div{background:var(--soft);border-radius:8px;padding:8px 10px;min-width:0}
+.dgrid dt{font-size:13px;color:var(--muted);font-weight:600}
+.dgrid dd{margin:0;font-weight:700;font-size:17px}
+.dsec h4{font-family:var(--body);font-size:15px;color:var(--muted);font-weight:700;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chipbtn{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:4px 12px;font-size:15px;cursor:pointer;font-weight:600}
+.chipbtn:hover{border-color:var(--accent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:10px;background:var(--sel);color:var(--sel-ink);font-weight:700;text-decoration:none;border:0;cursor:pointer}
+.btn.alt{background:var(--card);color:var(--ink);border:1.5px solid var(--line)}
+
+footer.foot{color:var(--muted);font-size:15px;padding-block:6px 30px}
+footer.foot p{margin:4px 0;max-width:110ch}
+
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width:1000px){
+  .pulse{grid-template-columns:minmax(0,1fr)}
+  .scan-layout{grid-template-columns:minmax(0,1fr)}
+  .rail{display:none}
+  .scan-pick{display:block;margin-bottom:12px}
+  .vstats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@media (prefers-reduced-motion:no-preference){ .fill{transition:width .35s ease, left .35s ease} }
+@media (max-width:720px){
+  :root{--fs:16px}
+  .wrap{padding-inline:16px}
+  .brand b{font-size:21px}
+  .hero-idx .val{font-size:36px}
+  .health{grid-template-columns:minmax(0,1fr)}
+  .verdict .v{font-size:27px}
+  .tabbar{position:fixed;top:auto;bottom:0;left:0;right:0;border-top:1px solid var(--line);border-bottom:0;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .tabbar .wrap{padding-inline:4px;gap:0;justify-content:space-between}
+  .tab{flex:1;flex-direction:column;gap:3px;padding:9px 2px 8px;font-size:12.5px;border-bottom:0;border-top:3px solid transparent;min-width:0}
+  .tab[aria-selected="true"]{border-top-color:var(--accent)}
+  .tab .cnt{display:none}
+  main.wrap{padding-bottom:110px}
+  footer.foot{padding-bottom:110px}
+  .sec-head h2{font-size:24px}
+  .brow{grid-template-columns:minmax(0,1fr) 84px 46px;padding:10px 14px}
+  .btrack{grid-column:1/-1;grid-row:2}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tile .v{font-size:28px}
+  .search{width:100%}
+  .toolbar .ctl{width:100%}
+  .cols2{grid-template-columns:minmax(0,1fr)}
+  .frow{grid-template-columns:120px minmax(0,1fr) 54px}
+  .frow .lbl small{display:none}
+  .dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .drawer{top:auto;height:92vh;width:100%;border-radius:16px 16px 0 0}
+}
+@media (prefers-reduced-motion:no-preference){
+  .fill,.meter i,.tile .bar i,.frow .bar{transition:width .35s ease,left .35s ease}
+  .drawer{animation:slidein .22s ease}
+  @keyframes slidein{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <div>
-      <h1>PKC Sector Radar</h1>
-      <div class="asof" id="asof">Loading data…</div>
-    </div>
-    <button class="theme-btn" id="themeBtn" type="button">Switch theme</button>
-  </header>
-  <div class="readouts" id="readouts"></div>
-  <nav class="tabs" role="tablist" id="tabs">
-    <button role="tab" data-v="rot" aria-selected="true">Rotation</button>
-    <button role="tab" data-v="br" aria-selected="false">Breadth</button>
-    <button role="tab" data-v="rs" aria-selected="false">RS ranking</button>
-    <button role="tab" data-v="sc" aria-selected="false">Scanners</button>
-    <button role="tab" data-v="vp" aria-selected="false">VPCI Screener</button>
-  </nav>
-  <main id="view"></main>
-</div>
+<header class="band">
+  <div class="wrap topbar">
+    <a class="brand" href="#rotation" aria-label="PKC Sector Radar home">
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17.5" fill="none" stroke="#3E5C85" stroke-width="2"/><circle cx="20" cy="20" r="11" fill="none" stroke="#3E5C85" stroke-width="2"/><path d="M20 20 L33 9" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/><circle cx="27" cy="25" r="2.6" fill="#5FD6B3"/><circle cx="13" cy="14" r="2" fill="#FF9479"/><circle cx="20" cy="20" r="2.4" fill="var(--accent)"/></svg>
+      <div><b>PKC Sector Radar</b><span id="asof">Loading market data…</span></div>
+    </a>
+    <button class="iconbtn" id="themeBtn" type="button" aria-label="Switch light or dark theme">
+      <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg><span>Theme</span>
+    </button>
+  </div>
+  <section class="wrap pulse" id="pulse" aria-label="Market pulse"></section>
+</header>
+
+<nav class="tabbar" aria-label="Sections">
+  <div class="wrap" role="tablist" id="tabs">
+    <button class="tab" role="tab" data-v="rotation" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5h11v3H3zm0 5.5h16v3H3zM3 16h8v3H3z"/></svg>Rotation</button>
+    <button class="tab" role="tab" data-v="breadth" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M3 13h4l2.5-6 4 11 2.5-6H21"/></svg>Breadth</button>
+    <button class="tab" role="tab" data-v="rs" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M4 18l6-6 4 4 6-8M15 8h5v5"/></svg>RS ranking</button>
+    <button class="tab" role="tab" data-v="scanners" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M16 16l4.5 4.5"/></svg>Scanners<span class="cnt" id="scanCnt"></span></button>
+    <button class="tab" role="tab" data-v="vpci" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>VPCI screener</button>
+  </div>
+</nav>
+
+<main class="wrap" id="view"><div class="empty">Loading…</div></main>
+
+<footer class="wrap foot" id="foot"></footer>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-modal="true" role="dialog" aria-labelledby="dTitle"></aside>
 
 <script>
+/* ════════════════════ state & helpers ════════════════════ */
 const PERIODS=["1D","1W","1M","3M","6M","YTD","1Y"];
-const PLABEL={"1D":"Today","1W":"1W","1M":"1M","3M":"3M","6M":"6M","YTD":"YTD","1Y":"1Y"};
-const st={tab:"rot",period:"1M",group:"Themes",agg:"mean",sort:"ret",open:null,
-  rs:{q:"",sec:"",theme:"",min:0,tt:false,s2:false,a50:false,key:"rs",dir:-1,show:100}};
+const PL={"1D":"Today","1W":"1W","1M":"1M","3M":"3M","6M":"6M","YTD":"YTD","1Y":"1Y"};
+const TABS=["rotation","breadth","rs","scanners","vpci"];
+const st={tab:"rotation",period:"1M",group:"Themes",agg:"mean",sort:"ret",view:"bars",open:null,scan:"up4",
+  rs:{q:"",sec:"",theme:"",min:0,tt:false,s2:false,a50:false},tbl:{}};
 let D={};
-
-/* ---------- helpers ---------- */
 const $=s=>document.querySelector(s);
-const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const fmt=(v,d=2,sign=true)=>v==null||!isFinite(v)?"–":(sign&&v>0?"+":"")+v.toFixed(d)+"%";
-const cls=v=>v==null?"":v>0?"up":v<0?"down":"";
-const tv=s=>`https://www.tradingview.com/chart/?symbol=NSE:${encodeURIComponent(s)}`;
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const isNum=v=>typeof v==="number"&&isFinite(v);
+const sgn=(v,d=2,u="%")=>!isNum(v)?"–":(v>0?"+":v<0?"−":"")+Math.abs(v).toFixed(d)+u;
+const cls=v=>!isNum(v)?"":v>0?"up":v<0?"down":"";
+const inr=v=>!isNum(v)?"–":v.toLocaleString("en-IN",{maximumFractionDigits:v>=1000?0:2});
 const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
 const median=a=>{const b=[...a].sort((x,y)=>x-y),m=b.length>>1;return b.length%2?b[m]:(b[m-1]+b[m])/2};
-function seg(name,opts,cur,labels){
-  return `<div class="seg" role="group" aria-label="${name}">`+opts.map(o=>
-    `<button type="button" data-seg="${name}" data-val="${o}" aria-pressed="${o===cur}">${esc(labels?labels[o]:o)}</button>`).join("")+`</div>`;
-}
+const store={get(k,d){try{const v=localStorage.getItem("radar."+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("radar."+k,JSON.stringify(v))}catch(e){}}};
+const tv=(s,ex)=>`https://in.tradingview.com/chart/?symbol=${encodeURIComponent((ex||"NSE")+":"+s)}`;
+function seg(name,opts,cur,labels){return `<div class="seg" role="group" aria-label="${esc(name)}">`+opts.map(o=>`<button type="button" data-seg="${name}" data-val="${esc(o)}" aria-pressed="${o===cur}">${esc(labels?labels[o]:o)}</button>`).join("")+`</div>`}
+function rsPill(v){if(!isNum(v))return "–";const c=v>=90?"rs-a":v>=70?"rs-b":v>=40?"rs-c":"rs-d";return `<span class="rs ${c}">${v}</span>`}
+function stagePill(s){return !s?"–":s===2?`<span class="pill p-up">Stage 2</span>`:s===4?`<span class="pill p-down">Stage 4</span>`:s===1?`<span class="pill p-mut">Stage 1</span>`:`<span class="pill p-mut">Stage 3</span>`}
+const symBtn=(s,n,ex)=>`<button type="button" class="symbtn" data-sym="${esc(s)}"${ex?` data-ex="${esc(ex)}"`:""}>${esc(s)}</button>${n?`<span class="nm">${esc(n)}</span>`:""}`;
+function fmtDate(d){if(!d)return"";const t=new Date(String(d).slice(0,10)+"T00:00:00");return isNaN(t)?String(d):t.toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}
 
-/* ---------- data ---------- */
+/* ════════════════════ data ════════════════════ */
 async function load(){
-  if(window.EMBED){D=window.EMBED;return;}
-  const get=n=>fetch(`data/${n}.json?v=${Date.now()}`).then(r=>{if(!r.ok)throw new Error(n+".json "+r.status);return r.json()});
+  if(window.EMBED){D=window.EMBED;return}
+  const get=n=>fetch(`data/${n}.json?v=${Date.now()}`).then(r=>{if(!r.ok)throw new Error(`${n}.json (${r.status})`);return r.json()});
   const [meta,stocks,groups,breadth,scans]=await Promise.all(["meta","stocks","groups","breadth","scans"].map(get));
   D={meta,stocks,groups,breadth,scans};
 }
 function index(){
   D.by=Object.fromEntries(D.stocks.map(s=>[s.s,s]));
-  D.themesOf={};
-  for(const [t,syms] of Object.entries(D.groups.Themes||{})) for(const s of syms)(D.themesOf[s]=D.themesOf[s]||[]).push(t);
+  D.themesOf={};for(const [t,ss] of Object.entries(D.groups.Themes||{}))for(const s of ss)(D.themesOf[s]=D.themesOf[s]||[]).push(t);
+  D.scansOf={};const sc=D.scans||{};
+  if(sc.meta)for(const m of sc.meta)for(const s of (sc.hits[m.id]||[]))(D.scansOf[s]=D.scansOf[s]||[]).push(m.id);
+  D.scanMeta=Object.fromEntries((sc.meta||[]).map(m=>[m.id,m]));
 }
 
-/* ---------- header ---------- */
-function renderHead(){
+/* ════════════════════ header & pulse ════════════════════ */
+function renderHeader(){
   const m=D.meta;
-  $("#asof").textContent=`Prices as of ${m.asof} · updated ${m.generated} · ${m.universe} stocks in universe · source ${m.source==="upstox"?"Upstox":m.source==="yahoo"?"Yahoo (backup)":m.source}`;
-  $("#readouts").innerHTML=Object.entries(m.indices||{}).map(([k,v])=>{
-    const r=v.r[st.period];
-    return `<div class="ro"><div class="k">${esc(k)} · ${PLABEL[st.period]}</div><div class="v num ${cls(r)}">${fmt(r)}</div></div>`;
-  }).join("");
+  $("#asof").textContent=`Prices to ${fmtDate(m.asof)} · updated ${m.generated.replace(/^\d{4}-\d{2}-\d{2} /,"")}`;
+  const n=Object.values(D.scans?.hits||{}).filter(a=>a.length).length;$("#scanCnt").textContent=n||"";
+}
+function renderPulse(){
+  const m=D.meta,b=D.breadth,L=b.dates.length-1,bn=b.bench_name,ix=m.indices||{},main=ix[bn]||Object.values(ix)[0];
+  const r=main?.r?.[st.period];
+  const N=Math.min(130,b.bench.length),ser=b.bench.slice(-N),vals=ser.filter(isNum);
+  let spark="";
+  if(vals.length>2){const lo=Math.min(...vals),hi=Math.max(...vals),W=400,H=76,x=i=>i*(W/(N-1)),y=v=>H-4-(v-lo)/(hi-lo||1)*(H-10);
+    let d="";ser.forEach((v,i)=>{if(isNum(v))d+=(d?"L":"M")+x(i).toFixed(1)+","+y(v).toFixed(1)});
+    spark=`<svg class="spark" viewBox="0 0 400 76" preserveAspectRatio="none" role="img" aria-label="${esc(bn)} over the last ${N} sessions"><path class="a" d="${d}L${W},${H}L0,${H}Z"/><path class="l" d="${d}"/></svg>`}
+  const others=Object.entries(ix).filter(([k])=>k!==bn);
+  const a50=b.a50[L],a200=b.a200[L],adv=b.adv[L],dec=b.dec[L],nh=b.nh[L],nl=b.nl[L],u4=b.up4[L],d4=b.dn4[L];
+  const vd=a50>=60?["Strong","up"]:a50>=40?["Mixed",""]:["Weak","down"];
+  const d50=a50-b.a50[Math.max(0,L-5)],tt=(D.scans?.hits?.trend_template||[]).length;
+  const split=(a,c)=>{const t=a+c||1;return `<div class="meter split" aria-hidden="true"><i style="width:${a/t*100}%"></i><i style="width:${c/t*100}%"></i></div>`};
+  $("#pulse").innerHTML=`
+  <div class="hero-idx">
+    <div class="lab"><span>${esc(bn)}</span><span>${st.period==="1D"?"Today":PL[st.period]+" change"}</span></div>
+    <div><span class="val num">${main?inr(main.px):"–"}</span><span class="chg num ${cls(r)}">${sgn(r)}</span></div>
+    ${spark}
+    <div class="minis">${others.map(([k,v])=>`<div class="mini"><span>${esc(k.replace("NIFTY ","Nifty ").replace("SMLCAP","Smallcap").replace("MIDCAP","Midcap").replace("MICROCAP","Microcap "))}</span><b class="num ${cls(v.r[st.period])}">${sgn(v.r[st.period])}</b></div>`).join("")}</div>
+  </div>
+  <div class="health">
+    <div class="verdict"><span class="k">Breadth reading</span><span class="v ${vd[1]}" style="${vd[1]?"":"color:var(--accent)"}">${vd[0]}</span>
+      <span class="why">${a50.toFixed(1)}% of ${m.universe.toLocaleString("en-IN")} stocks above their 50 DMA · <span class="${cls(d50)}">${d50>0?"+":""}${d50.toFixed(1)} pts</span> in a week</span></div>
+    <div class="hm"><div class="k"><span>Above 50 DMA</span><b class="num">${a50.toFixed(1)}%</b></div><div class="meter"><i style="width:${a50}%"></i><span class="tick" style="left:50%"></span></div></div>
+    <div class="hm"><div class="k"><span>Above 200 DMA</span><b class="num">${a200.toFixed(1)}%</b></div><div class="meter"><i style="width:${a200}%"></i><span class="tick" style="left:50%"></span></div></div>
+    <div class="hm"><div class="k"><span>Advances / declines</span><b class="num"><span class="up">${adv}</span> / <span class="down">${dec}</span></b></div>${split(adv,dec)}</div>
+    <div class="hm"><div class="k"><span>52-week highs / lows</span><b class="num"><span class="up">${nh}</span> / <span class="down">${nl}</span></b></div>${split(nh,nl)}</div>
+    <div class="hm"><div class="k"><span>Up 4%+ / down 4%+</span><b class="num"><span class="up">${u4}</span> / <span class="down">${d4}</span></b></div>${split(u4,d4)}</div>
+    <div class="hm"><div class="k"><span>Pass Minervini trend template</span><b class="num">${tt} <span style="color:var(--band-muted);font-weight:500;font-size:15px">(${(tt/m.universe*100).toFixed(1)}%)</span></b></div><div class="meter"><i style="width:${Math.min(100,tt/m.universe*100)}%"></i></div></div>
+  </div>`;
+}
+function renderFoot(){
+  const m=D.meta,f=m.filters||{};
+  $("#foot").innerHTML=`<p>Universe: ${m.universe.toLocaleString("en-IN")} NSE stocks (price ≥ ₹${f.min_price}, median daily turnover ≥ ₹${f.min_median_turnover_cr} Cr${f.min_market_cap_cr?`, market cap ≥ ₹${f.min_market_cap_cr} Cr`:""}). Prices from ${m.source==="upstox"?"Upstox (split- and bonus-adjusted), with today's candle checked against the NSE bhavcopy":m.source==="yahoo"?"Yahoo Finance (backup source)":esc(m.source)}. Refreshed every weekday evening.</p><p>For personal research. Not investment advice.</p>`;
 }
 
-/* ---------- rotation ---------- */
-function groupStats(prev){
+/* ════════════════════ generic table ════════════════════ */
+const TBL={};
+function dtable(id,rows,cols,{limit=100,empty="Nothing to show.",csv=true}={}){
+  const T=st.tbl[id]||(st.tbl[id]={key:null,dir:-1,show:limit});
+  if(!rows.length)return `<div class="empty">${esc(empty)}</div>`;
+  let data=rows;
+  if(T.key){const c=cols.find(c=>c.k===T.key);if(c){const f=c.sort||(r=>r[c.k]);data=[...rows].sort((a,b)=>{const A=f(a),B=f(b);if(A==null||A==="")return 1;if(B==null||B==="")return -1;return typeof A==="string"?T.dir*A.localeCompare(B):T.dir*(A-B)})}}
+  const vis=data.slice(0,T.show);
+  let h=`<div class="tscroll"><table class="dt" data-tid="${esc(id)}"><thead><tr>${cols.map(c=>`<th class="${c.l?"l":""}" data-k="${esc(c.k)}" tabindex="0" aria-sort="${T.key===c.k?(T.dir<0?"descending":"ascending"):"none"}">${esc(c.label)}${T.key===c.k?(T.dir<0?" ▼":" ▲"):""}</th>`).join("")}</tr></thead><tbody>`;
+  for(const r of vis)h+="<tr>"+cols.map(c=>`<td class="${c.l?"l ":""}${c.td?c.td(r):""}">${c.fmt?c.fmt(r):esc(r[c.k]??"–")}</td>`).join("")+"</tr>";
+  h+=`</tbody></table></div><div class="tfoot"><span>${rows.length.toLocaleString("en-IN")} rows${rows.length>T.show?` · showing ${T.show}`:""}</span><span>`;
+  if(rows.length>T.show)h+=`<button class="ghost" type="button" data-more="${esc(id)}">Show ${Math.min(100,rows.length-T.show)} more</button> `;
+  if(csv)h+=`<button class="ghost" type="button" data-csv="${esc(id)}">Download CSV</button>`;
+  h+=`</span></div>`;
+  TBL[id]={rows:data,cols};
+  return h;
+}
+function wireTables(root,rerender){
+  root.querySelectorAll("table.dt").forEach(t=>{const id=t.dataset.tid;
+    t.querySelectorAll("th[data-k]").forEach(th=>{const go=()=>{const T=st.tbl[id];const k=th.dataset.k;T.dir=T.key===k?-T.dir:-1;T.key=k;rerender()};th.addEventListener("click",go);th.addEventListener("keydown",e=>{if(e.key==="Enter")go()})})});
+  root.querySelectorAll("[data-more]").forEach(b=>b.addEventListener("click",()=>{st.tbl[b.dataset.more].show+=100;rerender()}));
+  root.querySelectorAll("[data-csv]").forEach(b=>b.addEventListener("click",()=>downloadCsv(b.dataset.csv)));
+}
+function downloadCsv(id){
+  const {rows,cols}=TBL[id];const strip=h=>String(h).replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();
+  const q=v=>{v=v==null?"":String(v);return /[",\n]/.test(v)?`"${v.replace(/"/g,'""')}"`:v};
+  const val=(c,r)=>c.csv?c.csv(r):c.sort?c.sort(r):r[c.k]!==undefined?r[c.k]:c.fmt?strip(c.fmt(r)):"";
+  const lines=[cols.map(c=>q(c.label)).join(",")].concat(rows.map(r=>cols.map(c=>q(val(c,r))).join(",")));
+  const blob=new Blob([lines.join("\n")],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`${id}_${D.meta.asof}.csv`;document.body.appendChild(a);a.click();a.remove();
+}
+const C={
+  stock:{k:"s",label:"Stock",l:1,fmt:r=>symBtn(r.s,r.n),sort:r=>r.s},
+  px:{k:"px",label:"Price",fmt:r=>`<span class="num">${inr(r.px)}</span>`},
+  ret:p=>({k:"r."+p,label:p,fmt:r=>`<span class="num ${cls(r.r[p])}">${sgn(r.r[p],1)}</span>`,sort:r=>r.r[p]}),
+  rs:{k:"rs",label:"RS",fmt:r=>rsPill(r.rs)},
+  drs:{k:"drs",label:"RS Δ1W",fmt:r=>{const d=isNum(r.rs)&&isNum(r.rs1w)?r.rs-r.rs1w:null;return `<span class="num ${cls(d)}">${d==null?"–":(d>0?"+":"")+d}</span>`},sort:r=>isNum(r.rs)&&isNum(r.rs1w)?r.rs-r.rs1w:null},
+  h52:{k:"h52",label:"From 52W high",fmt:r=>`<span class="num">${sgn(r.h52,1)}</span>`},
+  st:{k:"st",label:"Stage",l:1,fmt:r=>stagePill(r.st)},
+  vr:{k:"vr",label:"Vol ×",fmt:r=>`<span class="num">${isNum(r.vr)?r.vr.toFixed(1):"–"}</span>`},
+  to:{k:"to",label:"Turnover ₹Cr",fmt:r=>`<span class="num">${isNum(r.to)?r.to.toLocaleString("en-IN"):"–"}</span>`},
+  rsi:{k:"rsi",label:"RSI",fmt:r=>`<span class="num">${isNum(r.rsi)?r.rsi.toFixed(0):"–"}</span>`},
+  sec:{k:"sec",label:"Sector / industry",l:1,fmt:r=>esc(r.ind||r.sec||"–"),sort:r=>r.ind||r.sec||""},
+  themes:{k:"th",label:"Themes",l:1,td:()=>"wrapcell",fmt:r=>esc((D.themesOf[r.s]||[]).join(", ")||"–"),sort:r=>(D.themesOf[r.s]||[]).join(",")},
+};
+
+/* ════════════════════ ROTATION ════════════════════ */
+function groupStats(prev,period=st.period){
   const g=D.groups[st.group]||{},key=prev?"rp":"r",out=[];
   for(const [name,syms] of Object.entries(g)){
-    const vals=syms.map(s=>D.by[s]?.[key]?.[st.period]).filter(v=>v!=null&&isFinite(v));
-    if(vals.length<(D.meta.min_group_size||3))continue;
     const live=syms.filter(s=>D.by[s]);
-    const a50=live.filter(s=>D.by[s].a50!=null);
-    out.push({name,n:vals.length,v:st.agg==="mean"?mean(vals):median(vals),
-      adv:vals.filter(v=>v>0).length/vals.length*100,
-      br:a50.length?a50.filter(s=>D.by[s].a50).length/a50.length*100:null,syms:live});
+    const pairs=live.map(s=>[s,D.by[s][key]?.[period]]).filter(([,v])=>isNum(v));
+    if(pairs.length<(D.meta.min_group_size||3))continue;
+    const vals=pairs.map(p=>p[1]),a50=live.filter(s=>D.by[s].a50!=null);
+    out.push({name,n:vals.length,v:st.agg==="mean"?mean(vals):median(vals),adv:vals.filter(v=>v>0).length/vals.length*100,
+      br:a50.length?a50.filter(s=>D.by[s].a50).length/a50.length*100:null,syms:live,top:[...pairs].sort((a,b)=>b[1]-a[1]).slice(0,2)});
   }
   return out;
 }
-function renderRot(){
+function renderRotation(){
   const now=groupStats(false),prev=groupStats(true);
   const prank={};[...prev].sort((a,b)=>b.v-a.v).forEach((g,i)=>prank[g.name]=i+1);
   const ranked=[...now].sort((a,b)=>b.v-a.v);ranked.forEach((g,i)=>g.rank=i+1);
-  let rows=ranked;
-  if(st.sort==="name")rows=[...now].sort((a,b)=>a.name.localeCompare(b.name));
-  if(st.sort==="br")rows=[...now].sort((a,b)=>(b.br??-1)-(a.br??-1));
-  const mx=Math.max(1,...now.map(g=>Math.abs(g.v)));
-  const showRank=st.period!=="1D";
-  let h=`<div class="controls">
-    <div><span class="ctl-label">Period</span>${seg("period",PERIODS,st.period,PLABEL)}</div>
-    <div><span class="ctl-label">Group by</span>${seg("group",Object.keys(D.groups),st.group)}</div>
-    <div><span class="ctl-label">Average</span>${seg("agg",["mean","median"],st.agg,{mean:"Mean",median:"Median"})}</div>
-    <div><span class="ctl-label">Sort</span>${seg("sort",["ret","br","name"],st.sort,{ret:"Return",br:"Breadth",name:"A–Z"})}</div>
-  </div><div class="panel bars">`;
-  if(!rows.length)h+=`<div class="empty">No group has ${D.meta.min_group_size}+ stocks with data for this period.</div>`;
+  let rows=ranked;if(st.sort==="name")rows=[...now].sort((a,b)=>a.name.localeCompare(b.name));if(st.sort==="br")rows=[...now].sort((a,b)=>(b.br??-1)-(a.br??-1));
+  const what=st.group==="Themes"?"theme":st.group==="NSE Index"?"NSE index":st.group.toLowerCase();
+  let h=`<div class="sec-head"><div><h2>Where the money is rotating</h2><p>Average return of the stocks in each ${what}, ranked. Arrows show rank change against a week ago. Tap a row for its stocks.</p></div></div>
+  <div class="card toolbar">
+    <div class="ctl"><span>Period</span>${seg("period",PERIODS,st.period,PL)}</div>
+    <div class="ctl"><span>Group by</span>${seg("group",Object.keys(D.groups),st.group)}</div>
+    <div class="ctl"><span>Average</span>${seg("agg",["mean","median"],st.agg,{mean:"Mean",median:"Median"})}</div>
+    <div class="ctl"><span>Sort</span>${seg("sort",["ret","br","name"],st.sort,{ret:"Return",br:"Breadth",name:"A–Z"})}</div>
+    <div class="ctl"><span>View</span>${seg("view",["bars","heat"],st.view,{bars:"Bars",heat:"Heatmap"})}</div>
+  </div>`;
+  if(!rows.length){$("#view").innerHTML=h+`<div class="card empty">No group has ${D.meta.min_group_size}+ stocks with data for this period.</div>`;return}
+  if(st.view==="heat"){$("#view").innerHTML=h+heatmap(rows);wireTables($("#view"),renderRotation);return}
+  const mx=Math.max(1,...now.map(g=>Math.abs(g.v))),showRank=st.period!=="1D";
+  h+=`<div class="card rows">`;
   for(const g of rows){
-    const w=Math.abs(g.v)/mx*50,left=g.v>=0?50:50-w;
-    const pr=prank[g.name],dr=pr?pr-g.rank:0;
-    const rk=!showRank||!pr?"":dr>0?`<span class="rk gain" title="Rank 1 week ago: ${pr}">▲${dr}</span>`:dr<0?`<span class="rk loss" title="Rank 1 week ago: ${pr}">▼${-dr}</span>`:`<span class="rk" title="Rank unchanged">=</span>`;
+    const w=Math.abs(g.v)/mx*50,left=g.v>=0?50:50-w,pr=prank[g.name],dr=pr?pr-g.rank:0;
+    const rk=!showRank||!pr?"<span></span>":dr>0?`<span class="rk gain" title="Rank a week ago: ${pr}">▲${dr}</span>`:dr<0?`<span class="rk loss" title="Rank a week ago: ${pr}">▼${-dr}</span>`:`<span class="rk" title="Rank unchanged">=</span>`;
     const open=st.open===g.name;
     h+=`<div class="brow" tabindex="0" role="button" aria-expanded="${open}" data-g="${esc(g.name)}">
-      <div class="bname">${esc(g.name)}<span class="cnt">${g.n}</span></div>
-      <div class="btrack"><div class="zero"></div><div class="fill ${cls(g.v)}" style="left:${left}%;width:${w}%"></div></div>
-      <div class="bval num ${cls(g.v)}">${fmt(g.v)}</div>${rk||"<span></span>"}
-      ${open?`<div class="bsub">${g.adv.toFixed(0)}% of stocks up over ${PLABEL[st.period]} · ${g.br==null?"–":g.br.toFixed(0)+"%"} above 50 DMA</div><div class="members">${memberTable(g.syms)}</div>`:""}
-    </div>`;
+      <div class="bname">${esc(g.name)}<span class="cnt">${g.n}</span><span class="lead">Top: ${g.top.map(([s,v])=>`${esc(s)} ${sgn(v,1)}`).join(" · ")}</span></div>
+      <div class="btrack" aria-hidden="true"><div class="zero"></div><div class="fill ${g.v>=0?"pos":"neg"}" style="left:${left}%;width:${w}%"></div></div>
+      <div class="bval num ${cls(g.v)}">${sgn(g.v)}</div>${rk}
+      ${open?members(g):""}</div>`;
   }
-  h+=`</div><p class="note">Bars are the ${st.agg} return of the stocks in each group. Arrows show rank change against the same calculation one week ago. Click a group to see its stocks.</p>`;
-  $("#view").innerHTML=h;
+  h+=`</div><p class="note">Bars are the ${st.agg} ${st.period==="1D"?"today's":PL[st.period]} return of stocks in each group (groups need ${D.meta.min_group_size}+ stocks).</p>`;
+  $("#view").innerHTML=h;wireTables($("#view"),renderRotation);
 }
-function memberTable(syms){
-  const rows=syms.map(s=>D.by[s]).sort((a,b)=>(b.r[st.period]??-999)-(a.r[st.period]??-999));
-  return `<div class="tscroll"><table><thead><tr><th class="l">Stock</th><th>${PLABEL[st.period]}</th><th>Price</th><th>RS</th><th>From 52W high</th><th>Stage</th><th>Vol ×</th></tr></thead><tbody>`+
-  rows.map(x=>`<tr><td class="sym"><a href="${tv(x.s)}" target="_blank" rel="noopener">${esc(x.s)}</a><span class="nm">${esc(x.n)}</span></td>
-    <td class="num ${cls(x.r[st.period])}">${fmt(x.r[st.period])}</td><td class="num">${x.px?.toLocaleString("en-IN")}</td>
-    <td class="num">${x.rs??"–"}</td><td class="num ${cls(x.h52)}">${fmt(x.h52,1)}</td><td>${stagePill(x.st)}</td><td class="num">${x.vr==null?"–":x.vr.toFixed(1)}</td></tr>`).join("")+
-  `</tbody></table></div>`;
+function members(g){
+  return `<div class="members"><div class="meta">${g.adv.toFixed(0)}% of stocks up over ${st.period==="1D"?"today":PL[st.period]} · ${g.br==null?"–":g.br.toFixed(0)+"%"} above 50 DMA</div>${dtable("grp_"+g.name,g.syms.map(s=>D.by[s]),[C.stock,C.ret(st.period),C.px,C.rs,C.h52,C.st,C.vr],{limit:60,csv:false})}</div>`;
 }
-const secOf=x=>x.ind||x.sec||"–";
-function stagePill(s){return s?`<span class="pill st${s}">${s===2?"Stage 2":s===4?"Stage 4":s===1?"Base":"Top/basing"}</span>`:"–"}
+function heatmap(rows){
+  const stats=Object.fromEntries(PERIODS.map(p=>[p,Object.fromEntries(groupStats(false,p).map(g=>[g.name,g.v]))]));
+  const mx=Object.fromEntries(PERIODS.map(p=>[p,Math.max(1,...Object.values(stats[p]).map(Math.abs))]));
+  const sorted=st.sort==="ret"?[...rows].sort((a,b)=>(stats[st.period][b.name]??-999)-(stats[st.period][a.name]??-999)):rows;
+  const cell=(v,m)=>{if(!isNum(v))return `<div class="cell">–</div>`;const f=Math.min(1,Math.abs(v)/m),c=v>=0?"var(--up)":"var(--down)";return `<div class="cell num" style="background:color-mix(in srgb,${c} ${Math.round(8+f*62)}%,transparent);${f>.55?"color:#fff":""}">${sgn(v,1)}</div>`};
+  let h=`<div class="card"><div class="tscroll"><table class="heat"><thead><tr><th>Group</th>${PERIODS.map(p=>`<th data-hp="${p}" class="${p===st.period?"on":""}" tabindex="0">${p}</th>`).join("")}</tr></thead><tbody>`;
+  for(const g of sorted){h+=`<tr class="hr" data-g="${esc(g.name)}" tabindex="0"><td>${esc(g.name)} <span style="color:var(--muted);font-weight:400;font-size:14px">${g.n}</span></td>${PERIODS.map(p=>`<td>${cell(stats[p][g.name],mx[p])}</td>`).join("")}</tr>`;
+    if(st.open===g.name)h+=`<tr><td colspan="${PERIODS.length+1}" style="padding:0 8px 10px;position:static">${members(g)}</td></tr>`}
+  return h+`</tbody></table></div></div><p class="note">Colour depth is scaled within each period column. Click a period heading to rank by it; click a group for its stocks.</p>`;
+}
 
-/* ---------- breadth ---------- */
-function lineChart(series,opts){
-  const W=1000,H=opts.h||300,pl=44,pr=opts.right?58:14,pt=12,pb=28;
-  const n=D.breadth.dates.length,x=i=>pl+i*(W-pl-pr)/(n-1);
-  const y=(v,lo,hi)=>pt+(1-(v-lo)/(hi-lo))*(H-pt-pb);
+/* ════════════════════ BREADTH ════════════════════ */
+function lineChart(id,series,o){
+  const W=1000,H=o.h||300,pl=46,pr=14,pt=12,pb=28,n=D.breadth.dates.length;
+  const x=i=>pl+i*(W-pl-pr)/(n-1),y=(v,lo,hi)=>pt+(1-(v-lo)/(hi-lo))*(H-pt-pb);
   let g="";
-  for(const t of opts.ticks){g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(t,opts.lo,opts.hi)}" y2="${y(t,opts.lo,opts.hi)}" stroke="var(--track)" stroke-width="${t===opts.mid?2:1}"/><text x="${pl-6}" y="${y(t,opts.lo,opts.hi)+4}" text-anchor="end">${t}${opts.unit||""}</text>`}
-  const step=Math.ceil(n/6);
-  for(let i=0;i<n;i+=step)g+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle">${D.breadth.dates[i].slice(2,7)}</text>`;
-  for(const s of series){
-    const lo=s.lo??opts.lo,hi=s.hi??opts.hi;
-    if(s.bars){const bw=Math.max(1,(W-pl-pr)/n-1),y0=y(0,lo,hi);
-      s.data.forEach((v,i)=>{if(v==null)return;const yy=y(v,lo,hi);g+=`<rect x="${x(i)-bw/2}" y="${Math.min(yy,y0)}" width="${bw}" height="${Math.abs(yy-y0)}" fill="${v>=0?"var(--up)":"var(--down)"}"/>`});continue;}
+  for(const t of o.ticks)g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(t,o.lo,o.hi)}" y2="${y(t,o.lo,o.hi)}" stroke="var(--track)" stroke-width="${t===o.mid?1.6:1}"/><text x="${pl-8}" y="${y(t,o.lo,o.hi)+4}" text-anchor="end">${t}${o.unit||""}</text>`;
+  const step=Math.ceil(n/6);for(let i=0;i<n;i+=step)g+=`<text x="${x(i)}" y="${H-7}" text-anchor="middle">${new Date(D.breadth.dates[i]+"T00:00:00").toLocaleDateString("en-IN",{month:"short",year:"2-digit"})}</text>`;
+  for(const s of series){const lo=s.lo??o.lo,hi=s.hi??o.hi;
+    if(s.bars){const bw=Math.max(1,(W-pl-pr)/n-1),y0=y(0,lo,hi);s.data.forEach((v,i)=>{if(v==null)return;const yy=y(v,lo,hi);g+=`<rect x="${x(i)-bw/2}" y="${Math.min(yy,y0)}" width="${bw}" height="${Math.max(1,Math.abs(yy-y0))}" fill="${v>=0?"var(--up)":"var(--down)"}"/>`});continue}
     const pts=s.data.map((v,i)=>v==null?null:`${x(i).toFixed(1)},${y(v,lo,hi).toFixed(1)}`).filter(Boolean).join(" ");
-    g+=`<polyline points="${pts}" fill="none" stroke="${s.c}" stroke-width="${s.w||2.5}" ${s.dash?'stroke-dasharray="6 5"':""} stroke-linejoin="round"/>`;
-  }
-  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(opts.label)}">${g}</svg>`;
+    g+=`<polyline points="${pts}" fill="none" stroke="${s.c}" stroke-width="${s.w||2}" ${s.dash?'stroke-dasharray="6 5"':""} stroke-linejoin="round"/>`}
+  g+=`<line class="xh" x1="0" x2="0" y1="${pt}" y2="${H-pb}" stroke="var(--muted)" stroke-width="1" opacity="0"/>`;
+  return `<svg data-chart="${id}" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(o.label)}" style="touch-action:pan-y;display:block">${g}<rect x="${pl}" y="0" width="${W-pl-pr}" height="${H}" fill="transparent"/></svg><div class="tip" hidden></div>`;
 }
-function renderBr(){
-  const b=D.breadth,L=b.dates.length-1,P=Math.max(0,L-5);
-  const tile=(k,lab)=>{const v=b[k][L],d=v-b[k][P];
-    return `<div class="panel gauge"><div class="k">${lab}</div><div class="v num">${v.toFixed(1)}%</div>
-    <div class="d num ${cls(d)}">${d>0?"+":""}${d.toFixed(1)} pts vs 1W ago</div><div class="gbar"><i style="width:${v}%"></i></div></div>`};
-  const sum=k=>b[k].slice(-5).reduce((x,y)=>x+y,0);
-  let h=`<div class="gauges">${tile("a20","Above 20 DMA")}${tile("a50","Above 50 DMA")}${tile("a200","Above 200 DMA")}
-    <div class="panel gauge"><div class="k">Advance / decline today</div><div class="v num"><span class="up">${b.adv[L]}</span> / <span class="down">${b.dec[L]}</span></div>
-      <div class="d">Ratio ${(b.adv[L]/Math.max(1,b.dec[L])).toFixed(2)} · 5-day ${sum("adv")} / ${sum("dec")}</div></div>
-    <div class="panel gauge"><div class="k">52W highs / lows today</div><div class="v num"><span class="up">${b.nh[L]}</span> / <span class="down">${b.nl[L]}</span></div>
-      <div class="d">5-day ${sum("nh")} / ${sum("nl")}</div></div>
-    <div class="panel gauge"><div class="k">Up 4%+ / down 4%+ today</div><div class="v num"><span class="up">${b.up4[L]}</span> / <span class="down">${b.dn4[L]}</span></div>
-      <div class="d">5-day ${sum("up4")} / ${sum("dn4")}</div></div></div>`;
-  const bv=b.bench.filter(v=>v!=null),blo=Math.min(...bv),bhi=Math.max(...bv);
-  h+=`<div class="panel chart"><h3>Share of stocks above moving averages</h3>
-    <div class="legend"><span style="--c:var(--sel)">Above 50 DMA</span><span style="--c:var(--warn)">Above 200 DMA</span><span style="--c:var(--muted)">${esc(b.bench_name)} (scaled, dashed)</span></div>
-    ${lineChart([{data:b.bench,c:"var(--muted)",lo:blo-(bhi-blo)*.05,hi:bhi+(bhi-blo)*.05,dash:1,w:2},{data:b.a50,c:"var(--sel)"},{data:b.a200,c:"var(--warn)"}],
-      {lo:0,hi:100,ticks:[0,20,50,80,100],mid:50,unit:"%",label:"Percent of stocks above 50 and 200 day moving averages"})}</div>`;
-  const net=b.nh.map((v,i)=>v-b.nl[i]),nlo=Math.min(0,...net),nhi=Math.max(1,...net);
-  const tk=[nlo,0,nhi].map(Math.round).filter((v,i,a)=>a.indexOf(v)===i);
-  h+=`<div class="panel chart"><h3>Net new 52-week highs (highs minus lows)</h3>
-    ${lineChart([{data:net,bars:1}],{lo:nlo,hi:nhi,ticks:tk,mid:0,label:"Net new 52 week highs per day",h:220})}</div>`;
-  const last=[];for(let i=L;i>=Math.max(0,L-14);i--)last.push(i);
-  h+=`<div class="panel"><div class="tscroll"><table><thead><tr><th class="l">Date</th><th>&gt;20 DMA</th><th>&gt;50 DMA</th><th>&gt;200 DMA</th><th>Adv</th><th>Dec</th><th>Highs</th><th>Lows</th><th>Up 4%</th><th>Down 4%</th><th>${esc(b.bench_name)}</th></tr></thead><tbody>`+
-    last.map(i=>`<tr><td class="l">${b.dates[i]}</td><td class="num">${b.a20[i]}%</td><td class="num">${b.a50[i]}%</td><td class="num">${b.a200[i]}%</td>
-    <td class="num up">${b.adv[i]}</td><td class="num down">${b.dec[i]}</td><td class="num up">${b.nh[i]}</td><td class="num down">${b.nl[i]}</td>
-    <td class="num up">${b.up4[i]}</td><td class="num down">${b.dn4[i]}</td><td class="num">${b.bench[i]?.toLocaleString("en-IN")??"–"}</td></tr>`).join("")+`</tbody></table></div></div>
-    <p class="note">Breadth uses today's ${D.meta.universe}-stock universe across the whole history, so stocks that left the list earlier are not counted.</p>`;
-  $("#view").innerHTML=h;
+function wireChart(box,id,fmtTip){
+  const svg=box.querySelector(`svg[data-chart="${id}"]`),tip=box.querySelector(".tip"),xh=svg.querySelector(".xh"),n=D.breadth.dates.length,W=1000,pl=46,pr=14;
+  const move=e=>{const r=svg.getBoundingClientRect(),cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+    const i=Math.max(0,Math.min(n-1,Math.round((cx/r.width*W-pl)/((W-pl-pr)/(n-1))))),sx=pl+i*(W-pl-pr)/(n-1);
+    xh.setAttribute("x1",sx);xh.setAttribute("x2",sx);xh.setAttribute("opacity",".7");tip.hidden=false;tip.innerHTML=fmtTip(i);
+    const bx=box.getBoundingClientRect(),tw=tip.offsetWidth;let left=sx/W*r.width+(r.left-bx.left)+12;if(left+tw>bx.width-8)left-=tw+24;tip.style.left=Math.max(4,left)+"px";tip.style.top="48px"};
+  const out=()=>{tip.hidden=true;xh.setAttribute("opacity","0")};
+  svg.addEventListener("mousemove",move);svg.addEventListener("touchmove",move,{passive:true});svg.addEventListener("touchstart",move,{passive:true});svg.addEventListener("mouseleave",out);svg.addEventListener("touchend",out);
+}
+function renderBreadth(){
+  const b=D.breadth,L=b.dates.length-1,P=Math.max(0,L-5),sum=k=>b[k].slice(-5).reduce((x,y)=>x+y,0);
+  const tile=(k,lab)=>{const v=b[k][L],d=v-b[k][P];return `<div class="card tile"><div class="k">${lab}</div><div class="v num">${v.toFixed(1)}%</div><div class="d num ${cls(d)}">${d>0?"+":""}${d.toFixed(1)} pts vs a week ago</div><div class="bar"><i style="width:${v}%"></i></div></div>`};
+  const pair=(lab,a,c,k1,k2)=>`<div class="card tile"><div class="k">${lab}</div><div class="v num"><span class="up">${a}</span> <span style="color:var(--muted);font-weight:500">/</span> <span class="down">${c}</span></div><div class="d" style="color:var(--muted)">5-day total ${sum(k1).toLocaleString("en-IN")} / ${sum(k2).toLocaleString("en-IN")}</div></div>`;
+  let h=`<div class="sec-head"><div><h2>Market breadth</h2><p>How many stocks are taking part. A rising index on falling breadth is a warning; breadth turning up from below 20% has marked many bottoms.</p></div></div>
+  <div class="tiles">${tile("a20","Above 20 DMA")}${tile("a50","Above 50 DMA")}${tile("a200","Above 200 DMA")}
+    ${pair("Advances / declines today",b.adv[L],b.dec[L],"adv","dec")}${pair("52-week highs / lows today",b.nh[L],b.nl[L],"nh","nl")}${pair("Up 4%+ / down 4%+ today",b.up4[L],b.dn4[L],"up4","dn4")}</div>`;
+  const bv=b.bench.filter(isNum),blo=Math.min(...bv),bhi=Math.max(...bv);
+  h+=`<div class="card chart" id="ch1"><h3>Share of stocks above their moving averages</h3>
+    <div class="legend"><span><i style="--c:var(--s1)"></i>Above 50 DMA</span><span><i style="--c:var(--s2)"></i>Above 200 DMA</span><span><i class="dash" style="--c:var(--muted)"></i>${esc(b.bench_name)} (own scale)</span></div>
+    ${lineChart("a",[{data:b.bench,c:"var(--muted)",lo:blo-(bhi-blo)*.05,hi:bhi+(bhi-blo)*.05,dash:1,w:1.6},{data:b.a50,c:"var(--s1)"},{data:b.a200,c:"var(--s2)"}],{lo:0,hi:100,ticks:[0,20,50,80,100],mid:50,unit:"%",label:"Percent of stocks above their 50 and 200 day moving averages"})}</div>`;
+  const net=b.nh.map((v,i)=>v-b.nl[i]),nlo=Math.min(0,...net),nhi=Math.max(1,...net),tk=[nlo,0,nhi].map(Math.round).filter((v,i,a)=>a.indexOf(v)===i);
+  h+=`<div class="card chart" id="ch2"><h3>Net new 52-week highs</h3><div class="legend"><span><i style="--c:var(--up)"></i>More highs than lows</span><span><i style="--c:var(--down)"></i>More lows than highs</span></div>
+    ${lineChart("b",[{data:net,bars:1}],{lo:nlo,hi:nhi,ticks:tk,mid:0,label:"Daily new 52-week highs minus new lows",h:220})}</div>`;
+  const last=[];for(let i=L;i>=Math.max(0,L-14);i--)last.push({i,d:b.dates[i]});
+  const pc=k=>({k,label:{a20:">20 DMA",a50:">50 DMA",a200:">200 DMA"}[k],fmt:r=>`<span class="num">${b[k][r.i]}%</span>`,sort:r=>b[k][r.i]});
+  const ct=(k,lab,c)=>({k,label:lab,fmt:r=>`<span class="num ${c}">${b[k][r.i]}</span>`,sort:r=>b[k][r.i]});
+  h+=`<h3 style="font-size:19px;margin:6px 0 10px">Last 15 sessions</h3><div class="card">${dtable("brt",last,[{k:"d",label:"Date",l:1,fmt:r=>fmtDate(r.d),sort:r=>r.d},pc("a20"),pc("a50"),pc("a200"),ct("adv","Adv","up"),ct("dec","Dec","down"),ct("nh","Highs","up"),ct("nl","Lows","down"),ct("up4","Up 4%","up"),ct("dn4","Down 4%","down"),{k:"bn",label:b.bench_name,fmt:r=>`<span class="num">${inr(b.bench[r.i])}</span>`,sort:r=>b.bench[r.i]}],{limit:15})}</div>
+  <p class="note">Breadth uses today's ${D.meta.universe.toLocaleString("en-IN")}-stock universe across the whole history.</p>`;
+  $("#view").innerHTML=h;wireTables($("#view"),renderBreadth);
+  wireChart($("#ch1"),"a",i=>`<b>${fmtDate(b.dates[i])}</b><br>Above 50 DMA: <b>${b.a50[i]}%</b><br>Above 200 DMA: <b>${b.a200[i]}%</b><br>${esc(b.bench_name)}: <b>${inr(b.bench[i])}</b>`);
+  wireChart($("#ch2"),"b",i=>`<b>${fmtDate(b.dates[i])}</b><br>Highs <b>${b.nh[i]}</b> · Lows <b>${b.nl[i]}</b><br>Net <b>${net[i]>0?"+":""}${net[i]}</b>`);
 }
 
-/* ---------- RS ranking ---------- */
-const RSCOLS=[["s","Stock","l"],["rs","RS"],["drs","RS Δ1W"],["px","Price"],["r.1D","1D"],["r.1W","1W"],["r.1M","1M"],["r.3M","3M"],["r.6M","6M"],["r.1Y","1Y"],
-  ["h52","From 52W high"],["st","Stage"],["vr","Vol ×"],["to","Turnover ₹Cr"],["sec","Sector / industry","l"]];
-const val=(x,k)=>k==="drs"?(x.rs!=null&&x.rs1w!=null?x.rs-x.rs1w:null):k.startsWith("r.")?x.r[k.slice(2)]:x[k];
-function rsRows(){
-  const f=st.rs,q=f.q.trim().toUpperCase();
-  let a=D.stocks.filter(x=>(!q||x.s.includes(q)||x.n.toUpperCase().includes(q))&&(!f.sec||x.sec===f.sec||x.ind===f.sec)
-    &&(!f.theme||(D.themesOf[x.s]||[]).includes(f.theme))&&(x.rs??0)>=f.min&&(!f.tt||x.tt)&&(!f.s2||x.st===2)&&(!f.a50||x.a50));
-  a.sort((p,q)=>{const A=val(p,f.key),B=val(q,f.key);if(A==null)return 1;if(B==null)return -1;
-    return typeof A==="string"?f.dir*A.localeCompare(B):f.dir*(A-B)});
-  return a;
-}
-function renderRs(){
+/* ════════════════════ RS RANKING ════════════════════ */
+function renderRS(){
   const f=st.rs,secs=[...new Set(D.stocks.flatMap(x=>[x.sec,x.ind]).filter(Boolean))].sort(),ths=Object.keys(D.groups.Themes||{}).sort();
-  const opt=(arr,cur)=>arr.map(o=>`<option ${o===cur?"selected":""}>${esc(o)}</option>`).join("");
-  $("#view").innerHTML=`<div class="filters">
-    <input type="search" id="q" placeholder="Search symbol or name" value="${esc(f.q)}" aria-label="Search stocks">
-    <select id="fsec" aria-label="Sector"><option value="">All sectors and industries</option>${opt(secs,f.sec)}</select>
-    <select id="fth" aria-label="Theme"><option value="">All themes</option>${opt(ths,f.theme)}</select>
-    <select id="fmin" aria-label="Minimum RS">${[0,50,70,80,90].map(v=>`<option value="${v}" ${v==f.min?"selected":""}>${v?"RS ≥ "+v:"Any RS"}</option>`).join("")}</select>
-    <label><input type="checkbox" id="ftt" ${f.tt?"checked":""}>Trend template</label>
-    <label><input type="checkbox" id="fs2" ${f.s2?"checked":""}>Stage 2</label>
-    <label><input type="checkbox" id="fa50" ${f.a50?"checked":""}>Above 50 DMA</label>
-  </div><div class="panel" id="rsTable"></div>
-  <p class="note">RS is a 1–99 percentile of weighted 3/6/9/12-month performance (40% on the latest quarter). Trend template is Minervini's 8 conditions with RS ≥ 70. Click a column to sort; click a symbol to open its TradingView chart.</p>`;
-  const bind=(id,k,fn=v=>v)=>$(id).addEventListener(id==="#q"?"input":"change",e=>{f[k]=fn(e.target.type==="checkbox"?e.target.checked:e.target.value);f.show=100;drawRs()});
-  bind("#q","q");bind("#fsec","sec");bind("#fth","theme");bind("#fmin","min",Number);bind("#ftt","tt");bind("#fs2","s2");bind("#fa50","a50");
-  drawRs();
+  const opt=(a,cur)=>a.map(o=>`<option ${o===cur?"selected":""}>${esc(o)}</option>`).join("");
+  $("#view").innerHTML=`<div class="sec-head"><div><h2>Relative strength ranking</h2><p>Every stock ranked 1–99 on weighted 3/6/9/12-month performance (40% on the latest quarter). Leaders usually rank 80+ before the big move.</p></div></div>
+  <div class="card toolbar">
+    <div class="ctl"><span>Search</span><input class="search" type="search" id="q" placeholder="Symbol or company" value="${esc(f.q)}" aria-label="Search stocks"></div>
+    <div class="ctl"><span>Sector / industry</span><select class="select" id="fsec" aria-label="Sector"><option value="">All</option>${opt(secs,f.sec)}</select></div>
+    <div class="ctl"><span>Theme</span><select class="select" id="fth" aria-label="Theme"><option value="">All</option>${opt(ths,f.theme)}</select></div>
+    <div class="ctl"><span>Minimum RS</span>${seg("rsmin",["0","50","70","80","90"],String(f.min),{"0":"Any","50":"50+","70":"70+","80":"80+","90":"90+"})}</div>
+    <div class="ctl"><span>Filters</span><div style="display:flex;flex-wrap:wrap;gap:0 16px"><label class="check"><input type="checkbox" id="ftt" ${f.tt?"checked":""}>Trend template</label><label class="check"><input type="checkbox" id="fs2" ${f.s2?"checked":""}>Stage 2</label><label class="check"><input type="checkbox" id="fa50" ${f.a50?"checked":""}>Above 50 DMA</label></div></div>
+  </div><div class="card" id="rsT"></div>`;
+  const on=(id,k,ev)=>$(id).addEventListener(ev,e=>{f[k]=e.target.type==="checkbox"?e.target.checked:e.target.value;if(st.tbl.rs)st.tbl.rs.show=100;store.set("rs",f);drawRS()});
+  on("#q","q","input");on("#fsec","sec","change");on("#fth","theme","change");on("#ftt","tt","change");on("#fs2","s2","change");on("#fa50","a50","change");
+  drawRS();
 }
-function drawRs(){
-  const f=st.rs,rows=rsRows(),vis=rows.slice(0,f.show);
-  const ar=k=>f.key===k?(f.dir<0?" ▼":" ▲"):"";
-  let h=`<div class="tscroll"><table><thead><tr>${RSCOLS.map(([k,l,c])=>`<th class="${c||""}" data-k="${k}" tabindex="0" aria-sort="${f.key===k?(f.dir<0?"descending":"ascending"):"none"}">${l}${ar(k)}</th>`).join("")}</tr></thead><tbody>`;
-  h+=vis.map(x=>{const d=val(x,"drs");return `<tr><td class="sym"><a href="${tv(x.s)}" target="_blank" rel="noopener">${esc(x.s)}</a><span class="nm">${esc(x.n)}</span></td>
-    <td class="num">${x.rs??"–"}</td><td class="num ${cls(d)}">${d==null?"–":(d>0?"+":"")+d}</td><td class="num">${x.px?.toLocaleString("en-IN")}</td>
-    ${["1D","1W","1M","3M","6M","1Y"].map(p=>`<td class="num ${cls(x.r[p])}">${fmt(x.r[p],1)}</td>`).join("")}
-    <td class="num">${fmt(x.h52,1)}</td><td>${stagePill(x.st)}</td><td class="num">${x.vr==null?"–":x.vr.toFixed(1)}</td><td class="num">${x.to??"–"}</td>
-    <td class="l">${esc(secOf(x))}</td></tr>`}).join("");
-  h+=`</tbody></table></div>`;
-  if(!rows.length)h+=`<div class="empty">No stocks match these filters. Loosen the RS minimum or clear a checkbox.</div>`;
-  if(rows.length>f.show)h+=`<button class="more" id="more" type="button">Show ${Math.min(100,rows.length-f.show)} more of ${rows.length-f.show} remaining</button>`;
-  else if(rows.length)h+=`<p class="note" style="padding:0 12px 10px">${rows.length} stocks</p>`;
-  $("#rsTable").innerHTML=h;
-  $("#rsTable").querySelectorAll("th").forEach(th=>{const go=()=>{const k=th.dataset.k;f.dir=f.key===k?-f.dir:(k==="s"||k==="sec"?1:-1);f.key=k;drawRs()};
-    th.addEventListener("click",go);th.addEventListener("keydown",e=>{if(e.key==="Enter")go()})});
-  $("#more")?.addEventListener("click",()=>{f.show+=100;drawRs()});
+function drawRS(){
+  const f=st.rs,q=f.q.trim().toUpperCase();
+  const rows=D.stocks.filter(x=>(!q||x.s.includes(q)||x.n.toUpperCase().includes(q))&&(!f.sec||x.sec===f.sec||x.ind===f.sec)&&(!f.theme||(D.themesOf[x.s]||[]).includes(f.theme))&&(x.rs??0)>=f.min&&(!f.tt||x.tt)&&(!f.s2||x.st===2)&&(!f.a50||x.a50));
+  if(!st.tbl.rs)st.tbl.rs={key:"rs",dir:-1,show:100};
+  $("#rsT").innerHTML=dtable("rs",rows,[C.stock,C.rs,C.drs,C.px,C.ret("1D"),C.ret("1W"),C.ret("1M"),C.ret("3M"),C.ret("6M"),C.ret("1Y"),C.h52,C.st,C.rsi,C.vr,C.to,C.sec],{empty:"No stocks match. Loosen the RS minimum or clear a filter."});
+  wireTables($("#rsT"),drawRS);
 }
 
-/* ---------- scanners ---------- */
-const SCANS=[
-  ["high52","New 52-week closing high","Closed above the highest close of the previous 252 sessions."],
-  ["darvas","Darvas box breakout","20-day range no wider than 15%, closed above the box top on 1.5× average volume."],
-  ["vol_spike","Volume spike up","Volume at least 3× the 50-day average and price up 2% or more today."],
-  ["ema_up","20 EMA crossed above 50 EMA","Bullish crossover in the last 3 sessions, price above the 20 EMA."],
-  ["leaders","Leaders near highs","RS 90 or above and within 5% of the 52-week high."],
-  ["trend_template","Trend template","Passes all 8 Minervini trend conditions with RS ≥ 70."],
-  ["ema_down","20 EMA crossed below 50 EMA","Bearish crossover in the last 3 sessions, price below the 20 EMA. Use as an exit check on holdings."],
-];
-function renderSc(){
-  let h="";
-  for(const [k,t,d] of SCANS){
-    const rows=(D.scans[k]||[]).map(s=>D.by[s]).filter(Boolean).sort((a,b)=>(b.rs??0)-(a.rs??0));
-    h+=`<section class="panel scan"><div class="scan-h"><h3>${t}</h3><span class="c num">${rows.length} stocks</span><p>${d}</p></div>`;
-    h+=rows.length?`<div class="tscroll" style="max-height:420px"><table><thead><tr><th class="l">Stock</th><th class="l">Sector</th><th>Price</th><th>1D</th><th>1M</th><th>Vol ×</th><th>RS</th><th>From 52W high</th><th class="l">Themes</th></tr></thead><tbody>`+
-      rows.map(x=>`<tr><td class="sym"><a href="${tv(x.s)}" target="_blank" rel="noopener">${esc(x.s)}</a><span class="nm">${esc(x.n)}</span></td><td class="l">${esc(secOf(x))}</td>
-      <td class="num">${x.px?.toLocaleString("en-IN")}</td><td class="num ${cls(x.r["1D"])}">${fmt(x.r["1D"],1)}</td><td class="num ${cls(x.r["1M"])}">${fmt(x.r["1M"],1)}</td>
-      <td class="num">${x.vr==null?"–":x.vr.toFixed(1)}</td><td class="num">${x.rs??"–"}</td><td class="num">${fmt(x.h52,1)}</td><td class="l">${esc((D.themesOf[x.s]||[]).join(", ")||"–")}</td></tr>`).join("")+`</tbody></table></div>`
-      :`<div class="empty">No stocks triggered today.</div>`;
-    h+=`</section>`;
-  }
-  $("#view").innerHTML=h;
+/* ════════════════════ SCANNERS ════════════════════ */
+function fmtMetric(m,v){if(!isNum(v))return "–";return m.fmt==="pct"?sgn(v,1):m.fmt==="x"?v.toFixed(1)+"×":v.toFixed(Math.abs(v)<100?1:0)}
+function renderScanners(){
+  const S=D.scans;if(!S?.meta){$("#view").innerHTML=`<div class="err">Scanner data is in an older format. Run “Daily update” once.</div>`;return}
+  if(!D.scanMeta[st.scan])st.scan=S.meta[0].id;
+  const m=D.scanMeta[st.scan],hits=S.hits[m.id]||[];
+  const rail=S.cats.map(c=>`<h4>${esc(c)}</h4>`+S.meta.filter(x=>x.cat===c).map(x=>{const n=(S.hits[x.id]||[]).length;return `<button type="button" data-scan="${x.id}" aria-current="${x.id===m.id}"><span>${esc(x.name)}</span><span class="c ${n?"":"z"}">${n}</span></button>`}).join("")).join("");
+  const pick=`<select class="select" id="scanSel" style="width:100%" aria-label="Choose a scanner">${S.cats.map(c=>`<optgroup label="${esc(c)}">${S.meta.filter(x=>x.cat===c).map(x=>`<option value="${x.id}" ${x.id===m.id?"selected":""}>${esc(x.name)} (${(S.hits[x.id]||[]).length})</option>`).join("")}</optgroup>`).join("")}</select>`;
+  const rows=hits.map(s=>D.by[s]).filter(Boolean),metric=S.metric?.[m.id]||{};
+  const cols=[C.stock,C.px,C.ret("1D")];
+  const DUP={"Day %":"r.1D","Vol ×":"vr","From 52wH %":"h52"},dup=DUP[m.metric];
+  if(m.metric&&!dup)cols.push({k:"metric",label:m.metric,fmt:r=>`<span class="num">${fmtMetric(m,metric[r.s])}</span>`,sort:r=>metric[r.s]});
+  cols.push(C.ret("1M"),C.vr,C.rs,C.h52,C.st,C.sec,C.themes);
+  const tid="scan_"+m.id,mk=dup||"metric";
+  if(!st.tbl[tid])st.tbl[tid]={key:m.sort==="metric"||m.sort==="metric_asc"?mk:"rs",dir:m.sort==="metric_asc"?1:-1,show:100};
+  $("#view").innerHTML=`<div class="sec-head"><div><h2>Scanner library</h2><p>${S.meta.length} technical scans run on every stock after the close. Tap any stock for its detail card, including every other scan it appears in.</p></div></div>
+  <div class="scan-pick">${pick}</div>
+  <div class="scan-layout"><nav class="card rail" aria-label="Scanners">${rail}</nav>
+  <section class="card"><div class="scan-head"><h3>${esc(m.name)}<span class="cnt num">${hits.length}</span></h3><p>${esc(m.desc)}</p><div class="catchips"><span class="pill p-acc">${esc(m.cat)}</span></div></div>
+  <div id="scanT">${dtable(tid,rows,cols,{empty:"No stocks triggered this scan today."})}</div></section></div>`;
+  wireTables($("#scanT"),renderScanners);
+  $("#scanSel").addEventListener("change",e=>{st.scan=e.target.value;store.set("scan",st.scan);renderScanners()});
 }
 
-/* ---------- VPCI screener (Pawan's Streamlit app, precomputed nightly) ---------- */
-const VP={mode:"completed",prorate:true,tab:"fresh",cache:{},rot:null,sort:{},show:{}};
-const VTABS=[["fresh","🔥 Fresh Signals"],["buy","★ Buyable (7/7)"],["watch","◉ Watchlist (6/7)"],["all","All Results"],
-  ["rank","🏆 Ranked"],["g4","🎯 G4 Pending"],["young","🌱 New Listings"],["sect","🏭 Sector Leadership"],["rotn","📈 Sector Rotation"]];
-async function vpLoad(mode){
-  if(window.EMBED_VP)return window.EMBED_VP[mode];
-  if(!VP.cache[mode]){const r=await fetch(`data/vpci/${mode}.json?v=${Date.now()}`);if(!r.ok)throw new Error(`vpci/${mode}.json ${r.status}`);VP.cache[mode]=await r.json();}
-  return VP.cache[mode];
+/* ════════════════════ VPCI ════════════════════ */
+const VP={mode:"completed",prorate:true,tab:"fresh",cache:{},rot:null,q:"",sec:"",view:"cards",allcols:false};
+const GATES=[["g1","G1","EMA 13 above EMA 26"],["g2","G2","Close above EMA 13"],["g3","G3","EMA 13 rising over 3 weeks"],["g4","G4","Close above prior 13-week high"],["g5","G5","VPCI > 0, above signal, rising"],["g6","G6","13-week return positive"],["g7","G7","Close and EMA 13 above 40-week SMA"]];
+const VTABS=[["fresh","🔥 Fresh signals"],["buy","★ Buyable (7/7)"],["watch","◉ Watchlist (6/7)"],["all","All results"],["rank","🏆 Ranked"],["g4","🎯 G4 pending"],["young","🌱 New listings"],["sect","🏭 Sector leadership"],["rotn","📈 Sector rotation"]];
+const vfile=()=>VP.mode==="running"&&!VP.prorate?"running_raw":VP.mode;
+async function vpLoad(f){if(window.EMBED_VP)return window.EMBED_VP[f];if(!VP.cache[f]){const r=await fetch(`data/vpci/${f}.json?v=${Date.now()}`);if(!r.ok)throw new Error(`vpci/${f}.json (${r.status})`);VP.cache[f]=await r.json()}return VP.cache[f]}
+async function vpRot(){if(window.EMBED_VP)return window.EMBED_VP.rotation;if(!VP.rot){const r=await fetch(`data/vpci/rotation.json?v=${Date.now()}`);VP.rot=r.ok?await r.json():{weeks:0,table:{columns:[],rows:[]}}}return VP.rot}
+const objs=t=>(t?.rows||[]).map(r=>Object.fromEntries(t.columns.map((c,i)=>[c,r[i]])));
+const gateDots=r=>`<span class="gates" role="img" aria-label="${GATES.filter(g=>r[g[0]]).length} of 7 gates passed">${GATES.map(g=>`<i class="${r[g[0]]?"on":""}" title="${g[1]}: ${g[2]} — ${r[g[0]]?"pass":"fail"}"></i>`).join("")}</span>`;
+const statusPill=s=>{if(!s||s==="Other")return `<span class="pill p-mut">${esc(s||"–")}</span>`;const c=/FRESH|BUYABLE|CONTINUING/.test(s)?"p-up":/EXTENDED|WATCHLIST|RELAXED/.test(s)?"p-acc":"p-mut";return `<span class="pill ${c}">${esc(s)}</span>`};
+function vcell(c,v){
+  if(v===null||v===undefined||v==="")return "–";
+  if(typeof v==="boolean")return v?`<span class="up" style="font-weight:700">✓</span>`:`<span style="color:var(--muted)">✗</span>`;
+  if(isNum(v)){const d=/^score_|composite/.test(c)?3:(c==="vpci"||c==="vpci_signal")?4:Number.isInteger(v)?0:2;return `<span class="num">${d===0&&Math.abs(v)>=1000?v.toLocaleString("en-IN"):v.toFixed(d)}</span>`}
+  return esc(v);
 }
-async function vpRot(){
-  if(window.EMBED_VP)return window.EMBED_VP.rotation;
-  if(!VP.rot){const r=await fetch(`data/vpci/rotation.json?v=${Date.now()}`);VP.rot=r.ok?await r.json():{weeks:0,table:{columns:[],rows:[]}};}
-  return VP.rot;
+const LEFT=new Set(["position_state","scenario","candle_type","missed_gates","Sector","Industry","Market Cap","source","exchange","sector","industry","name","last_entry_date","last_exit_date","week_ending","asof"]);
+function vcols(rows,keys){
+  const all=new Set(rows.length?Object.keys(rows[0]):[]);
+  return keys.filter(k=>k==="gates"||all.has(k)).map(k=>{
+    if(k==="symbol")return {k,label:"Stock",l:1,fmt:r=>symBtn(r.symbol,r["Company Name"]||r.name,r.exchange),sort:r=>r.symbol,csv:r=>r.symbol};
+    if(k==="gates")return {k,label:"Gates",l:1,fmt:gateDots,sort:r=>r.gate_count,csv:r=>r.gate_count};
+    if(k==="status")return {k,label:"Status",l:1,fmt:r=>statusPill(r.status),sort:r=>r.status,csv:r=>r.status};
+    if(k==="Company Name")return {k,label:"Company",l:1,fmt:r=>esc(r[k]),sort:r=>r[k]};
+    if(k==="composite_score")return {k,label:"composite score",fmt:r=>`<span class="sbar" style="width:${Math.round((r[k]||0)*70)}px"></span><span class="num">${isNum(r[k])?r[k].toFixed(3):"–"}</span>`,sort:r=>r[k]};
+    if(k==="rs_return")return {k,label:"RS 13w %",fmt:r=>`<span class="num ${cls(r[k])}">${isNum(r[k])?sgn(r[k],1,""):"–"}</span>`,sort:r=>r[k]};
+    if(k==="pct_from_52w")return {k,label:"From 52W high %",fmt:r=>`<span class="num">${isNum(r[k])?r[k].toFixed(1):"–"}</span>`,sort:r=>r[k]};
+    if(k==="risk_pct")return {k,label:"Risk %",fmt:r=>`<span class="num">${isNum(r[k])?r[k].toFixed(1):"–"}</span>`,sort:r=>r[k]};
+    return {k,label:k.replace(/_/g," "),l:LEFT.has(k)?1:0,fmt:r=>vcell(k,r[k]),sort:r=>r[k]};
+  });
 }
-const tvx=(sym,ex)=>`https://in.tradingview.com/chart/?symbol=${encodeURIComponent((ex||"NSE")+":"+sym)}`;
-function toObjs(t){return (t?.rows||[]).map(r=>Object.fromEntries(t.columns.map((c,i)=>[c,r[i]])))}
-function fmtCell(c,v){
-  if(v===null||v===undefined||v==="")return ["","–"];
-  if(typeof v==="boolean")return [v?"b-t":"b-f",v?"✓":"✗"];
-  if(typeof v==="number"){
-    const d=/^score_|composite/.test(c)?3:(c==="vpci"||c==="vpci_signal")?4:Number.isInteger(v)?0:2;
-    return ["num",d===0&&Math.abs(v)>=1000?v.toLocaleString("en-IN"):v.toFixed(d)];
-  }
-  return ["txt",String(v)];
+const CORE=["symbol","Market Cap","close","status","gates","vpci","rs_return","pct_from_52w","trail_stop","init_sl","risk_pct","vol_ratio","scenario","position_state","Sector","Industry"];
+function appCols(rows){let c=rows.length?Object.keys(rows[0]):[];c=c.filter(x=>x!=="Company Name");if(c.includes("Market Cap")){c=c.filter(x=>x!=="Market Cap");c.splice(c.indexOf("symbol")+1,0,"Market Cap")}return c}
+function vfilter(rows){const q=VP.q.trim().toUpperCase();return rows.filter(r=>(!q||String(r.symbol).toUpperCase().includes(q)||String(r["Company Name"]||"").toUpperCase().includes(q))&&(!VP.sec||r.Sector===VP.sec))}
+function sigCard(r){
+  const s=(k,v,c="")=>`<div><dt>${k}</dt><dd class="num ${c}">${v}</dd></div>`;
+  const mc=r["Market Cap"]&&r["Market Cap"]!=="N/A"?" · ₹"+esc(String(r["Market Cap"]).replace(" crore inr"," Cr")):"";
+  return `<article class="card scard">
+    <div class="t"><div><div class="sym">${symBtn(r.symbol,"",r.exchange)}</div><div class="co">${esc(r["Company Name"]||"")}${mc}</div></div>
+      <div style="text-align:right"><div class="px num">₹${inr(r.close)}</div>${statusPill(r.status)}</div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">${gateDots(r)}<span class="state">${esc(r.position_state||"")}</span></div>
+    <dl>${s("VPCI",isNum(r.vpci)?r.vpci.toFixed(2):"–")}${s("RS 13w",sgn(r.rs_return,1),cls(r.rs_return))}${s("From 52W high",isNum(r.pct_from_52w)?r.pct_from_52w.toFixed(1)+"%":"–")}
+      ${s("Trail stop","₹"+inr(r.trail_stop))}${s("Initial SL","₹"+inr(r.init_sl))}${s("Risk",isNum(r.risk_pct)?r.risk_pct.toFixed(1)+"%":"–")}
+      ${s("Volume ×",isNum(r.vol_ratio)?r.vol_ratio.toFixed(2):"–")}${s("Scenario",esc(r.scenario||"–"))}${s("Sector",esc(r.Sector||"–"))}</dl>
+  </article>`;
 }
-function vtable(id,rows,cols,opts={}){
-  if(!rows.length)return `<div class="empty">${esc(opts.empty||"No rows.")}</div>`;
-  cols=cols||Object.keys(rows[0]);
-  const s=VP.sort[id];
-  if(s){rows=[...rows].sort((a,b)=>{const A=a[s.k],B=b[s.k];if(A==null)return 1;if(B==null)return -1;return typeof A==="string"?s.d*A.localeCompare(B):s.d*(A-B)})}
-  const lim=VP.show[id]||100,vis=rows.slice(0,lim);
-  let h=`<div class="tscroll vt"><table data-tid="${id}"><thead><tr>${cols.map(c=>`<th class="${c==="symbol"||c==="Company Name"||c==="status"?"l":""}" data-k="${esc(c)}" tabindex="0">${esc(c)}${s&&s.k===c?(s.d<0?" ▼":" ▲"):""}</th>`).join("")}</tr></thead><tbody>`;
-  for(const r of vis){h+="<tr>"+cols.map(c=>{
-    if(c==="symbol")return `<td class="sym"><a href="${tvx(r.symbol,r.exchange)}" target="_blank" rel="noopener">${esc(r.symbol)}</a></td>`;
-    const [k,t]=fmtCell(c,r[c]);return `<td class="${k}">${esc(t)}</td>`}).join("")+"</tr>"}
-  h+=`</tbody></table></div>`;
-  if(rows.length>lim)h+=`<button class="more" type="button" data-more="${id}">Show ${Math.min(100,rows.length-lim)} more of ${rows.length-lim} remaining</button>`;
-  h+=`<button class="dl" type="button" data-dl="${id}">📥 Download CSV (${rows.length} rows)</button>`;
-  VP.tables=VP.tables||{};VP.tables[id]={rows,cols};
-  return h;
-}
-function csvOf(id){const {rows,cols}=VP.tables[id];const q=v=>v==null?"":/[",\n]/.test(String(v))?`"${String(v).replace(/"/g,'""')}"`:String(v);
-  return [cols.join(",")].concat(rows.map(r=>cols.map(c=>q(r[c])).join(","))).join("\n")}
-function lead(rows,first){const all=rows.length?Object.keys(rows[0]):[];return first.filter(c=>all.includes(c)).concat(all.filter(c=>!first.includes(c)))}
-function uiCols(rows){ // app.py: Market Cap moved right after Company Name
-  let c=rows.length?Object.keys(rows[0]):[];if(c.includes("Market Cap")){c=c.filter(x=>x!=="Market Cap");const i=c.includes("Company Name")?c.indexOf("Company Name")+1:c.indexOf("symbol")+1;c.splice(i,0,"Market Cap")}return c}
-async function renderVp(){
-  const v=$("#view");
-  const file=VP.mode==="running"&&!VP.prorate?"running_raw":VP.mode;
-  v.innerHTML=`<div class="vbar"><div><span class="ctl-label">Weekly candle</span>${seg("vpmode",["completed","running"],VP.mode,{completed:"Completed weeks (app default after close)",running:"Running week, live candle"})}</div>
-    ${VP.mode==="running"?`<div><span class="ctl-label">Pro-rate partial-week volume</span>${seg("vpprorate",["on","off"],VP.prorate?"on":"off",{on:"On",off:"Off"})}</div>`:""}
-    <a href="https://pkcvpc.streamlit.app/" target="_blank" rel="noopener">Open the live Streamlit app ↗</a></div><div id="vpBody"><div class="empty">Loading scan…</div></div>`;
-  let d;try{d=await vpLoad(file)}catch(e){$("#vpBody").innerHTML=`<div class="err"><b>VPCI results are not available yet.</b><br>${esc(e.message)}. They are created by the evening job; run “Daily update” once from the Actions tab.</div>`;return}
-  const res=toObjs(d.results),yng=toObjs(d.young),failed=d.failed||[];
-  const buyN=res.filter(r=>r.full_entry).length;
+async function renderVpci(){
+  $("#view").innerHTML=`<div class="sec-head"><div><h2>VPCI screener</h2><p>Your Streamlit screener — VPCI v3, 7 gates, true-fresh position tracking — run on the full list every evening with the same code and defaults.</p></div>
+    <a class="btn alt" href="https://pkcvpc.streamlit.app/" target="_blank" rel="noopener">Open the live Streamlit app ↗</a></div>
+  <div class="card toolbar">
+    <div class="ctl"><span>Weekly candle</span>${seg("vpmode",["completed","running"],VP.mode,{completed:"Completed weeks (app default after close)",running:"Running week, live candle"})}</div>
+    ${VP.mode==="running"?`<div class="ctl"><span>Pro-rate partial-week volume</span>${seg("vpprorate",["on","off"],VP.prorate?"on":"off",{on:"On",off:"Off"})}</div>`:""}
+  </div><div id="vpBody"><div class="card empty">Loading scan…</div></div>`;
+  let d;try{d=await vpLoad(vfile())}catch(e){$("#vpBody").innerHTML=`<div class="err"><b>VPCI results are not available yet.</b><br>${esc(e.message)}. The evening job creates them — run “Daily update” once from the Actions tab.</div>`;return}
+  VP.d=d;VP.res=objs(d.results);VP.yng=objs(d.young);
+  const res=VP.res,failed=d.failed||[],cnt=s=>res.filter(r=>s.includes(r.status)).length,n=res.length||1,gp=GATES.map(g=>res.filter(r=>r[g[0]]).length);
   let h="";
-  if(!d.live&&d.bar_week&&d.bar_week.unfinished)h+=`<div class="warnbox">ℹ️ As in your app, this mode uses Upstox's weekly candle, which already contains this unfinished week. The engine keeps that bar for stocks whose week-so-far volume is at least 25% of last week's (most stocks by mid-week), without pro-rating the volume. Quieter stocks fall back to last week's completed bar.</div>`;
+  if(!d.live&&d.bar_week?.unfinished)h+=`<div class="warnbox">ℹ️ As in your app, this mode uses Upstox's weekly candle, which already contains this unfinished week. The engine keeps that bar for stocks whose week-so-far volume is at least 25% of last week's, without pro-rating it; quieter stocks fall back to last week's bar.</div>`;
   if(d.live)h+=`<div class="warnbox">⚠️ Signals on the running week are <b>provisional</b> — they can and do flip before Friday's close. Weigh them by the <code>week_confidence</code> column.</div>`;
-  if(d.live&&d.project_volume===false)h+=`<div class="err" style="margin-bottom:12px">🚨 <b>Pro-rate is OFF.</b> The running week holds only part of a week's volume, so <code>VM = SMA_V(5)/SMA_V(20)</code> and <code>VPR</code> collapse, VPCI goes negative, <b>G5 fails and your 7/7 count will crater</b>. This is arithmetic, not signal. Turn it ON unless you are deliberately inspecting raw volume.</div>`;
-  h+=`<p class="caption">Scan run ${esc(d.scan_time)} on ${esc(d.universe_file)} · latest weekly bar: ${d.bar_week?`week of ${esc(d.bar_week.monday)} to ${esc(d.bar_week.friday)}${d.bar_week.unfinished?" (week not finished yet)":""}`:esc(d.week_ending||"–")} · settings: Upstox → Yahoo, relaxed mode off.</p>
-  <div class="metrics">
-    <div class="panel metric"><div class="k">Total Symbols Analyzed</div><div class="v num">${d.total}</div></div>
-    <div class="panel metric"><div class="k">✅ Candidates Found</div><div class="v num">${res.length}</div></div>
-    <div class="panel metric"><div class="k">⚠️ No Data / Excluded</div><div class="v num">${failed.length}</div></div>
-    <div class="panel metric"><div class="k">★ Buyable (7/7)</div><div class="v num">${buyN}</div></div></div>
-  <div class="badges"><b>Data coverage:</b>${Object.entries(d.source_counts||{}).map(([k,n])=>`<span class="badge">${esc(k)}: ${n.toLocaleString("en-IN")}</span>`).join("")}
-    ${Object.entries(d.exchange_counts||{}).map(([k,n])=>`<span class="badge">🏛 ${esc(k)}: ${n.toLocaleString("en-IN")}</span>`).join("")}
-    ${failed.length?`<span class="badge off">Not found anywhere: ${failed.length}</span>`:""}</div>`;
-  if(failed.length)h+=`<details class="exp"><summary>⚠️ ${failed.length} symbols not found on any source (Upstox → Kite → Yahoo)</summary><div style="padding:6px 14px 10px">${failed.map(esc).join(", ")}</div></details>`;
-  h+=`<div class="subtabs" role="group" aria-label="Screener views">${VTABS.map(([k,l])=>`<button type="button" data-vtab="${k}" aria-pressed="${VP.tab===k}">${l}</button>`).join("")}</div><div id="vpTab"></div>`;
+  if(d.live&&d.project_volume===false)h+=`<div class="err" style="margin-bottom:12px">🚨 <b>Pro-rate is OFF.</b> The running week holds only part of a week's volume, so <code>VM = SMA_V(5)/SMA_V(20)</code> and <code>VPR</code> collapse, VPCI goes negative, <b>G5 fails and the 7/7 count craters</b>. This is arithmetic, not signal.</div>`;
+  const tl=(k,val,sub="")=>`<div class="card tile"><div class="k">${k}</div><div class="v num">${val}</div>${sub?`<div class="d" style="color:var(--muted)">${sub}</div>`:""}</div>`;
+  h+=`<div class="vstats">${tl("🔥 Fresh signals",cnt(["🔥 FRESH BUY","🔥 FRESH EXT"]),"first-ever, or first after a sell")}${tl("★ Buyable 7/7",res.filter(r=>r.full_entry).length,`${cnt(["📌 CONTINUING (7/7)"])} already in a position`)}${tl("◉ Watchlist 6/7",cnt(["★ RELAXED (6/7)","◉ WATCHLIST (6/7)"]),"tier 1 gates passed")}${tl("Stocks analysed",res.length.toLocaleString("en-IN"),`${failed.length} not found · ${VP.yng.length} new listings`)}</div>`;
+  h+=`<div class="card funnel"><h3>Where stocks pass and fail</h3>${GATES.map((g,i)=>`<div class="frow"><span class="lbl">${g[1]}<small>${esc(g[2])}</small></span><div><div class="bar" style="width:${gp[i]/n*100}%"></div></div><span class="n num">${(gp[i]/n*100).toFixed(0)}%</span></div>`).join("")}
+    <p class="note" style="margin-top:8px">Share of ${res.length.toLocaleString("en-IN")} stocks passing each gate. ${res.filter(r=>r.gate_count>=5).length} pass 5+ gates, ${res.filter(r=>r.gate_count>=6).length} pass 6+, ${res.filter(r=>r.gate_count===7).length} pass all 7.</p></div>`;
+  h+=`<div class="badges"><b>Scan</b> <span class="badge">${esc(d.scan_time)}</span><span class="badge">Week of ${esc(d.bar_week?fmtDate(d.bar_week.monday):d.week_ending)}${d.bar_week?.unfinished?" · unfinished":""}</span>${Object.entries(d.source_counts||{}).map(([k,v])=>`<span class="badge ok">${esc(k)} ${v.toLocaleString("en-IN")}</span>`).join("")}${Object.entries(d.exchange_counts||{}).map(([k,v])=>`<span class="badge">🏛 ${esc(k)} ${v.toLocaleString("en-IN")}</span>`).join("")}${failed.length?`<span class="badge off">Not found ${failed.length}</span>`:""}</div>`;
+  if(failed.length)h+=`<details class="exp"><summary>⚠️ ${failed.length} symbols not found on any source (Upstox → Kite → Yahoo)</summary><div style="padding:6px 16px 10px">${failed.map(esc).join(", ")}</div></details>`;
+  const tc={fresh:cnt(["🔥 FRESH BUY","🔥 FRESH EXT"]),buy:cnt(["★ BUYABLE (7/7)","📌 CONTINUING (7/7)"]),watch:cnt(["★ RELAXED (6/7)","◉ WATCHLIST (6/7)"]),all:res.length,rank:(d.ranked?.rows||[]).length,g4:(d.g4?.rows||[]).length,young:VP.yng.length};
+  h+=`<div class="subtabs" role="group" aria-label="Screener views">${VTABS.map(([k,l])=>`<button type="button" data-vtab="${k}" aria-pressed="${VP.tab===k}">${l}${tc[k]!=null?`<span class="c">${tc[k]}</span>`:""}</button>`).join("")}</div><div id="vpTab"></div>`;
   $("#vpBody").innerHTML=h;
-  await vpTab(d,res,yng);
+  await vpTab();
 }
-async function vpTab(d,res,yng){
-  const t=VP.tab,box=$("#vpTab");let h="";
-  const st_=s=>res.filter(r=>s.includes(r.status));
+function vtools(withView){
+  const secs=[...new Set(VP.res.map(r=>r.Sector).filter(Boolean))].sort();
+  return `<div class="vtools"><input class="search" type="search" id="vq" placeholder="Search symbol or company" value="${esc(VP.q)}" aria-label="Search">
+    <select class="select" id="vsec" aria-label="Sector"><option value="">All sectors</option>${secs.map(s=>`<option ${s===VP.sec?"selected":""}>${esc(s)}</option>`).join("")}</select>
+    ${withView?seg("vview",["cards","table"],VP.view,{cards:"Cards",table:"Table"}):""}
+    ${!withView||VP.view==="table"?`<label class="check"><input type="checkbox" id="vall" ${VP.allcols?"checked":""}>Every column (as in the app)</label>`:""}</div>`;
+}
+function wireVtools(){
+  const q=$("#vq");if(q)q.addEventListener("input",e=>{VP.q=e.target.value;vpTab().then(()=>{const n=$("#vq");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}})});
+  const s=$("#vsec");if(s)s.addEventListener("change",e=>{VP.sec=e.target.value;vpTab()});
+  const a=$("#vall");if(a)a.addEventListener("change",e=>{VP.allcols=e.target.checked;vpTab()});
+}
+async function vpTab(){
+  const d=VP.d,res=VP.res,yng=VP.yng,box=$("#vpTab"),t=VP.tab,f=vfile();let h="";
+  const by=s=>vfilter(res.filter(r=>s.includes(r.status)));
+  const tbl=(id,rows,first)=>dtable(`vp_${id}_${f}`,rows,vcols(rows,VP.allcols?appCols(rows):first),{empty:"No stocks."});
+  const dflt=(id,key,dir)=>{if(!st.tbl[`vp_${id}_${f}`])st.tbl[`vp_${id}_${f}`]={key,dir,show:100}};
   if(t==="fresh"){
-    h+=`<p class="caption"><b>Fresh = a genuinely NEW entry.</b> All 7 gates open this week AND the stock has no open prior position — either it never signalled before, or its last position was closed by a SELL (weekly close below the 3×ATR trailing stop). Stocks that merely re-passed 7/7 while an old buy is still live are excluded (they show as 📌 CONTINUING in All Results). <code>position_state</code> tells you which case each one is.</p>`;
-    const f=st_(["🔥 FRESH BUY","🔥 FRESH EXT"]);
-    h+=f.length?vtable("fresh",f,lead(f,["symbol","Company Name","Market Cap","close","status","position_state","last_exit_date","vpci","rs_return","pct_from_52w","trail_stop","init_sl","risk_pct","vol_ratio","scenario","source","exchange"]))
-      :`<div class="empty panel">No genuinely fresh signals this week (first-ever, or first after a sell).</div>`;
-    const c=st_(["📌 CONTINUING (7/7)"]);
-    if(c.length)h+=`<details class="exp"><summary>📌 ${c.length} stocks re-showing 7/7 inside an OPEN position (old engine wrongly called these fresh)</summary><div>${vtable("cont",c,uiCols(c))}</div></details>`;
-  }else if(t==="buy"){const r=st_(["★ BUYABLE (7/7)","📌 CONTINUING (7/7)"]);h+=r.length?vtable("buy",r,uiCols(r)):`<div class="empty panel">No stocks passed all 7 criteria.</div>`;}
-  else if(t==="watch"){const r=st_(["★ RELAXED (6/7)","◉ WATCHLIST (6/7)"]);h+=r.length?vtable("watch",r,uiCols(r)):`<div class="empty panel">No watchlist candidates found.</div>`;}
-  else if(t==="all"){h+=vtable("all",res,uiCols(res));}
-  else if(t==="rank"){const r=toObjs(d.ranked);
-    h+=`<h3>All Ranked Buyable Candidates</h3><p class="caption">Composite score: VPCI 25% + RS 25% + 52wH 20% + Tight base 15% + Volume 10% + Mcap fit 5%</p>`;
-    h+=r.length?vtable("rank",r,["rank","symbol","Company Name","Market Cap","close","composite_score","score_vpci","score_rs","score_52w","score_tight","score_vol","score_mcap","source","exchange","status"].filter(c=>c in r[0]))+`<p class="caption">Total ranked: ${r.length} stocks. Top 5 typically have score &gt; 0.80. Score gap from #1 to #5 indicates conviction strength.</p>`
-      :`<div class="empty panel">No 7/7 stocks to rank this week. Try the Watchlist tab for 6/7 candidates.</div>`;}
-  else if(t==="g4"){const r=toObjs(d.g4);
-    h+=`<h3>🎯 G4 Pending — Pre-Breakout Watchlist</h3><p class="caption">All 6 other gates passing; only the G4 breakout above the 13-week high is missing. Watch these for the breakout.</p>`;
-    h+=r.length?vtable("g4",r,["rank","symbol","Company Name","Market Cap","close","composite_score","score_vpci","score_rs","score_52w","score_tight","score_vol","score_mcap","score_proximity","source","exchange","status"].filter(c=>c in r[0]))+`<p class="caption">Total G4-pending: ${r.length} stocks. Click any symbol to open its chart and watch for the breakout above the 13w high.</p>`
-      :`<div class="empty panel">No stocks meet the strict G4-pending criteria this week (all 6 other gates passing, only G4 missing).</div>`;}
-  else if(t==="young"){
-    h+=`<h3>🌱 New Listings — Early VPCI Accumulation Watch</h3><p class="caption">Stocks with 22–41 weekly bars — too young for the full 7-gate scan (needs the 40-week SMA), but old enough for the exact same VPCI 5/20 computation. <b>Accumulating = the engine's G5 condition</b> (VPCI &gt; 0, above its signal line, and rising). These are candidates to track until they mature into the main scan — not buy signals.</p>`;
-    if(!yng.length)h+=`<div class="empty panel">No recently listed stocks with enough bars for a VPCI read were found this scan.</div>`;
-    else{const acc=yng.filter(r=>r.accumulating);
-      h+=`<div class="metrics"><div class="panel metric"><div class="k">🌱 Young stocks scanned</div><div class="v num">${yng.length}</div></div><div class="panel metric"><div class="k">✅ Accumulating (G5-style)</div><div class="v num">${acc.length}</div></div><div class="panel metric"><div class="k">📈 Above 13w EMA</div><div class="v num">${yng.filter(r=>r.above_13ema).length}</div></div></div>`;
-      h+=`<h4>✅ Accumulating — VPCI &gt; 0, above signal, rising</h4>`+(acc.length?vtable("yacc",acc):`<div class="empty panel">None of the young listings show VPCI accumulation this week.</div>`);
-      h+=`<details class="exp"><summary>All young listings (including non-accumulating)</summary><div>${vtable("yall",yng)}</div></details>`;}
+    h+=`<p class="note" style="margin:0 0 12px"><b>Fresh = a genuinely new entry.</b> All 7 gates open this week and no open prior position — never signalled before, or the last position was closed by a sell (weekly close below the 3×ATR trailing stop). Re-passes inside a live position show as 📌 Continuing.</p>`+vtools(true);
+    const fr=by(["🔥 FRESH BUY","🔥 FRESH EXT"]);dflt("fresh","pct_from_52w",1);
+    if(!fr.length)h+=`<div class="card empty">No genuinely fresh signals this week (first-ever, or first after a sell).</div>`;
+    else h+=VP.view==="cards"?`<div class="cards">${[...fr].sort((a,b)=>a.pct_from_52w-b.pct_from_52w).map(sigCard).join("")}</div>`:`<div class="card">${tbl("fresh",fr,["symbol","Market Cap","close","status","gates","position_state","last_exit_date","vpci","rs_return","pct_from_52w","trail_stop","init_sl","risk_pct","vol_ratio","scenario","Sector","source","exchange"])}</div>`;
+    const c=by(["📌 CONTINUING (7/7)"]);
+    if(c.length)h+=`<details class="exp"><summary>📌 ${c.length} stocks re-showing 7/7 inside an open position</summary><div>${tbl("cont",c,CORE)}</div></details>`;
+  }else if(t==="buy"||t==="watch"||t==="all"){
+    const rows=t==="buy"?by(["★ BUYABLE (7/7)","📌 CONTINUING (7/7)"]):t==="watch"?by(["★ RELAXED (6/7)","◉ WATCHLIST (6/7)"]):vfilter(res);
+    dflt(t,t==="all"?"gates":"pct_from_52w",t==="all"?-1:1);
+    h+=vtools(false)+`<div class="card">${rows.length?tbl(t,rows,t==="watch"?["symbol","Market Cap","close","status","gates","missed_gates","vpci","rs_return","pct_from_52w","trail_stop","risk_pct","vol_ratio","scenario","Sector","Industry"]:CORE):`<div class="empty">${t==="buy"?"No stocks passed all 7 criteria.":t==="watch"?"No watchlist candidates found.":"No results."}</div>`}</div>`;
+  }else if(t==="rank"||t==="g4"){
+    const r=vfilter(objs(t==="rank"?d.ranked:d.g4));
+    const first=["rank","symbol","Market Cap","close","composite_score","score_vpci","score_rs","score_52w","score_tight","score_vol","score_mcap"].concat(t==="g4"?["score_proximity"]:[]).concat(["source","exchange","status"]);
+    h+=`<p class="note" style="margin:0 0 12px">${t==="rank"?"Composite score: VPCI 25% + RS 25% + 52W high 20% + tight base 15% + volume 10% + market-cap fit 5%. The top 5 typically score above 0.80; the gap from #1 to #5 shows conviction.":"All 6 other gates pass; only the G4 breakout above the 13-week high is missing. Watch these for the breakout."}</p>`+vtools(false);
+    dflt(t,"rank",1);
+    h+=`<div class="card">${r.length?tbl(t,r,first):`<div class="empty">${t==="rank"?"No 7/7 stocks to rank this week. Try the Watchlist tab.":"No stocks meet the strict G4-pending criteria this week."}</div>`}</div>`;
+  }else if(t==="young"){
+    h+=`<p class="note" style="margin:0 0 12px">Stocks with 22–41 weekly bars — too young for the 40-week SMA, old enough for the same VPCI 5/20 maths. <b>Accumulating = the engine's G5 condition</b> (VPCI &gt; 0, above signal, rising). Track these; they are not buy signals.</p>`;
+    if(!yng.length)h+=`<div class="card empty">No recently listed stocks with enough bars this scan.</div>`;
+    else{const acc=yng.filter(r=>r.accumulating),keys=Object.keys(yng[0]);
+      h+=`<div class="tiles">${[["🌱 Young stocks scanned",yng.length],["✅ Accumulating (G5-style)",acc.length],["📈 Above 13-week EMA",yng.filter(r=>r.above_13ema).length]].map(([k,v])=>`<div class="card tile"><div class="k">${k}</div><div class="v num">${v}</div></div>`).join("")}</div>
+      <h3 style="font-size:19px;margin:6px 0 10px">Accumulating — VPCI &gt; 0, above signal, rising</h3><div class="card">${acc.length?dtable("vp_yacc_"+f,acc,vcols(acc,keys)):`<div class="empty">None of the young listings show accumulation this week.</div>`}</div>
+      <details class="exp"><summary>All young listings (including non-accumulating)</summary><div>${dtable("vp_yall_"+f,yng,vcols(yng,keys))}</div></details>`}
   }else if(t==="sect"){
-    const S=d.sector||{},both=toObjs(S.sector_both),ind=toObjs(S.industry_both);
-    h+=`<h3>🏭 Leading Sectors &amp; Industries — G5 (VPCI) + G6 (Leader RS) + G7 (Above 40w)</h3><p class="caption">Sectors and industries ranked by the count of stocks where the institutional confirmation gates fire together. G5 = VPCI accumulation; G6 = leader RS positive vs index; G7 = price above the 40-week MA (Stage 2 trend). When several constituents of the same sector pass all three, accumulation, relative strength and trend are aligned — the highest-conviction sector for fresh capital this week.</p>`;
-    const tot=both.reduce((a,r)=>a+(r.stocks_passing||0),0);
-    if(!both.length||!tot)h+=`<div class="empty panel">No stocks pass G5, G6 and G7 together in this scan.</div>`;
-    else{h+=`<div class="metrics"><div class="panel metric"><div class="k">Stocks passing G5 ∧ G6 ∧ G7</div><div class="v num">${tot}</div></div><div class="panel metric"><div class="k">Sectors with ≥1 leader</div><div class="v num">${both.filter(r=>r.stocks_passing>0).length}</div></div><div class="panel metric"><div class="k">Top sector</div><div class="v" style="font-size:22px">${esc(both[0].sector)}</div><div class="k">${both[0].stocks_passing} stocks</div></div></div>`;
-      h+=`<div class="cols2"><div><h4>🥇 Sectors — G5 ∧ G6 ∧ G7 (strict)</h4><p class="caption">All three gates passing — institutional confirmation cut.</p>${vtable("sb",both.slice(0,20))}</div>
-        <div><h4>🏷️ Industries — G5 ∧ G6 ∧ G7 (strict)</h4><p class="caption">Drill-down within sectors — the actual sub-theme leading.</p>${vtable("ib",ind.slice(0,20))}</div></div>`;
-      h+=`<details class="exp"><summary>📊 Broader breadth — Sectors / Industries with G5 ∨ G6 ∨ G7 firing</summary><div><p class="caption" style="padding:0 14px">A wider net for early sector accumulation: stocks passing any of the three institutional gates — spots sectors just starting to rotate.</p><div class="cols2"><div>${vtable("se",toObjs(S.sector_either).slice(0,20))}</div><div>${vtable("ie",toObjs(S.industry_either).slice(0,20))}</div></div></div></details>`;
-      h+=`<details class="exp"><summary>🔬 Stock-level view — every passer with sector tags</summary><div>${vtable("stk",toObjs(S.stock_table))}</div></details>`;}
+    const S=d.sector||{},both=objs(S.sector_both),ind=objs(S.industry_both),tot=both.reduce((a,r)=>a+(r.stocks_passing||0),0);
+    h+=`<p class="note" style="margin:0 0 12px">Sectors and industries ranked by stocks where G5 (VPCI accumulation), G6 (positive 13-week return) and G7 (above the 40-week MA) fire together — accumulation, strength and trend aligned.</p>`;
+    if(!both.length||!tot)h+=`<div class="card empty">No stocks pass G5, G6 and G7 together in this scan.</div>`;
+    else{const bars=(rows,key)=>{const mx=Math.max(1,...rows.map(r=>r.stocks_passing));return rows.filter(r=>r.stocks_passing>0).slice(0,15).map(r=>`<div class="hbar"><span>${esc(r[key])}</span><div><div class="b" style="width:${r.stocks_passing/mx*100}%"></div></div><span class="num" style="text-align:right"><b>${r.stocks_passing}</b> <span style="color:var(--muted)">· ${r["hit_rate_%"]}%</span></span></div>`).join("")};
+      const se=objs(S.sector_either),ie=objs(S.industry_either),sk=objs(S.stock_table);
+      h+=`<div class="tiles"><div class="card tile"><div class="k">Stocks passing G5 ∧ G6 ∧ G7</div><div class="v num">${tot}</div></div><div class="card tile"><div class="k">Sectors with at least one leader</div><div class="v num">${both.filter(r=>r.stocks_passing>0).length}</div></div><div class="card tile"><div class="k">Top sector</div><div class="v" style="font-size:24px">${esc(both[0].sector)}</div><div class="d" style="color:var(--muted)">${both[0].stocks_passing} stocks · ${both[0]["hit_rate_%"]}% of the sector</div></div></div>
+      <div class="cols2"><div class="card pad"><h3 style="font-size:19px;margin-bottom:8px">🥇 Sectors — all three gates</h3>${bars(both,"sector")}<p class="note">Bar = stocks passing; % = share of the sector.</p></div>
+        <div class="card pad"><h3 style="font-size:19px;margin-bottom:8px">🏷️ Industries — all three gates</h3>${bars(ind,"industry")}</div></div>
+      <details class="exp"><summary>📊 Broader breadth — any of G5, G6, G7 firing</summary><div class="cols2" style="padding:0 12px 8px"><div>${dtable("vp_se_"+f,se.slice(0,20),vcols(se,Object.keys(se[0]||{})),{csv:false})}</div><div>${dtable("vp_ie_"+f,ie.slice(0,20),vcols(ie,Object.keys(ie[0]||{})),{csv:false})}</div></div></details>
+      <details class="exp"><summary>🔬 Stock-level view — every passer with sector tags</summary><div>${dtable("vp_stk_"+f,sk,vcols(sk,Object.keys(sk[0]||{})))}</div></details>`}
   }else if(t==="rotn"){
-    const R=await vpRot();
-    h+=`<h3>📈 Sector Rotation — Week-Over-Week History</h3><p class="caption">Counts of stocks passing G5 ∧ G6 ∧ G7 per sector across saved weekly snapshots. A sector accelerating from 2 → 5 → 9 leaders over three weeks is rotating in; a decaying one is rotating out. One snapshot is saved per week by the evening job.</p>`;
-    const rows=toObjs(R.table);
-    if(!rows.length)h+=`<div class="empty panel">No history yet. Each week adds a column here.</div>`;
-    else{const cols=R.table.columns,weeks=cols.slice(1),mx=Math.max(1,...rows.flatMap(r=>weeks.map(w=>r[w]||0)));
-      h+=`<p class="caption">Loaded ${R.weeks} weekly snapshot(s).</p><div class="tscroll vt panel"><table><thead><tr><th class="l">sector</th>${weeks.map(w=>`<th>${esc(w)}</th>`).join("")}</tr></thead><tbody>`+
-        rows.map(r=>`<tr><td class="l">${esc(r.sector)}</td>${weeks.map(w=>{const v=r[w]||0,f=v/mx;return `<td class="num" style="${v>0?`background:color-mix(in srgb,var(--up) ${Math.round(15+60*f)}%,transparent);font-weight:700`:""}">${v}</td>`}).join("")}</tr>`).join("")+`</tbody></table></div>`;
-      if(R.rot_in||R.rot_out)h+=`<div class="cols2" style="margin-top:12px"><div class="panel" style="padding:10px 14px"><h4>🚀 Rotating IN (week-over-week)</h4>${(R.rot_in||[]).map(([s,v])=>`<div>${esc(s)} <b class="up">+${v}</b></div>`).join("")||"–"}</div><div class="panel" style="padding:10px 14px"><h4>🪂 Rotating OUT (week-over-week)</h4>${(R.rot_out||[]).map(([s,v])=>`<div>${esc(s)} <b class="down">${v}</b></div>`).join("")||"–"}</div></div>`;}
+    const R=await vpRot(),rows=objs(R.table);
+    h+=`<p class="note" style="margin:0 0 12px">Stocks passing G5 ∧ G6 ∧ G7 per sector, one snapshot per week. A sector climbing 2 → 5 → 9 leaders is rotating in; a fading one is rotating out.</p>`;
+    if(!rows.length)h+=`<div class="card empty">No history yet. Each week adds a column.</div>`;
+    else{const weeks=R.table.columns.slice(1),mx=Math.max(1,...rows.flatMap(r=>weeks.map(w=>r[w]||0)));
+      h+=`<div class="card"><div class="tscroll"><table class="heat"><thead><tr><th>Sector</th>${weeks.map(w=>`<th>Week to ${esc(fmtDate(w))}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.sector)}</td>${weeks.map(w=>{const v=r[w]||0,fr=v/mx;return `<td><div class="cell num" style="${v?`background:color-mix(in srgb,var(--up) ${Math.round(12+60*fr)}%,transparent);${fr>.55?"color:#fff":""}`:""}">${v}</div></td>`}).join("")}</tr>`).join("")}</tbody></table></div></div>
+      <p class="note">${R.weeks} weekly snapshot(s) so far.</p>`;
+      if(R.rot_in||R.rot_out)h+=`<div class="cols2"><div class="card pad"><h3 style="font-size:19px">🚀 Rotating in</h3>${(R.rot_in||[]).map(([s,v])=>`<div class="hbar"><span>${esc(s)}</span><span></span><b class="up num" style="text-align:right">+${v}</b></div>`).join("")||"–"}</div><div class="card pad"><h3 style="font-size:19px">🪂 Rotating out</h3>${(R.rot_out||[]).map(([s,v])=>`<div class="hbar"><span>${esc(s)}</span><span></span><b class="down num" style="text-align:right">${v}</b></div>`).join("")||"–"}</div></div>`}
   }
-  box.innerHTML=h;
-  box.querySelectorAll("th[data-k]").forEach(th=>{const tid=th.closest("table").dataset.tid;const go=()=>{const k=th.dataset.k,s=VP.sort[tid];VP.sort[tid]={k,d:s&&s.k===k?-s.d:-1};vpTab(d,res,yng)};th.addEventListener("click",go);th.addEventListener("keydown",e=>{if(e.key==="Enter")go()})});
-  box.querySelectorAll("[data-more]").forEach(b=>b.addEventListener("click",()=>{VP.show[b.dataset.more]=(VP.show[b.dataset.more]||100)+100;vpTab(d,res,yng)}));
-  box.querySelectorAll("[data-dl]").forEach(b=>b.addEventListener("click",()=>{const blob=new Blob([csvOf(b.dataset.dl)],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`vpci_${d.mode}_${b.dataset.dl}_${(d.scan_time||"").slice(0,10)}.csv`;document.body.appendChild(a);a.click();a.remove()}));
+  box.innerHTML=h;wireTables(box,vpTab);wireVtools();
 }
 
-/* ---------- wiring ---------- */
-function render(){renderHead();({rot:renderRot,br:renderBr,rs:renderRs,sc:renderSc,vp:renderVp})[st.tab]()}
-$("#tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;st.tab=b.dataset.v;
-  document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));render()});
-$("#view").addEventListener("click",e=>{
-  const s=e.target.closest("[data-seg]");
-  if(s&&s.dataset.seg==="vpmode"){VP.mode=s.dataset.val;VP.sort={};VP.show={};renderVp();return;}
-  if(s&&s.dataset.seg==="vpprorate"){VP.prorate=s.dataset.val==="on";VP.sort={};VP.show={};renderVp();return;}
-  if(s){st[s.dataset.seg]=s.dataset.val;if(s.dataset.seg==="group")st.open=null;render();return;}
-  const vt=e.target.closest("[data-vtab]");if(vt){VP.tab=vt.dataset.vtab;document.querySelectorAll("[data-vtab]").forEach(b=>b.setAttribute("aria-pressed",b===vt));vpLoad(VP.mode==="running"&&!VP.prorate?"running_raw":VP.mode).then(d=>vpTab(d,toObjs(d.results),toObjs(d.young)));return;}
-  if(e.target.closest("#vpBody"))return;
-  if(e.target.closest(".members"))return;
-  const r=e.target.closest(".brow");if(r){st.open=st.open===r.dataset.g?null:r.dataset.g;renderRot();}
-});
-$("#view").addEventListener("keydown",e=>{const r=e.target.closest?.(".brow");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();st.open=st.open===r.dataset.g?null:r.dataset.g;renderRot();
-  document.querySelector(`.brow[data-g="${CSS.escape(r.dataset.g)}"]`)?.focus()}});
-$("#themeBtn").addEventListener("click",()=>{const d=document.documentElement,cur=d.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
-  d.dataset.theme=cur==="dark"?"light":"dark";try{localStorage.setItem("radar-theme",d.dataset.theme)}catch(e){}});
-try{const t=localStorage.getItem("radar-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+/* ════════════════════ stock drawer ════════════════════ */
+let lastFocus=null;
+async function openDrawer(sym,ex){
+  lastFocus=document.activeElement;
+  const x=D.by[sym];let vr=null;
+  try{const d=await vpLoad("completed");vr=objs(d.results).find(r=>r.symbol===sym)||null}catch(e){}
+  const per=x?PERIODS.map(p=>`<div><dt>${p}</dt><dd class="num ${cls(x.r[p])}">${sgn(x.r[p],1)}</dd></div>`).join(""):"";
+  const kv=(k,v)=>`<div><dt>${k}</dt><dd class="num">${v}</dd></div>`;
+  const scans=(D.scansOf[sym]||[]).map(id=>D.scanMeta[id]).filter(Boolean);
+  const name=x?.n||vr?.["Company Name"]||"",sector=x?.ind||x?.sec||vr?.Sector||"";
+  $("#drawer").innerHTML=`<header><div><h2 id="dTitle">${esc(sym)}</h2><div class="co">${esc(name)}${sector?` · ${esc(sector)}`:""}</div></div><button class="close" type="button" data-close aria-label="Close">×</button></header>
+  <div class="body">
+    ${x?`<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span class="num" style="font-family:var(--display);font-weight:800;font-size:34px">₹${inr(x.px)}</span><span class="num ${cls(x.r["1D"])}" style="font-weight:700;font-size:19px">${sgn(x.r["1D"])} today</span></div>
+    <div class="dsec"><h4>Returns</h4><dl class="dgrid">${per}</dl></div>
+    <div class="dsec"><h4>Trend and strength</h4><dl class="dgrid">${kv("RS rating",rsPill(x.rs))}${kv("RS a week ago",x.rs1w??"–")}${kv("Stage",stagePill(x.st))}${kv("Trend template",x.tt?'<span class="up">Pass</span>':'<span style="color:var(--muted)">No</span>')}
+      ${kv("Above 20 / 50 / 200",[x.a20,x.a50,x.a200].map(b=>b==null?"–":b?'<span class="up">✓</span>':'<span class="down">✗</span>').join(" "))}${kv("From 52W high",sgn(x.h52,1))}${kv("Above 52W low",sgn(x.l52,1))}${kv("RSI 14",isNum(x.rsi)?x.rsi.toFixed(0):"–")}
+      ${kv("ADX 14",isNum(x.adx)?x.adx.toFixed(0):"–")}${kv("ATR % of price",isNum(x.atrp)?x.atrp.toFixed(1)+"%":"–")}${kv("Volume × 50d",isNum(x.vr)?x.vr.toFixed(1):"–")}${kv("Turnover ₹Cr/day",isNum(x.to)?x.to:"–")}</dl></div>`:`<p class="note" style="margin:0">This symbol is outside the main NSE universe (BSE-only, or below the liquidity filter), so only its VPCI read is shown.</p>`}
+    ${vr?`<div class="dsec"><h4>VPCI screener · completed weeks</h4><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">${statusPill(vr.status)}${gateDots(vr)}<span style="color:var(--muted)">${esc(vr.position_state||"")}</span></div>
+      <dl class="dgrid">${kv("Gates",vr.gate_count+"/7")}${kv("VPCI",isNum(vr.vpci)?vr.vpci.toFixed(2):"–")}${kv("Trail stop","₹"+inr(vr.trail_stop))}${kv("Risk",isNum(vr.risk_pct)?vr.risk_pct.toFixed(1)+"%":"–")}</dl></div>`:""}
+    ${(D.themesOf[sym]||[]).length?`<div class="dsec"><h4>Themes</h4><div class="chips">${D.themesOf[sym].map(t=>`<button type="button" class="chipbtn" data-theme-go="${esc(t)}">${esc(t)}</button>`).join("")}</div></div>`:""}
+    <div class="dsec"><h4>In today's scanners</h4>${scans.length?`<div class="chips">${scans.map(m=>`<button type="button" class="chipbtn" data-scan-go="${m.id}">${esc(m.name)}</button>`).join("")}</div>`:`<p class="note" style="margin:0">None today.</p>`}</div>
+    <div><a class="btn" href="${tv(sym,ex||vr?.exchange)}" target="_blank" rel="noopener">Open chart on TradingView ↗</a></div>
+  </div>`;
+  $("#drawer").hidden=false;$("#scrim").hidden=false;document.body.style.overflow="hidden";$("#drawer .close").focus();
+}
+function closeDrawer(){if($("#drawer").hidden)return;$("#drawer").hidden=true;$("#scrim").hidden=true;document.body.style.overflow="";lastFocus?.focus?.()}
 
-load().then(()=>{index();render()}).catch(err=>{
+/* ════════════════════ routing & wiring ════════════════════ */
+function render(){
+  renderPulse();
+  document.querySelectorAll("#tabs .tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===st.tab));
+  ({rotation:renderRotation,breadth:renderBreadth,rs:renderRS,scanners:renderScanners,vpci:renderVpci})[st.tab]();
+}
+function go(tab){
+  if(!TABS.includes(tab))tab="rotation";st.tab=tab;store.set("tab",tab);
+  if(location.hash.slice(1)!==tab)history.replaceState(null,"","#"+tab);
+  render();const nav=document.querySelector(".tabbar");if(getComputedStyle(nav).position==="sticky"&&window.scrollY>nav.offsetTop)window.scrollTo(0,nav.offsetTop);
+  if(getComputedStyle(nav).position==="fixed")window.scrollTo(0,Math.max(0,$("#view").offsetTop-8));
+}
+$("#tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(b)go(b.dataset.v)});
+document.addEventListener("click",e=>{
+  const sb=e.target.closest(".symbtn");if(sb){openDrawer(sb.dataset.sym,sb.dataset.ex);return}
+  if(e.target.closest("[data-close]")||e.target.id==="scrim"){closeDrawer();return}
+  const sg=e.target.closest("[data-scan-go]");if(sg){closeDrawer();st.scan=sg.dataset.scanGo;go("scanners");return}
+  const tg=e.target.closest("[data-theme-go]");if(tg){closeDrawer();st.group="Themes";st.open=tg.dataset.themeGo;st.view="bars";go("rotation");setTimeout(()=>document.querySelector(`.brow[data-g="${CSS.escape(st.open)}"]`)?.scrollIntoView({block:"center"}),60);return}
+  const s=e.target.closest("[data-seg]");
+  if(s){const k=s.dataset.seg,v=s.dataset.val;
+    if(k==="vpmode"){VP.mode=v;renderVpci();return}
+    if(k==="vpprorate"){VP.prorate=v==="on";renderVpci();return}
+    if(k==="vview"){VP.view=v;vpTab();return}
+    if(k==="rsmin"){st.rs.min=+v;store.set("rs",st.rs);s.parentElement.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b===s));drawRS();return}
+    st[k]=v;if(k==="group")st.open=null;store.set("prefs",{period:st.period,group:st.group,agg:st.agg,sort:st.sort,view:st.view});
+    if(k==="period")renderPulse();renderRotation();return}
+  const vt=e.target.closest("[data-vtab]");if(vt){VP.tab=vt.dataset.vtab;document.querySelectorAll("[data-vtab]").forEach(b=>b.setAttribute("aria-pressed",b===vt));vpTab();return}
+  const sc=e.target.closest("[data-scan]");if(sc){st.scan=sc.dataset.scan;store.set("scan",st.scan);renderScanners();return}
+  const hp=e.target.closest("[data-hp]");if(hp){st.period=hp.dataset.hp;st.sort="ret";renderPulse();renderRotation();return}
+  if(e.target.closest(".members")||e.target.closest("details")||e.target.closest("#drawer"))return;
+  const r=e.target.closest(".brow,.heat tr.hr");if(r){st.open=st.open===r.dataset.g?null:r.dataset.g;renderRotation();return}
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){closeDrawer();return}
+  const r=e.target.closest?.(".brow,.heat tr.hr,[data-hp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click();document.querySelector(`[data-g="${CSS.escape(r.dataset.g||"")}"]`)?.focus()}
+});
+window.addEventListener("hashchange",()=>{const t=location.hash.slice(1);if(TABS.includes(t)&&t!==st.tab)go(t)});
+$("#themeBtn").addEventListener("click",()=>{const d=document.documentElement,cur=d.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");d.dataset.theme=cur==="dark"?"light":"dark";store.set("theme",d.dataset.theme)});
+(()=>{const t=store.get("theme",null);if(t)document.documentElement.dataset.theme=t;Object.assign(st,store.get("prefs",{}));Object.assign(st.rs,store.get("rs",{}));st.scan=store.get("scan",st.scan);
+  const h=location.hash.slice(1);st.tab=TABS.includes(h)?h:store.get("tab","rotation")})();
+
+load().then(()=>{index();renderHeader();renderFoot();render()}).catch(err=>{
   $("#asof").textContent="";
-  $("#view").innerHTML=`<div class="err"><b>Data files could not be loaded.</b><br>${esc(err.message)}. The daily job may not have run yet. Open the Actions tab on GitHub, run “Daily update” once, then reload this page.</div>`;
+  $("#view").innerHTML=`<div class="err"><b>Data files could not be loaded.</b><br>${esc(err.message)}. The evening job may not have run yet — open the Actions tab on GitHub, run “Daily update” once, then reload.</div>`;
 });
 </script>
 </body>
