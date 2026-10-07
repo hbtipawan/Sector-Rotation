@@ -14,6 +14,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: daily-update
@@ -23,10 +25,13 @@ jobs:
   update:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -53,10 +58,19 @@ jobs:
         continue-on-error: true
         run: python scripts/vpci_app_run.py
 
-      - name: Publish
+      - name: Save data to the repository
         run: |
           git config user.name "radar-bot"
           git config user.email "radar-bot@users.noreply.github.com"
           git add docs/data config
           git diff --cached --quiet || git commit -m "Data update $(date -u +%F)"
           git push
+
+      # Commits made by this job do not trigger a GitHub Pages rebuild,
+      # so the job publishes the website itself.
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      - id: deployment
+        uses: actions/deploy-pages@v4
