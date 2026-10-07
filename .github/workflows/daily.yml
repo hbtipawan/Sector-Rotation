@@ -22,7 +22,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
@@ -48,6 +48,10 @@ jobs:
 
       - name: Compute dashboard data
         run: python scripts/compute.py
+
+      - name: Run VPCI screener (vpci/app.py logic, both weekly modes)
+        continue-on-error: true
+        run: python scripts/vpci_app_run.py
 
       - name: Publish
         run: |
