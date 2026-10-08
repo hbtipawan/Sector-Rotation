@@ -21,6 +21,7 @@
   --shadow:0 1px 2px rgba(15,26,42,.06),0 4px 14px rgba(15,26,42,.05);
   --display:"Archivo","Arial Narrow",Arial,sans-serif; --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --fs:17px; --r:10px;
+  --f-b:#2a78d6; --f-o:#eb6834; --f-t:#1baf7a; --f-y:#eda100; --f-p:#e87ba4; --f-g:#008300;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --desk:#0B111B; --card:#141E2C; --soft:#1A2638; --ink:#EDF1F6; --muted:#A9B6C8; --line:#263347; --track:#223044;
@@ -28,14 +29,16 @@
   --accent:#F0B456; --accent-ink:#F0B456; --sel:#DCE7F5; --sel-ink:#0B111B;
   --up:#1FA184; --down:#E35A3A; --up-t:#45C4A6; --down-t:#FF8A6E;
   --s1:#4C8BD8; --s2:#BF7F25; --warn:#F2C14E; --warn-bg:#2A2312;
-  --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark;}}
+  --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark;
+  --f-b:#3987e5; --f-o:#d95926; --f-t:#199e70; --f-y:#c98500; --f-p:#d55181; --f-g:#008300;}}
 :root[data-theme="dark"]{
   --desk:#0B111B; --card:#141E2C; --soft:#1A2638; --ink:#EDF1F6; --muted:#A9B6C8; --line:#263347; --track:#223044;
   --band:#0A1524; --band2:#112035; --band-ink:#EDF1F6; --band-muted:#9FB0C6; --band-line:#22344F;
   --accent:#F0B456; --accent-ink:#F0B456; --sel:#DCE7F5; --sel-ink:#0B111B;
   --up:#1FA184; --down:#E35A3A; --up-t:#45C4A6; --down-t:#FF8A6E;
   --s1:#4C8BD8; --s2:#BF7F25; --warn:#F2C14E; --warn-bg:#2A2312;
-  --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark;}
+  --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark;
+  --f-b:#3987e5; --f-o:#d95926; --f-t:#199e70; --f-y:#c98500; --f-p:#d55181; --f-g:#008300;}
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-padding-top:70px}
@@ -48,6 +51,77 @@ a{color:inherit}
 .up{color:var(--up-t)} .down{color:var(--down-t)}
 h1,h2,h3,h4{font-family:var(--display);font-stretch:108%;margin:0;line-height:1.15;text-wrap:balance}
 [hidden]{display:none!important}
+
+/* ── Watchlists ───────────────────────────────────────── */
+.wlbtn{border:0;background:none;cursor:pointer;font-size:19px;line-height:1;color:var(--muted);min-width:30px;min-height:30px;padding:0 6px 0 0;margin:-6px 0 -6px -4px;vertical-align:-2px;border-radius:6px}
+.wlbtn:hover{color:var(--accent-ink)}
+.wlbtn.on{color:var(--accent-ink)}
+.wlbtn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.wlbtn~.nm{padding-left:26px}
+.scard .wlbtn{font-size:22px}
+.wlpop{position:fixed;z-index:90;width:310px;max-width:calc(100vw - 24px);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 44px rgba(5,15,30,.3);padding:12px}
+.wlpop-h{font-size:15px;color:var(--muted);margin:2px 4px 8px}
+.wlpop-h b{color:var(--ink);font-size:17px}
+.wlrow{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:9px;cursor:pointer;font-size:16px}
+.wlrow:hover{background:var(--soft)}
+.wlrow input{width:20px;height:20px;accent-color:var(--sel);flex:none}
+.wlrow span:first-of-type{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wlrow .c,.wlchip .c{font-size:13px;font-weight:700;color:var(--muted);background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:0 7px}
+.wlpop-new{display:flex;gap:8px;margin:8px 4px 4px}
+.wlpop-new input,.wlf input,.wlf textarea,.wlf select,.mdl input,.mdl textarea,.mdl select{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:9px;padding:8px 10px;min-height:42px;width:100%;min-width:0}
+.wlpop-new input:focus,.wlf input:focus,.wlf textarea:focus,.mdl input:focus,.mdl textarea:focus{outline:none;border-color:var(--accent)}
+.linkbtn{border:0;background:none;color:var(--s1);font-weight:600;cursor:pointer;padding:8px 4px;font-size:15px;text-decoration:underline;text-underline-offset:3px}
+.wlpop .linkbtn{display:block;margin-top:2px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:95;background:var(--ink);color:var(--card);padding:10px 16px;border-radius:10px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:calc(100vw - 32px)}
+.wlbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.wlchip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:7px 14px;font-size:16px;font-weight:700;cursor:pointer;display:inline-flex;gap:8px;align-items:center;color:var(--ink)}
+.wlchip[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
+.wlchip[aria-pressed="true"] .c{background:transparent;color:inherit;border-color:currentColor}
+.wlchip.add{border-style:dashed;color:var(--muted);font-weight:600}
+.wltools{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.alerts{display:flex;flex-direction:column}
+.al{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline;padding:11px 16px;border-top:1px solid var(--track)}
+.al:first-child{border-top:0}
+.al .tag{font-size:13px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.al .tag.crit{background:var(--down);color:#fff}.al .tag.warn{border:1.5px solid var(--down-t);color:var(--down-t)}
+.al .tag.good{background:var(--up);color:#fff}.al .tag.info{border:1.5px solid var(--line);color:var(--muted)}
+.al .txt{font-size:16px}.al .txt .ls{color:var(--muted);font-size:14px}
+.fdot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:1px;box-shadow:0 0 0 1.5px rgba(0,0,0,.18)}
+.fdot.b{background:var(--f-b)}.fdot.o{background:var(--f-o)}.fdot.t{background:var(--f-t)}.fdot.y{background:var(--f-y)}.fdot.p{background:var(--f-p)}.fdot.g{background:var(--f-g)}
+.fpick{display:flex;flex-wrap:wrap;gap:6px}
+.fpick label{display:inline-flex;align-items:center;gap:4px;border:1.5px solid var(--line);border-radius:999px;padding:5px 10px;cursor:pointer;font-size:14.5px;font-weight:600}
+.fpick input{position:absolute;opacity:0;pointer-events:none}
+.fpick label:has(input:checked){border-color:var(--ink);background:var(--soft)}
+.fpick label:focus-within{outline:2px solid var(--accent)}
+.spark{display:block}
+.setup{font-size:13.5px;font-weight:700;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.setup.zone{background:var(--up);color:#fff}.setup.ext{border:1.5px solid var(--warn);color:var(--warn)}.setup.near{border:1.5px solid var(--up-t);color:var(--up-t)}
+.setup.below{color:var(--muted);border:1.5px solid var(--line)}.setup.stop{background:var(--down);color:#fff}.setup.tgt{border:1.5px solid var(--s1);color:var(--s1)}
+.rowact{display:inline-flex;gap:4px}
+.rowact button{border:1.5px solid var(--line);background:var(--card);border-radius:8px;min-width:34px;height:34px;cursor:pointer;font-size:15px;color:var(--ink)}
+.rowact button:hover{border-color:var(--muted)}
+.wlf{display:flex;flex-direction:column;gap:12px}
+.wlf .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.wlf label.f{display:flex;flex-direction:column;gap:4px;font-size:14px;font-weight:600;color:var(--muted)}
+.wlf .risk{background:var(--soft);border-radius:9px;padding:10px 12px;font-size:15px}
+.wlmem{width:100%;border-collapse:collapse;font-size:15px}
+.wlmem td{padding:6px 4px;border-bottom:1px solid var(--track);vertical-align:middle}
+.wlmem td:first-child{font-weight:700}
+.wlmem input{min-height:36px;padding:5px 8px;font-size:15px}
+.wlmem input[type=date]{width:152px}.wlmem input[inputmode]{width:92px}
+.mscrim{position:fixed;inset:0;background:rgba(5,12,22,.55);z-index:92}
+.mdl{position:fixed;z-index:93;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 40px);overflow:auto;background:var(--card);color:var(--ink);border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.35);padding:20px}
+.mdl h3{font-size:22px;font-weight:800;margin-bottom:8px}
+.mdl p{color:var(--muted);margin:6px 0 12px}
+.mdl .acts{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;flex-wrap:wrap}
+.mdl .err{color:var(--down-t);font-weight:600}
+.mdl ol{padding-left:22px;margin:8px 0}.mdl li{margin:4px 0}
+.btn.danger{background:var(--down)}
+.pchart{position:relative}
+.pchart svg text{font-size:15px;fill:var(--muted);font-family:var(--body)}
+.pchart .legend{margin:0 0 4px}
+.track-rec{display:flex;flex-wrap:wrap;gap:8px 22px;padding:14px 16px;font-size:16px}
+.track-rec b{font-size:22px;font-family:var(--display)}
 
 /* ── Global stock search (in the band) ───────────────────── */
 .gsearch{position:relative;flex:1;max-width:560px;margin-inline:auto}
@@ -110,6 +184,8 @@ h1,h2,h3,h4{font-family:var(--display);font-stretch:108%;margin:0;line-height:1.
 .tab svg{width:21px;height:21px;flex:none}
 .tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
 .tab:hover{color:var(--ink)}
+.tab .cnt:empty{display:none}
+.tab .ls{display:none}
 .tab .cnt{font-size:13px;font-weight:700;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:0 7px;color:var(--muted)}
 
 main.wrap{padding-block:22px 40px;min-height:60vh}
@@ -306,6 +382,10 @@ footer.foot p{margin:4px 0;max-width:110ch}
   .topbar{flex-wrap:wrap}
   .gsearch{order:3;flex-basis:100%;max-width:none;margin:4px 0 2px}
   .gsearch kbd{display:none}
+  .wlpop.sheet{left:0!important;right:0;top:auto!important;bottom:0;width:100%;max-width:none;border-radius:16px 16px 0 0;padding:14px 14px calc(18px + env(safe-area-inset-bottom,0px))}
+  .wlf .g3{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .wlmem input[type=date]{width:130px;font-size:14px;padding:5px 4px}.wlmem input[inputmode]{width:76px}.wlmem td{padding:6px 2px}
+  .toast{bottom:84px}
   #themeBtn span{display:none}
   .topbar .brand{flex:1;min-width:0}
   #themeBtn{flex:none}
@@ -318,6 +398,7 @@ footer.foot p{margin:4px 0;max-width:110ch}
   .tab{flex:1;flex-direction:column;gap:3px;padding:9px 2px 8px;font-size:12.5px;border-bottom:0;border-top:3px solid transparent;min-width:0}
   .tab[aria-selected="true"]{border-top-color:var(--accent)}
   .tab .cnt{display:none}
+  .tab .lf{display:none}.tab .ls{display:inline}
   main.wrap{padding-bottom:110px}
   footer.foot{padding-bottom:110px}
   .sec-head h2{font-size:24px}
@@ -365,9 +446,10 @@ footer.foot p{margin:4px 0;max-width:110ch}
   <div class="wrap" role="tablist" id="tabs">
     <button class="tab" role="tab" data-v="rotation" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5h11v3H3zm0 5.5h16v3H3zM3 16h8v3H3z"/></svg>Rotation</button>
     <button class="tab" role="tab" data-v="breadth" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M3 13h4l2.5-6 4 11 2.5-6H21"/></svg>Breadth</button>
-    <button class="tab" role="tab" data-v="rs" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M4 18l6-6 4 4 6-8M15 8h5v5"/></svg>RS ranking</button>
+    <button class="tab" role="tab" data-v="rs" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M4 18l6-6 4 4 6-8M15 8h5v5"/></svg><span class="lf">RS ranking</span><span class="ls">RS rank</span></button>
     <button class="tab" role="tab" data-v="scanners" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M16 16l4.5 4.5"/></svg>Scanners<span class="cnt" id="scanCnt"></span></button>
-    <button class="tab" role="tab" data-v="vpci" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>VPCI screener</button>
+    <button class="tab" role="tab" data-v="watch" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M12 3.6l2.5 5.2 5.6.7-4.1 3.9 1 5.6L12 16.3 7 19l1-5.6-4.1-3.9 5.6-.7z"/></svg><span class="lf">Watchlists</span><span class="ls">Watchlist</span><span class="cnt" id="wlCnt"></span></button>
+    <button class="tab" role="tab" data-v="vpci" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg><span class="lf">VPCI screener</span><span class="ls">VPCI</span></button>
   </div>
 </nav>
 
@@ -376,13 +458,16 @@ footer.foot p{margin:4px 0;max-width:110ch}
 <footer class="wrap foot" id="foot"></footer>
 
 <div class="scrim" id="scrim" hidden></div>
+<div class="wlpop" id="wlpop" hidden role="dialog" aria-label="Add to watchlists"></div>
+<div class="mscrim" id="mscrim" hidden></div><div class="mdl" id="mdl" hidden role="dialog" aria-modal="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 <aside class="drawer" id="drawer" hidden aria-modal="true" role="dialog" aria-labelledby="dTitle"></aside>
 
 <script>
 /* ════════════════════ state & helpers ════════════════════ */
 const PERIODS=["1D","1W","1M","3M","6M","YTD","1Y"];
 const PL={"1D":"Today","1W":"1W","1M":"1M","3M":"3M","6M":"6M","YTD":"YTD","1Y":"1Y"};
-const TABS=["rotation","breadth","rs","scanners","vpci"];
+const TABS=["rotation","breadth","rs","scanners","watch","vpci"];
 const st={tab:"rotation",period:"1M",group:"Themes",agg:"mean",sort:"ret",view:"bars",open:null,scan:"combo3",scanTop:0,scanFund:0,
   rs:{q:"",sec:"",theme:"",min:0,fmin:0,tt:false,s2:false,a50:false},tbl:{}};
 let D={};
@@ -399,7 +484,7 @@ const tv=(s,ex)=>`https://in.tradingview.com/chart/?symbol=${encodeURIComponent(
 function seg(name,opts,cur,labels){return `<div class="seg" role="group" aria-label="${esc(name)}">`+opts.map(o=>`<button type="button" data-seg="${name}" data-val="${esc(o)}" aria-pressed="${o===cur}">${esc(labels?labels[o]:o)}</button>`).join("")+`</div>`}
 function rsPill(v){if(!isNum(v))return "–";const c=v>=90?"rs-a":v>=70?"rs-b":v>=40?"rs-c":"rs-d";return `<span class="rs ${c}">${v}</span>`}
 function stagePill(s){return !s?"–":s===2?`<span class="pill p-up">Stage 2</span>`:s===4?`<span class="pill p-down">Stage 4</span>`:s===1?`<span class="pill p-mut">Stage 1</span>`:`<span class="pill p-mut">Stage 3</span>`}
-const symBtn=(s,n,ex)=>`<button type="button" class="symbtn" data-sym="${esc(s)}"${ex?` data-ex="${esc(ex)}"`:""}>${esc(s)}</button>${n?`<span class="nm">${esc(n)}</span>`:""}`;
+const symBtn=(s,n,ex)=>wlStar(s)+`<button type="button" class="symbtn" data-sym="${esc(s)}"${ex?` data-ex="${esc(ex)}"`:""}>${esc(s)}</button>${n?`<span class="nm">${esc(n)}</span>`:""}`;
 function fmtDate(d){if(!d)return"";const t=new Date(String(d).slice(0,10)+"T00:00:00");return isNaN(t)?String(d):t.toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}
 
 /* ════════════════════ data ════════════════════ */
@@ -669,7 +754,7 @@ function renderScanners(){
   $("#view").innerHTML=`<div class="sec-head"><div><h2>Scanner library</h2><p>${S.meta.length} scans run on every stock after the close${D.meta.fund?` — ${S.meta.filter(x=>!x.id.startsWith("f_")).length} technical and ${S.meta.filter(x=>x.id.startsWith("f_")).length} fundamental (from NSE filings)`:""}. Tap any stock for its detail card, including every other scan it appears in.</p></div></div>
   <div class="scan-pick">${pick}</div>
   <div class="scan-layout"><nav class="card rail" aria-label="Scanners">${rail}</nav>
-  <section class="card"><div class="scan-head"><h3>${esc(m.name)}<span class="cnt num">${hits.length}</span></h3><p>${esc(m.desc)}</p><div class="catchips"><span class="pill p-acc">${esc(m.cat)}</span></div>
+  <section class="card"><div class="scan-head"><h3>${esc(m.name)}<span class="cnt num">${hits.length}</span></h3><p>${esc(m.desc)}</p><div class="catchips"><span class="pill p-acc">${esc(m.cat)}</span>${rows.length?`<button type="button" class="ghost" data-wl-addall="${esc(JSON.stringify(rows.map(r=>r.s)))}" data-label="${esc(m.name)} stocks" style="margin-left:6px">☆ Add all ${rows.length} to a watchlist</button>`:""}</div>
   <div style="display:flex;flex-wrap:wrap;gap:12px 22px;margin-top:12px"><div class="ctl"><span>Stocks shown</span>${seg("scanTop",["0","5","10"],String(st.scanTop),{"0":"All","5":"Top 5 themes","10":"Top 10 themes"})}</div>
   ${D.meta.fund?`<div class="ctl"><span>Fundamentals</span>${seg("scanFund",["0","60","80"],String(st.scanFund),{"0":"Any","60":"Fund 60+","80":"Fund 80+"})}</div>`:""}</div>${topNote?`<p class="note" style="margin:8px 0 0">${esc(topNote)}</p>`:""}</div>
   <div id="scanT">${dtable(tid,rows,cols,{empty:"No stocks triggered this scan today."})}</div></section></div>`;
@@ -814,8 +899,9 @@ async function vpTab(){
 
 /* ════════════════════ stock drawer ════════════════════ */
 let lastFocus=null;
-async function openDrawer(sym,ex){
-  lastFocus=document.activeElement;
+async function openDrawer(sym,ex,focusWl){
+  const reopen=!$("#drawer").hidden;if(!reopen)lastFocus=document.activeElement;
+  await vpxLoad();ex=ex||exOf(sym);
   const x=D.by[sym];let vr=null;
   let vrun=null;
   try{const d=await vpLoad("completed");vr=objs(d.results).find(r=>r.symbol===sym)||null}catch(e){}
@@ -831,11 +917,12 @@ async function openDrawer(sym,ex){
   $("#drawer").innerHTML=`<header><div><h2 id="dTitle">${esc(sym)}</h2><div class="co">${esc(name)}${sector?` · ${esc(sector)}`:""}</div></div><button class="close" type="button" data-close aria-label="Close">×</button></header>
   <div class="body">
     ${x?`<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span class="num" style="font-family:var(--display);font-weight:800;font-size:34px">₹${inr(x.px)}</span><span class="num ${cls(x.r["1D"])}" style="font-weight:700;font-size:19px">${sgn(x.r["1D"])} today</span>${isNum(x.mc)?`<span class="num" style="font-size:17px;color:var(--muted)">Mcap ₹${Math.round(x.mc).toLocaleString("en-IN")} Cr</span>`:""}</div>
+    <div id="pchartSlot"></div>${wlCardHtml(sym)}
     <div class="dsec"><h4>Returns</h4><dl class="dgrid">${per}</dl></div>
     <div class="dsec"><h4>Trend and strength</h4><dl class="dgrid">${kv("RS rating",rsPill(x.rs))}${kv("RS a week ago",x.rs1w??"–")}${kv("Stage",stagePill(x.st))}${kv("Trend template",x.tt?'<span class="up">Pass</span>':'<span style="color:var(--muted)">No</span>')}
       ${kv("Above 20 / 50 / 200",[x.a20,x.a50,x.a200].map(b=>b==null?"–":b?'<span class="up">✓</span>':'<span class="down">✗</span>').join(" "))}${kv("From 52W high",sgn(x.h52,1))}${kv("Above 52W low",sgn(x.l52,1))}${kv("RSI 14",isNum(x.rsi)?x.rsi.toFixed(0):"–")}
       ${kv("ADX 14",isNum(x.adx)?x.adx.toFixed(0):"–")}${kv("ATR % of price",isNum(x.atrp)?x.atrp.toFixed(1)+"%":"–")}${kv("Volume × 50d",isNum(x.vr)?x.vr.toFixed(1):"–")}${kv("Turnover ₹Cr/day",isNum(x.to)?x.to:"–")}
-      ${kv("Close range today",isNum(x.dcr)?x.dcr.toFixed(0)+"%":"–")}${kv("ADR % (20d)",isNum(x.adr)?x.adr.toFixed(1)+"%":"–")}${kv("Signal groups today",isNum(x.nsc)?x.nsc.toFixed(0)+" / 7":"–")}</dl></div>`:`<p class="note" style="margin:0">This symbol is outside the main NSE universe (BSE-only, or below the liquidity filter), so only its VPCI read is shown.</p>`}
+      ${kv("Close range today",isNum(x.dcr)?x.dcr.toFixed(0)+"%":"–")}${kv("ADR % (20d)",isNum(x.adr)?x.adr.toFixed(1)+"%":"–")}${kv("Signal groups today",isNum(x.nsc)?x.nsc.toFixed(0)+" / 7":"–")}</dl></div>`:`<p class="note" style="margin:0">This symbol is outside the main NSE universe (BSE-only, or below the liquidity filter), so only its VPCI read is shown.</p><div id="pchartSlot"></div>${wlCardHtml(sym)}`}
     ${fundHtml}
     ${vr?`<div class="dsec"><h4>VPCI screener · completed weeks</h4><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">${statusPill(vr.status)}${gateDots(vr)}<span style="color:var(--muted)">${esc(vr.position_state||"")}</span></div>
       <dl class="dgrid">${kv("Gates",vr.gate_count+"/7")}${kv("VPCI",isNum(vr.vpci)?vr.vpci.toFixed(2):"–")}${kv("Trail stop","₹"+inr(vr.trail_stop))}${kv("Risk",isNum(vr.risk_pct)?vr.risk_pct.toFixed(1)+"%":"–")}</dl>
@@ -844,15 +931,397 @@ async function openDrawer(sym,ex){
     <div class="dsec"><h4>In today's scanners</h4>${scans.length?`<div class="chips">${scans.map(m=>`<button type="button" class="chipbtn" data-scan-go="${m.id}">${esc(m.name)}</button>`).join("")}</div>`:`<p class="note" style="margin:0">None today.</p>`}</div>
     <div><a class="btn" href="${tv(sym,ex||vr?.exchange)}" target="_blank" rel="noopener">Open chart on TradingView ↗</a></div>
   </div>`;
-  $("#drawer").hidden=false;$("#scrim").hidden=false;document.body.style.overflow="hidden";$("#drawer .close").focus();
+  $("#drawer").hidden=false;$("#scrim").hidden=false;document.body.style.overflow="hidden";
+  wireWlCard(sym);
+  if(focusWl)$("#wlsec")?.scrollIntoView({block:"start"});else if(!reopen)$("#drawer .close").focus();
+  clLoad().then(()=>{const slot=$("#pchartSlot");if(slot&&$("#dTitle")?.textContent===sym){slot.outerHTML=priceChart(sym);wirePriceChart(sym);if(focusWl)$("#wlsec")?.scrollIntoView({block:"start"})}});
 }
 function closeDrawer(){if($("#drawer").hidden)return;$("#drawer").hidden=true;$("#scrim").hidden=true;document.body.style.overflow="";lastFocus?.focus?.()}
+
+/* ════════════════════ WATCHLISTS ════════════════════
+   Stored in this browser (localStorage). Optional sync between devices through a private
+   (secret) GitHub gist that only the owner's token can write.
+   Model: lists[{id,name,items[{s,d,p,b}]}]  d = date added, p = price then, b = NIFTY 500 then
+          meta{SYM:{pivot,stop,target,note,flag}}  (levels belong to the stock, shared by lists)
+          log[{s,l,d,p,b,o,po,bo}]  removed stocks with entry/exit, for the track record          */
+const WLK="radar.wl.v1",FLAGS=[["b","Blue"],["o","Orange"],["t","Teal"],["y","Yellow"],["p","Pink"],["g","Green"]];
+let WL=null,WLMEM=null,VPX=null,CL=null,POPA=null;
+const wlBlank=()=>({v:1,updated:0,active:"w1",lists:[{id:"w1",name:"Watchlist",items:[]}],meta:{},log:[],settings:{}});
+function wlNorm(w){if(!w||!Array.isArray(w.lists))w=wlBlank();w.meta=w.meta||{};w.log=w.log||[];w.settings=w.settings||{};
+  if(!w.lists.length)w.lists.push({id:"w1",name:"Watchlist",items:[]});w.lists.forEach(l=>l.items=l.items||[]);
+  if(!w.lists.find(l=>l.id===w.active))w.active=w.lists[0].id;return w}
+function wlGet(){if(WL)return WL;let w=null;try{const t=localStorage.getItem(WLK);w=t?JSON.parse(t):null}catch(e){w=WLMEM}return WL=wlNorm(w)}
+function wlSave(fromSync){const w=wlGet();if(!fromSync)w.updated=Date.now();try{localStorage.setItem(WLK,JSON.stringify(w))}catch(e){WLMEM=w}
+  if(!fromSync)syncPushSoon();refreshStars();updateWlBadge()}
+const wlList=id=>wlGet().lists.find(l=>l.id===id);
+const wlListsOf=s=>wlGet().lists.filter(l=>l.items.some(i=>i.s===s));
+const wlHas=s=>wlListsOf(s).length>0;
+const wlNewId=()=>"w"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const wlAllSyms=()=>[...new Set(wlGet().lists.flatMap(l=>l.items.map(i=>i.s)))];
+const benchName=()=>D.breadth?.bench_name||"NIFTY 500";
+const benchPx=()=>D.meta.indices?.[benchName()]?.px??null;
+const pxOf=s=>D.by[s]?.px??VPX?.[s]?.close??null;
+const nameOf=s=>D.by[s]?.n||VPX?.[s]?.["Company Name"]||"";
+const exOf=s=>D.by[s]?null:VPX?.[s]?.exchange||null;
+async function vpxLoad(){if(VPX)return VPX;const m={};try{const d=await vpLoad("completed");for(const r of objs(d.results))m[r.symbol]=r}catch(e){}return VPX=m}
+async function clLoad(){if(CL)return CL;let c=window.EMBED?.closes||null;
+  if(!c){try{const r=await fetch(`data/closes.json?v=${encodeURIComponent(D.meta.generated||"")}`);c=r.ok?await r.json():null}catch(e){}}
+  c=c||{dates:[],c:{}};c.idx=Object.fromEntries(c.dates.map((d,i)=>[d,i]));return CL=c}
+function clIdx(date){if(!CL||!CL.dates.length)return -1;const d=CL.dates;if(date>=d[d.length-1])return d.length-1;if(date<d[0])return -1;
+  let lo=0,hi=d.length-1;while(lo<hi){const m=(lo+hi+1)>>1;if(d[m]<=date)lo=m;else hi=m-1}return lo}
+function wlAdd(lid,s,o={}){const L=wlList(lid);if(!L||L.items.some(i=>i.s===s))return false;const p=o.p??pxOf(s);
+  L.items.push({s,d:o.d||D.meta.asof,p:isNum(p)?p:null,b:o.b??benchPx()});return true}
+function wlRemove(lid,s,log=true){const L=wlList(lid);if(!L)return;const it=L.items.find(i=>i.s===s);if(!it)return;L.items=L.items.filter(i=>i!==it);
+  if(log){const w=wlGet();w.log.unshift({s,l:L.name,d:it.d,p:it.p,b:it.b,o:D.meta.asof,po:pxOf(s),bo:benchPx()});w.log=w.log.slice(0,500)}}
+function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,2600)}
+const wlStar=s=>{const on=WL?wlHas(s):false;return `<button type="button" class="wlbtn${on?" on":""}" data-wl="${esc(s)}" aria-pressed="${on}" aria-label="Watchlists for ${esc(s)}" title="Add to a watchlist">${on?"★":"☆"}</button>`};
+function refreshStars(){document.querySelectorAll(".wlbtn[data-wl]").forEach(b=>{const on=wlHas(b.dataset.wl);b.classList.toggle("on",on);b.textContent=on?"★":"☆";b.setAttribute("aria-pressed",on)})}
+
+/* ── per-stock numbers ── */
+function itemStats(it){
+  const s=it.s,x=D.by[s],px=pxOf(s),bn=benchPx(),m=wlGet().meta[s]||{};
+  const o={since:isNum(px)&&isNum(it.p)&&it.p>0?(px/it.p-1)*100:null};
+  o.bret=isNum(bn)&&isNum(it.b)&&it.b>0?(bn/it.b-1)*100:null;
+  o.alpha=isNum(o.since)&&isNum(o.bret)?o.since-o.bret:null;
+  o.days=Math.max(0,Math.round((new Date(D.meta.asof+"T00:00:00")-new Date(it.d+"T00:00:00"))/864e5));
+  const c=CL?.c?.[s];
+  if(c&&isNum(it.p)){const i0=Math.max(0,clIdx(it.d));const seg=c.slice(i0).filter(isNum);if(seg.length){o.maxg=(Math.max(...seg)/it.p-1)*100;o.maxdd=(Math.min(...seg)/it.p-1)*100}}
+  if(isNum(px)){
+    if(isNum(m.pivot)&&m.pivot>0)o.fromPiv=(px/m.pivot-1)*100;
+    if(isNum(m.stop)&&m.stop>0)o.toStop=(px/m.stop-1)*100;
+    if(isNum(m.target)&&m.target>0)o.toTgt=(m.target/px-1)*100;
+  }
+  o.setup=setupOf(px,m,o);
+  return o;
+}
+function setupOf(px,m,o){
+  if(isNum(o.toStop)&&o.toStop<0)return{k:"stop",t:"Below stop"};
+  if(isNum(o.toTgt)&&o.toTgt<=0)return{k:"tgt",t:"Target hit"};
+  if(!isNum(o.fromPiv))return null;
+  if(o.fromPiv<-3)return{k:"below",t:`${Math.abs(o.fromPiv).toFixed(1)}% below pivot`};
+  if(o.fromPiv<0)return{k:"near",t:`Near pivot (${o.fromPiv.toFixed(1)}%)`};
+  if(o.fromPiv<=5)return{k:"zone",t:`Buy zone +${o.fromPiv.toFixed(1)}%`};
+  return{k:"ext",t:`Extended +${o.fromPiv.toFixed(1)}%`};
+}
+const setupPill=u=>u?`<span class="setup ${u.k}">${esc(u.t)}</span>`:`<span style="color:var(--muted)">–</span>`;
+function spark(s,added){const c=CL?.c?.[s];if(!c)return `<span style="color:var(--muted)">–</span>`;
+  const n=63,a=c.slice(-n),v=a.filter(isNum);if(v.length<5)return "–";const lo=Math.min(...v),hi=Math.max(...v),W=104,H=30;
+  const x=i=>2+i*(W-4)/(a.length-1),y=t=>H-3-(t-lo)/((hi-lo)||1)*(H-6);
+  const pts=a.map((t,i)=>isNum(t)?`${x(i).toFixed(1)},${y(t).toFixed(1)}`:null).filter(Boolean).join(" ");
+  const up=v[v.length-1]>=v[0];let dot="";
+  if(added){const ia=clIdx(added)-(c.length-a.length);if(ia>=0&&isNum(a[ia]))dot=`<circle cx="${x(ia).toFixed(1)}" cy="${y(a[ia]).toFixed(1)}" r="3.2" fill="var(--card)" stroke="var(--ink)" stroke-width="1.6"/>`}
+  return `<svg class="spark" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${s} last 3 months ${up?"up":"down"}"><polyline points="${pts}" fill="none" stroke="${up?"var(--up)":"var(--down)"}" stroke-width="2" stroke-linejoin="round"/>${dot}</svg>`}
+
+/* ── alerts: what needs attention today ── */
+const BULL_SCANS=["combo3","up4","high52_dcr","ath","vcp","pocket_pivot","tight3w","power3","bgu","episodic_pivot","darvas","stage2_bo","bull_snort","wedge_pop","f_post","f_accel"];
+const BEAR_SCANS=["down4","leader_down","below200","ema_down","death","gap_down","f_red"];
+function sma50(c,i){if(!c||i<49)return null;let t=0;for(let k=i-49;k<=i;k++){if(!isNum(c[k]))return null;t+=c[k]}return t/50}
+function wlAlerts(syms){
+  const out=[],w=wlGet(),asof=D.meta.asof;
+  for(const s of syms){
+    const x=D.by[s],px=pxOf(s),m=w.meta[s]||{},lists=wlListsOf(s).map(l=>l.name).join(", ");
+    const add=(lvl,txt,rank)=>out.push({s,lvl,txt,rank,lists});
+    const prev=x&&isNum(x.r?.["1D"])?px/(1+x.r["1D"]/100):null;
+    if(isNum(px)&&isNum(m.stop)){if(px<m.stop)add("crit",isNum(prev)&&prev>=m.stop?`Closed below your stop ₹${inr(m.stop)} today`:`Below your stop ₹${inr(m.stop)} (${((px/m.stop-1)*100).toFixed(1)}%)`,0);
+      else if(px/m.stop-1<=.03)add("warn",`Within ${((px/m.stop-1)*100).toFixed(1)}% of your stop ₹${inr(m.stop)}`,2)}
+    if(isNum(px)&&isNum(m.target)&&px>=m.target)add("good",`Reached your target ₹${inr(m.target)}`,3);
+    if(isNum(px)&&isNum(m.pivot)){const fp=(px/m.pivot-1)*100;
+      if(isNum(prev)&&prev<=m.pivot&&px>m.pivot)add("good",`Broke out above your pivot ₹${inr(m.pivot)}${isNum(x?.vr)?` on ${x.vr.toFixed(1)}× volume`:""}`,1);
+      else if(fp>=0&&fp<=5)add("good",`In the buy zone, +${fp.toFixed(1)}% above pivot ₹${inr(m.pivot)}`,4);
+      else if(fp<0&&fp>=-3)add("info",`${Math.abs(fp).toFixed(1)}% below your pivot ₹${inr(m.pivot)} — get ready`,5)}
+    const bad=(D.scansOf[s]||[]).filter(id=>BEAR_SCANS.includes(id)).map(id=>D.scanMeta[id]?.name).filter(Boolean);
+    if(bad.length)add("warn",`Warning: ${bad.join(", ")}`,2);
+    const good=(D.scansOf[s]||[]).filter(id=>BULL_SCANS.includes(id)).map(id=>D.scanMeta[id]?.name).filter(Boolean);
+    if(good.length)add("good",`In today's scans: ${good.join(", ")}`,6);
+    if(x&&isNum(x.rs)&&isNum(x.rs1w)&&x.rs<70&&x.rs1w>=70)add("warn",`RS rating fell to ${x.rs} (was ${x.rs1w} a week ago)`,7);
+    const c=CL?.c?.[s];if(c&&c.length>51){const i=c.length-1,a=sma50(c,i),b=sma50(c,i-1);
+      if(isNum(a)&&isNum(b)&&c[i]<a&&c[i-1]>=b)add("warn","Closed below its 50-day average today",3);
+      if(isNum(a)&&isNum(b)&&c[i]>a&&c[i-1]<=b)add("info","Closed back above its 50-day average",8)}
+    if(x?.next_results){const dd=Math.round((new Date(x.next_results+"T00:00:00")-new Date(asof+"T00:00:00"))/864e5);
+      if(dd>=0&&dd<=7)add("info",`Results on ${new Date(x.next_results+"T00:00:00").toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"})} (${dd===0?"today":dd===1?"tomorrow":"in "+dd+" days"}) — decide before, not after`,9)}
+    const v=VPX?.[s];if(v&&/FRESH/.test(v.status||""))add("good","Fresh VPCI buy signal this week",6);
+  }
+  const ord={crit:0,warn:1,good:2,info:3};
+  return out.sort((a,b)=>ord[a.lvl]-ord[b.lvl]||a.rank-b.rank||a.s.localeCompare(b.s));
+}
+function updateWlBadge(){const el=$("#wlCnt");if(!el||!D.by)return;const a=wlAlerts(wlAllSyms()).filter(x=>x.lvl==="crit"||x.lvl==="good"&&x.rank<=1);el.textContent=a.length?String(new Set(a.map(x=>x.s)).size):"";el.title=a.length?"Stocks needing attention":""}
+
+/* ── popover: add one stock (or many) to lists ── */
+function wlPop(anchor,html){const p=$("#wlpop");p.innerHTML=html;p.hidden=false;POPA=anchor;
+  if(innerWidth<=720){p.classList.add("sheet");p.style.left="";p.style.top=""}
+  else{p.classList.remove("sheet");const r=anchor.getBoundingClientRect(),w=p.offsetWidth,h=p.offsetHeight;
+    let left=Math.min(innerWidth-w-12,Math.max(12,r.left-8)),top=r.bottom+6;if(top+h>innerHeight-12)top=Math.max(12,r.top-h-6);p.style.left=left+"px";p.style.top=top+"px"}
+  (p.querySelector("input[type=checkbox],input,button")||p).focus()}
+function wlPopClose(){const p=$("#wlpop");if(p.hidden)return;p.hidden=true;const a=POPA;POPA=null;if(a&&document.contains(a))a.focus()}
+function wlPopStock(anchor,s){const w=wlGet();
+  wlPop(anchor,`<div class="wlpop-h"><b>${esc(s)}</b> — tick the lists to keep it in</div><div>${w.lists.map(l=>{const on=l.items.some(i=>i.s===s);
+    return `<label class="wlrow"><input type="checkbox" data-wl-chk="${l.id}" data-sym="${esc(s)}" ${on?"checked":""}><span>${esc(l.name)}</span><span class="c">${l.items.length}</span></label>`}).join("")}</div>
+    <form class="wlpop-new" data-wl-newfor="${esc(s)}"><input name="n" placeholder="New list name" maxlength="40" aria-label="New list name"><button class="ghost" type="submit">Create</button></form>
+    <button type="button" class="linkbtn" data-wl-levels="${esc(s)}">Set pivot, stop, target &amp; note →</button>`)}
+function wlPopMany(anchor,syms,label){const w=wlGet();
+  wlPop(anchor,`<div class="wlpop-h">Add <b>${syms.length}</b> ${esc(label)} to…</div><div>${w.lists.map(l=>`<button type="button" class="wlrow" style="width:100%;border:0;background:none;text-align:left" data-wl-many="${l.id}"><span>${esc(l.name)}</span><span class="c">${l.items.length}</span></button>`).join("")}</div>
+    <form class="wlpop-new" data-wl-newmany="1"><input name="n" placeholder="New list name" maxlength="40" aria-label="New list name"><button class="ghost" type="submit">Create &amp; add</button></form>`);
+  $("#wlpop").dataset.many=JSON.stringify(syms)}
+
+/* ── small modal ── */
+function modal(html,onSubmit){const m=$("#mdl");m.innerHTML=html;m.hidden=false;$("#mscrim").hidden=false;
+  const f=m.querySelector("form");if(f)f.addEventListener("submit",async e=>{e.preventDefault();const r=await onSubmit?.(new FormData(f),f);if(r!==false)modalClose()});
+  m.querySelectorAll("[data-mclose]").forEach(b=>b.addEventListener("click",modalClose));
+  setTimeout(()=>(m.querySelector("input,textarea,select,button")||m).focus(),20);return m}
+function modalClose(){$("#mdl").hidden=true;$("#mscrim").hidden=true}
+function askName(title,value,cb){modal(`<form><h3>${esc(title)}</h3><input name="n" value="${esc(value||"")}" maxlength="40" required aria-label="List name">
+  <div class="acts"><button type="button" class="ghost" data-mclose>Cancel</button><button class="btn" type="submit">Save</button></div></form>`,fd=>{const n=String(fd.get("n")||"").trim();if(!n)return false;cb(n)})}
+
+/* ── import / export ── */
+function parseSyms(text){const known=s=>D.by[s]||VPX?.[s];const ok=[],bad=[];
+  for(let t of String(text).toUpperCase().split(/[\s,;|]+/)){t=t.replace(/^(NSE|BSE)[:_-]/,"").replace(/\.(NS|BO)$/,"").replace(/^#+/,"").trim();if(!t||t.startsWith("###"))continue;
+    (known(t)?ok:bad).push(t)}return{ok:[...new Set(ok)],bad:[...new Set(bad)]}}
+function dl(name,text,type="text/plain"){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
+function wlImportDialog(){const w=wlGet();
+  modal(`<form><h3>Import stocks</h3><p>Paste symbols separated by commas, spaces or new lines — <code>NSE:</code>/<code>BSE:</code> prefixes and TradingView list files are fine. Or load a TradingView <code>.txt</code> or a backup <code>.json</code>.</p>
+    <textarea name="t" rows="6" placeholder="SUNFLAG, AJANTPHARM, NSE:DIXON"></textarea>
+    <div class="wlf" style="margin-top:10px"><div class="g3"><label class="f">Into list<select name="l">${w.lists.map(l=>`<option value="${l.id}" ${l.id===w.active?"selected":""}>${esc(l.name)}</option>`).join("")}<option value="__new">+ New list…</option></select></label>
+    <label class="f">New list name<input name="nn" placeholder="Only for a new list" maxlength="40"></label>
+    <label class="f">Added on<input type="date" name="d" value="${D.meta.asof}" max="${D.meta.asof}"></label></div>
+    <label class="f">Or load a file<input type="file" name="f" accept=".txt,.csv,.json"></label></div>
+    <p class="err" id="imperr" hidden></p>
+    <div class="acts"><button type="button" class="ghost" data-mclose>Cancel</button><button class="btn" type="submit">Import</button></div></form>`,
+  async(fd,form)=>{let text=String(fd.get("t")||"");const file=fd.get("f");
+    if(file&&file.size){const ft=await file.text();if(/\.json$/i.test(file.name)){try{const j=JSON.parse(ft);if(!Array.isArray(j.lists))throw 0;
+        if(!confirm(`Replace all your watchlists with the backup (${j.lists.length} lists)?`))return false;WL=wlNorm(j);wlSave();renderWatch();toast("Backup restored");return}catch(e){$("#imperr").hidden=false;$("#imperr").textContent="That file isn't a watchlist backup.";return false}}
+      text+="\n"+ft}
+    await vpxLoad();const {ok,bad}=parseSyms(text);if(!ok.length){$("#imperr").hidden=false;$("#imperr").textContent=bad.length?`None of these are known symbols: ${bad.slice(0,12).join(", ")}`:"Nothing to import.";return false}
+    let lid=fd.get("l");if(lid==="__new"){const n=String(fd.get("nn")||"").trim()||"Imported";lid=wlNewId();w.lists.push({id:lid,name:n,items:[]})}
+    const d=String(fd.get("d")||D.meta.asof);await clLoad();let n=0;
+    for(const s of ok){let o={d};if(d<D.meta.asof){const i=clIdx(d),c=CL.c[s],bc=CL.c[benchName()];if(i>=0&&c&&isNum(c[i]))o.p=c[i];if(i>=0&&bc&&isNum(bc[i]))o.b=bc[i]}
+      if(wlAdd(lid,s,o))n++}
+    w.active=lid;wlSave();renderWatch();toast(`${n} added${bad.length?` · ${bad.length} not recognised: ${bad.slice(0,5).join(", ")}${bad.length>5?"…":""}`:""}`)})}
+function wlExportTV(){const w=wlGet(),L=wlList(w.active);const syms=L.items.map(i=>`${exOf(i.s)||"NSE"}:${i.s}`);dl(`${L.name.replace(/[^\w-]+/g,"_")}.txt`,syms.join(","));toast("TradingView list downloaded — import it from the watchlist menu in TradingView")}
+function wlShareLink(){const L=wlList(wlGet().active);const url=`${location.origin}${location.pathname}#wl=${encodeURIComponent(L.name)}:${L.items.map(i=>i.s).join(",")}`;
+  (navigator.clipboard?.writeText(url)||Promise.reject()).then(()=>toast("Share link copied"),()=>modal(`<h3>Share link</h3><p>Copy this link:</p><textarea rows="4" readonly>${esc(url)}</textarea><div class="acts"><button class="btn" data-mclose>Done</button></div>`))}
+function wlCheckShared(){const h=decodeURIComponent(location.hash||"");const m=h.match(/^#wl=([^:]*):(.*)$/);if(!m)return false;
+  const name=m[1]||"Shared list",syms=m[2].split(",").filter(Boolean);history.replaceState(null,"","#watch");
+  modal(`<form><h3>Import a shared list?</h3><p><b>${esc(name)}</b> — ${syms.length} stocks: ${esc(syms.slice(0,12).join(", "))}${syms.length>12?"…":""}</p>
+    <div class="acts"><button type="button" class="ghost" data-mclose>No thanks</button><button class="btn" type="submit">Import as a new list</button></div></form>`,async()=>{await vpxLoad();
+    const w=wlGet(),id=wlNewId();w.lists.push({id,name,items:[]});parseSyms(syms.join(",")).ok.forEach(s=>wlAdd(id,s));w.active=id;wlSave();go("watch")});return true}
+
+/* ── sync between devices: secret GitHub gist ── */
+const GH="https://api.github.com",GFILE="pkc-radar-watchlists.json";
+const syncCfg={get(){return store.get("wlsync",null)},set(v){store.set("wlsync",v)}};
+async function gh(path,opt,tok){const r=await fetch(GH+path,{method:opt?.method||"GET",body:opt?.body,headers:{"Accept":"application/vnd.github+json","Authorization":"Bearer "+tok,...(opt?.body?{"Content-Type":"application/json"}:{})}});
+  if(!r.ok)throw new Error(r.status===401?"GitHub refused the token (401). Check it has the gist permission.":`GitHub error ${r.status}`);return r.json()}
+function wlMerge(a,b){ // first connect on a device that already has lists: keep everything from both
+  const newer=(a.updated||0)>=(b.updated||0)?a:b,older=newer===a?b:a,out=wlNorm(JSON.parse(JSON.stringify(newer)));
+  for(const L of older.lists){let T=out.lists.find(x=>x.name.trim().toLowerCase()===L.name.trim().toLowerCase());if(!T){T={id:wlNewId(),name:L.name,items:[]};out.lists.push(T)}
+    for(const it of L.items){const e=T.items.find(i=>i.s===it.s);if(!e)T.items.push({...it});else if(it.d<e.d)Object.assign(e,it)}}
+  for(const [k,v] of Object.entries(older.meta||{}))if(!out.meta[k])out.meta[k]=v;
+  const seen=new Set(out.log.map(e=>e.s+e.d+e.o));for(const e of older.log||[])if(!seen.has(e.s+e.d+e.o))out.log.push(e);
+  out.updated=Date.now();return out}
+async function syncConnect(tok){const w=wlGet();const mine=await gh("/gists?per_page=100",null,tok);let g=mine.find(x=>x.files&&x.files[GFILE]);
+  if(g){const full=await gh("/gists/"+g.id,null,tok);let remote=null;try{remote=JSON.parse(full.files[GFILE].content)}catch(e){}
+    const localHas=w.lists.some(l=>l.items.length),remoteHas=remote&&Array.isArray(remote.lists)&&remote.lists.some(l=>l.items?.length);
+    WL=localHas&&remoteHas?wlMerge(w,wlNorm(remote)):remoteHas?wlNorm(remote):w;wlSave(true);
+    await gh("/gists/"+g.id,{method:"PATCH",body:JSON.stringify({files:{[GFILE]:{content:JSON.stringify(WL)}}})},tok)}
+  else g=await gh("/gists",{method:"POST",body:JSON.stringify({description:"PKC Sector Radar watchlists",public:false,files:{[GFILE]:{content:JSON.stringify(w)}}})},tok);
+  syncCfg.set({tok,id:g.id,at:Date.now(),err:null})}
+async function syncPull(){const c=syncCfg.get();if(!c)return;try{const full=await gh("/gists/"+c.id,null,c.tok);const remote=JSON.parse(full.files[GFILE]?.content||"null");
+    if(remote&&(remote.updated||0)>(wlGet().updated||0)){WL=wlNorm(remote);wlSave(true);if(st.tab==="watch")renderWatch();toast("Watchlists updated from your other device")}
+    c.at=Date.now();c.err=null}catch(e){c.err=e.message}syncCfg.set(c)}
+let syncT=null;
+function syncPushSoon(){const c=syncCfg.get();if(!c)return;clearTimeout(syncT);syncT=setTimeout(async()=>{try{await gh("/gists/"+c.id,{method:"PATCH",body:JSON.stringify({files:{[GFILE]:{content:JSON.stringify(wlGet())}}})},c.tok);c.at=Date.now();c.err=null}catch(e){c.err=e.message;toast("Sync failed — saved on this device")}syncCfg.set(c)},1500)}
+function syncDialog(){const c=syncCfg.get();
+  modal(c?`<form><h3>Sync is on</h3><p>Your watchlists are saved to a private GitHub gist and kept the same on every device where you connect the same token. Last synced: ${c.at?new Date(c.at).toLocaleString("en-IN"):"–"}.${c.err?`<br><span class="err">${esc(c.err)}</span>`:""}</p>
+      <div class="acts"><button type="button" class="ghost" data-mclose>Close</button><button type="button" class="ghost" id="syncnow">Sync now</button><button class="btn danger" type="submit">Turn off on this device</button></div></form>`
+    :`<form><h3>Sync across your devices</h3><p>Watchlists are saved in this browser. To see the same lists on your phone and PC, store them in a private GitHub gist (free, only you can change it):</p>
+      <ol><li>Open <a href="https://github.com/settings/tokens/new?scopes=gist&description=PKC%20Sector%20Radar%20watchlists" target="_blank" rel="noopener">this GitHub page</a> (signed in as you). It creates a token that can only read and write gists. Choose an expiry, then click <b>Generate token</b>.</li>
+      <li>Copy the token (starts with <code>ghp_</code>) and paste it below. Do the same on your other device.</li></ol>
+      <input name="tok" placeholder="ghp_…" autocomplete="off" spellcheck="false" aria-label="GitHub token" required>
+      <p style="font-size:14px">The token stays in this browser only. The gist is secret (not listed anywhere), but anyone given its exact address could read it — don't put anything private in notes.</p>
+      <p class="err" id="syncerr" hidden></p>
+      <div class="acts"><button type="button" class="ghost" data-mclose>Cancel</button><button class="btn" type="submit">Connect</button></div></form>`,
+  async fd=>{if(c){syncCfg.set(null);toast("Sync turned off on this device");renderWatch();return}
+    const tok=String(fd.get("tok")||"").trim();try{await syncConnect(tok);toast("Sync connected");renderWatch()}catch(e){const er=$("#syncerr");er.hidden=false;er.textContent=e.message;return false}});
+  $("#syncnow")?.addEventListener("click",async()=>{await syncPull();syncPushSoon();modalClose();toast("Synced")})}
+
+/* ── the Watchlists tab ── */
+st.wl={view:"track",flag:""};
+function renderWatch(){
+  $("#view").innerHTML=`<div class="empty">Loading watchlists…</div>`;
+  Promise.all([vpxLoad(),clLoad()]).then(()=>{if(st.tab==="watch")drawWatch();updateWlBadge()})}
+function drawWatch(){
+  const w=wlGet(),L=wlList(w.active),sync=syncCfg.get();
+  const flags=FLAGS.filter(([k])=>L.items.some(i=>w.meta[i.s]?.flag===k));
+  let items=L.items;if(st.wl.flag)items=items.filter(i=>w.meta[i.s]?.flag===st.wl.flag);
+  const rows=items.map(it=>{const x=D.by[it.s]||{s:it.s,n:nameOf(it.s),r:{}},m=w.meta[it.s]||{},o=itemStats(it);
+    return {...x,s:it.s,n:x.n||nameOf(it.s),ex:exOf(it.s),px:pxOf(it.s),_it:it,_m:m,...o,d:it.d,p0:it.p,flag:m.flag||"",note:m.note||"",piv:m.pivot,stp:m.stop,tgt:m.target,
+      scansN:(D.scansOf[it.s]||[]).length,vp:VPX?.[it.s]?.status||""}});
+  const vals=k=>rows.map(r=>r[k]).filter(isNum),avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+  const sinceA=vals("since"),alphaA=vals("alpha"),best=[...rows].filter(r=>isNum(r.since)).sort((a,b)=>b.since-a.since);
+  const alerts=wlAlerts(L.items.map(i=>i.s));
+  const tile=(k,v,sub)=>`<div class="card tile"><div class="k">${k}</div><div class="v num">${v}</div><div class="d" style="color:var(--muted)">${sub}</div></div>`;
+  let h=`<div class="sec-head"><div><h2>Watchlists</h2><p>Track ideas from first spot to buy point. Return since added uses the close on the day you added the stock; ★ next to any stock name anywhere on the site adds it. ${sync?`Synced across your devices${sync.err?` <span class="down">— last sync failed</span>`:""}.`:"Saved in this browser."}</p></div></div>
+  <div class="card toolbar" style="display:block">
+    <div class="wlbar" role="group" aria-label="Your lists">${w.lists.map(l=>`<button type="button" class="wlchip" data-wl-list="${l.id}" aria-pressed="${l.id===w.active}">${esc(l.name)}<span class="c">${l.items.length}</span></button>`).join("")}
+      <button type="button" class="wlchip add" data-wl-act="new">+ New list</button></div>
+    <div class="wltools"><button type="button" class="ghost" data-wl-act="rename">Rename</button><button type="button" class="ghost" data-wl-act="dup">Duplicate</button><button type="button" class="ghost" data-wl-act="del">Delete list</button>
+      <span style="flex:1"></span><button type="button" class="ghost" data-wl-act="import">Import</button><button type="button" class="ghost" data-wl-act="tv">TradingView .txt</button>
+      <button type="button" class="ghost" data-wl-act="share">Share link</button><button type="button" class="ghost" data-wl-act="backup">Backup</button><button type="button" class="ghost" data-wl-act="sync">${sync?"Sync: on":"Sync devices"}</button></div>
+  </div>`;
+  if(!L.items.length){
+    h+=`<div class="card" style="padding:22px 20px"><h3 style="font-size:22px;margin-bottom:8px">“${esc(L.name)}” is empty</h3><p style="margin:0 0 10px;color:var(--muted)">Ways to add stocks:</p>
+      <ul style="margin:0;padding-left:22px;line-height:1.8"><li>Tap <b>☆</b> next to any stock name — in Rotation, RS ranking, Scanners, VPCI or a stock card.</li><li>Search a stock at the top, open it, and use the Watchlists section.</li><li>On any scanner, use <b>☆ Add all</b> to keep the whole result list.</li><li><b>Import</b> a list from Kite, TradingView or a pasted line of symbols.</li></ul>
+      <p style="margin:14px 0 0;color:var(--muted)">A common pro workflow (O'Neil / Minervini): a wide <b>Watching</b> list of 20–40 names → a <b>Focus list</b> of 5–10 with pivot and stop set → buy only in the buy zone.</p>
+      ${w.lists.length===1?`<div class="chips" style="margin-top:14px">${["Focus list","Breakout watch","Long-term holdings","Results watch"].map(n=>`<button type="button" class="chipbtn" data-wl-quick="${n}">+ ${n}</button>`).join("")}</div>`:""}</div>`;
+    h+=historyHtml();
+    $("#view").innerHTML=h;wireTables($("#view"),drawWatch);return}
+  h+=`<div class="tiles">${tile("Stocks in this list",L.items.length,`${rows.filter(r=>isNum(r.piv)).length} with a pivot set`)}
+    ${tile("Average since added",`<span class="${cls(avg(sinceA))}">${sgn(avg(sinceA),1)}</span>`,`vs ${esc(benchName())}: <span class="${cls(avg(alphaA))}">${sgn(avg(alphaA),1," pts")}</span>`)}
+    ${tile("Up / down since added",`<span class="up">${sinceA.filter(v=>v>0).length}</span> <span style="color:var(--muted);font-weight:500">/</span> <span class="down">${sinceA.filter(v=>v<0).length}</span>`,`${alphaA.filter(v=>v>0).length} beating ${esc(benchName())}`)}
+    ${tile("Best since added",best[0]?`${esc(best[0].s)} <span class="up" style="font-size:.7em">${sgn(best[0].since,1)}</span>`:"–",best.length>1?`Worst: ${esc(best[best.length-1].s)} ${sgn(best[best.length-1].since,1)}`:"")}
+    ${tile("In the buy zone",rows.filter(r=>r.setup?.k==="zone").length,`${rows.filter(r=>r.setup?.k==="near").length} near pivot · ${rows.filter(r=>r.setup?.k==="stop").length} below stop`)}
+    ${tile("Alerts today",alerts.filter(a=>a.lvl!=="info").length,`${alerts.filter(a=>a.lvl==="crit").length} urgent · ${alerts.filter(a=>a.lvl==="info").length} notes`)}</div>`;
+  if(alerts.length)h+=`<div class="card" style="margin-bottom:14px"><h3 style="font-size:20px;padding:14px 16px 4px">Needs your attention today</h3><div class="alerts">${alerts.slice(0,40).map(a=>`<div class="al"><span class="tag ${a.lvl}">${a.lvl==="crit"?"Urgent":a.lvl==="warn"?"Warning":a.lvl==="good"?"Signal":"Note"}</span><div class="txt"><button type="button" class="symbtn" data-sym="${esc(a.s)}">${esc(a.s)}</button> — ${esc(a.txt)}</div></div>`).join("")}</div>${alerts.length>40?`<p class="note" style="padding:0 16px 12px">${alerts.length-40} more…</p>`:""}</div>`;
+  const stockW={k:"s",label:"Stock",l:1,fmt:r=>(r.flag?`<span class="fdot ${r.flag}" title="${FLAGS.find(f=>f[0]===r.flag)?.[1]} flag"></span>`:"")+symBtn(r.s,r.n,r.ex),sort:r=>r.s};
+  const pc=(k,label,d=1)=>({k,label,fmt:r=>`<span class="num ${cls(r[k])}">${sgn(r[k],d)}</span>`});
+  const lv=(k,label)=>({k,label,fmt:r=>`<span class="num">${isNum(r[k])?inr(r[k]):"–"}</span>`});
+  const col={spark:{k:"r.3M",label:"3 months",fmt:r=>spark(r.s,r.d),sort:r=>r.r?.["3M"]},
+    added:{k:"d",label:"Added",fmt:r=>`<span class="num">${esc(new Date(r.d+"T00:00:00").toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"2-digit"}))}</span><span class="nm">at ₹${isNum(r.p0)?inr(r.p0):"–"}</span>`},
+    since:pc("since","Since added"),alpha:{k:"alpha",label:"vs NIFTY",fmt:r=>`<span class="num ${cls(r.alpha)}">${sgn(r.alpha,1," pts")}</span>`},
+    days:{k:"days",label:"Days",fmt:r=>`<span class="num">${r.days}</span>`},maxg:pc("maxg","Best since"),maxdd:pc("maxdd","Worst dip"),
+    setup:{k:"fromPiv",label:"Setup",l:1,fmt:r=>setupPill(r.setup)},piv:lv("piv","Pivot"),stp:lv("stp","Stop"),tgt:lv("tgt","Target"),
+    toStop:pc("toStop","Above stop"),scans:{k:"scansN",label:"Scans today",fmt:r=>{const a=(D.scansOf[r.s]||[]).map(id=>D.scanMeta[id]?.name).filter(Boolean);return a.length?`<span class="num" title="${esc(a.join(" · "))}">${a.length}</span>`:"–"}},
+    res:{k:"next_results",label:"Results",fmt:r=>{if(!r.next_results)return "–";const dd=Math.round((new Date(r.next_results+"T00:00:00")-new Date(D.meta.asof+"T00:00:00"))/864e5);return `<span class="num ${dd<=7?"down":""}">${esc(new Date(r.next_results+"T00:00:00").toLocaleDateString("en-IN",{day:"numeric",month:"short"}))}</span>`}},
+    vp:{k:"vp",label:"VPCI",l:1,fmt:r=>r.vp?statusPill(r.vp):"–"},
+    note:{k:"note",label:"Note",l:1,td:()=>"wrapcell",fmt:r=>r.note?esc(r.note.length>90?r.note.slice(0,90)+"…":r.note):"<span style='color:var(--muted)'>–</span>"},
+    prom:{k:"promoter",label:"Promoter %",fmt:r=>`<span class="num">${isNum(r.promoter)?r.promoter.toFixed(1):"–"}</span>`},inst:pc("inst_1y","FII+DII Δ1Y",2),
+    act:{k:"_a",label:"",fmt:r=>`<span class="rowact"><button type="button" data-wl-edit="${esc(r.s)}" title="Levels, note, flag" aria-label="Edit ${esc(r.s)}">✎</button><button type="button" data-wl-mv="${esc(r.s)}" title="Move or copy to another list" aria-label="Move ${esc(r.s)}">⇄</button><button type="button" data-wl-rm="${esc(r.s)}" title="Remove from this list" aria-label="Remove ${esc(r.s)}">✕</button></span>`,sort:()=>0}};
+  const views={track:[stockW,col.spark,C.px,C.ret("1D"),col.added,col.since,col.alpha,col.days,col.maxg,col.maxdd,col.setup,col.piv,col.stp,col.toStop,C.rs,C.fr,col.scans,col.res,col.note,col.act],
+    perf:[stockW,col.spark,C.px,C.ret("1D"),C.ret("1W"),C.ret("1M"),C.ret("3M"),C.ret("6M"),C.ret("1Y"),C.h52,C.rs,C.drs,C.st,C.vr,C.adr,col.vp,col.act],
+    fund:[stockW,C.px,C.mc,C.fr,C.pe,C.patg,C.revg,C.roe,col.prom,col.inst,col.res,C.sec,col.act]};
+  const tid="wl_"+L.id+"_"+st.wl.view;if(!st.tbl[tid])st.tbl[tid]={key:st.wl.view==="track"?"since":"rs",dir:-1,show:200};
+  h+=`<div class="card"><div style="display:flex;flex-wrap:wrap;gap:12px 22px;padding:12px 14px;align-items:flex-end"><div class="ctl"><span>Columns</span>${seg("wlview",["track","perf","fund"],st.wl.view,{track:"Tracking",perf:"Performance",fund:"Fundamentals"})}</div>
+    ${flags.length?`<div class="ctl"><span>Flag</span><div class="chips"><button type="button" class="chipbtn" data-wl-flag="" aria-pressed="${!st.wl.flag}">All</button>${flags.map(([k,n])=>`<button type="button" class="chipbtn" data-wl-flag="${k}" aria-pressed="${st.wl.flag===k}"><span class="fdot ${k}"></span>${n}</button>`).join("")}</div></div>`:""}</div>
+    <div id="wlT">${dtable(tid,rows,views[st.wl.view],{empty:"No stocks with this flag."})}</div></div>
+    <p class="note">Buy zone = pivot to 5% above it (IBD). Above that is extended — chasing raises risk. “Best since” and “Worst dip” use daily closes since the day added. Rows sort by any column; ✎ sets pivot, stop, target, flag and note.</p>`;
+  h+=historyHtml();
+  $("#view").innerHTML=h;wireTables($("#view"),drawWatch);
+}
+function historyHtml(){const w=wlGet();if(!w.log.length)return "";
+  const rows=w.log.map((e,i)=>{const ret=isNum(e.po)&&isNum(e.p)&&e.p>0?(e.po/e.p-1)*100:null,br=isNum(e.bo)&&isNum(e.b)&&e.b>0?(e.bo/e.b-1)*100:null;
+    return {i,s:e.s,n:nameOf(e.s),l:e.l,d:e.d,o:e.o,ret,alpha:isNum(ret)&&isNum(br)?ret-br:null,days:Math.max(0,Math.round((new Date(e.o+"T00:00:00")-new Date(e.d+"T00:00:00"))/864e5))}});
+  const r=rows.filter(x=>isNum(x.ret)),win=r.filter(x=>x.ret>0).length,beat=r.filter(x=>isNum(x.alpha)&&x.alpha>0).length,avg=a=>a.length?a.reduce((p,q)=>p+q,0)/a.length:null;
+  const dshort=d=>esc(new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"2-digit"}));
+  const cols=[{k:"s",label:"Stock",l:1,fmt:x=>symBtn(x.s,x.n)},{k:"l",label:"List",l:1},{k:"d",label:"Added",fmt:x=>dshort(x.d)},{k:"o",label:"Removed",fmt:x=>dshort(x.o)},
+    {k:"days",label:"Days"},{k:"ret",label:"Return",fmt:x=>`<span class="num ${cls(x.ret)}">${sgn(x.ret,1)}</span>`},{k:"alpha",label:"vs NIFTY",fmt:x=>`<span class="num ${cls(x.alpha)}">${sgn(x.alpha,1," pts")}</span>`}];
+  if(!st.tbl.wlhist)st.tbl.wlhist={key:"o",dir:-1,show:50};
+  return `<details class="card" style="margin-top:16px"><summary style="padding:14px 16px;font-weight:700;font-size:18px;cursor:pointer">Removed stocks &amp; your track record (${rows.length})</summary>
+    <div class="track-rec"><span><b>${r.length?Math.round(win/r.length*100)+"%":"–"}</b> went up while on a list</span><span><b>${r.length?Math.round(beat/r.length*100)+"%":"–"}</b> beat ${esc(benchName())}</span><span><b>${sgn(avg(r.map(x=>x.ret)),1)}</b> average return</span><span><b>${sgn(avg(r.filter(x=>isNum(x.alpha)).map(x=>x.alpha)),1," pts")}</b> average vs index</span></div>
+    ${dtable("wlhist",rows,cols,{limit:50})}<div style="padding:0 16px 14px"><button type="button" class="ghost" data-wl-act="clearlog">Clear history</button></div></details>`}
+
+/* ── stock card: watchlist section + price chart ── */
+function wlCardHtml(s){const w=wlGet(),m=w.meta[s]||{},mem=wlListsOf(s);
+  return `<div class="dsec" id="wlsec"><h4>Watchlists</h4>
+    <div class="chips">${w.lists.map(l=>{const on=l.items.some(i=>i.s===s);return `<button type="button" class="chipbtn" data-wl-toggle="${l.id}" data-sym="${esc(s)}" aria-pressed="${on}" style="${on?"background:var(--sel);color:var(--sel-ink);border-color:var(--sel)":""}">${on?"★":"☆"} ${esc(l.name)}</button>`}).join("")}<button type="button" class="chipbtn" data-wl-newcard="${esc(s)}" style="border-style:dashed">+ New list</button></div>
+    ${mem.length?`<table class="wlmem" style="margin-top:10px"><tbody>${mem.map(l=>{const it=l.items.find(i=>i.s===s),o=itemStats(it);return `<tr><td>${esc(l.name)}</td><td><input type="date" value="${it.d}" max="${D.meta.asof}" data-wl-date="${l.id}" data-sym="${esc(s)}" aria-label="Date added to ${esc(l.name)}"></td><td><input inputmode="decimal" value="${isNum(it.p)?it.p:""}" data-wl-p="${l.id}" data-sym="${esc(s)}" aria-label="Price when added"></td><td class="num ${cls(o.since)}" style="text-align:right;font-weight:700">${sgn(o.since,1)}</td></tr>`}).join("")}</tbody></table>
+      <p class="note" style="margin:4px 0 0">Date and price added (editable). Change the date and the price fills in from that day's close.</p>`:""}
+    <form class="wlf" data-wl-form="${esc(s)}" style="margin-top:12px">
+      <div class="g3"><label class="f">Pivot (buy above) ₹<input name="pivot" inputmode="decimal" value="${isNum(m.pivot)?m.pivot:""}"></label><label class="f">Stop ₹<input name="stop" inputmode="decimal" value="${isNum(m.stop)?m.stop:""}"></label><label class="f">Target ₹<input name="target" inputmode="decimal" value="${isNum(m.target)?m.target:""}"></label></div>
+      <div class="fpick" role="radiogroup" aria-label="Flag"><label><input type="radio" name="flag" value="" ${!m.flag?"checked":""}>No flag</label>${FLAGS.map(([k,n])=>`<label><input type="radio" name="flag" value="${k}" ${m.flag===k?"checked":""}><span class="fdot ${k}"></span>${n}</label>`).join("")}</div>
+      <label class="f">Note — your thesis, the setup, what would make you sell<textarea name="note" rows="3" maxlength="1000">${esc(m.note||"")}</textarea></label>
+      <div class="risk" id="wlrisk"></div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn" type="submit">Save</button><label class="f" style="flex-direction:row;align-items:center;gap:8px">Risk per trade ₹<input name="risk" inputmode="numeric" value="${isNum(w.settings.risk)?w.settings.risk:""}" style="width:110px" placeholder="e.g. 5000"></label></div>
+    </form></div>`}
+function wlRiskText(f,s){const n=k=>{const v=parseFloat(f.elements[k].value);return isFinite(v)&&v>0?v:null},pv=n("pivot"),sp=n("stop"),tg=n("target"),rk=n("risk"),px=pxOf(s);
+  if(!pv||!sp)return `Set a pivot and a stop to see risk and position size.${isNum(px)?` Price now ₹${inr(px)}.`:""}`;
+  if(sp>=pv)return `<span class="down">Stop must be below the pivot.</span>`;
+  const r=(pv-sp)/pv*100;let t=`Risk from pivot to stop: <b>${r.toFixed(1)}%</b>${r>8?` <span class="down">(wider than 7–8% — most pros keep it tighter)</span>`:""}`;
+  if(tg&&tg>pv)t+=` · Reward/risk: <b>${((tg-pv)/(pv-sp)).toFixed(1)}×</b>`;
+  if(rk){const sh=Math.floor(rk/(pv-sp));t+=`<br>For ₹${rk.toLocaleString("en-IN")} risk: <b>${sh.toLocaleString("en-IN")} shares</b> ≈ ₹${Math.round(sh*pv).toLocaleString("en-IN")} position`}
+  return t}
+function wireWlCard(s){const f=document.querySelector(`[data-wl-form="${CSS.escape(s)}"]`);if(!f)return;const upd=()=>$("#wlrisk").innerHTML=wlRiskText(f,s);upd();f.addEventListener("input",upd);
+  f.addEventListener("submit",e=>{e.preventDefault();const w=wlGet(),num=k=>{const v=parseFloat(String(f.elements[k].value).replace(/,/g,""));return isFinite(v)&&v>0?v:null};
+    const m={pivot:num("pivot"),stop:num("stop"),target:num("target"),note:f.elements.note.value.trim(),flag:f.elements.flag.value||""};
+    const rk=num("risk");w.settings.risk=rk;
+    if(!m.pivot&&!m.stop&&!m.target&&!m.note&&!m.flag)delete w.meta[s];else w.meta[s]=m;
+    let added="";if(w.meta[s]&&!wlHas(s)){wlAdd(w.active,s);added=` and added to “${wlList(w.active).name}”`}
+    wlSave();toast("Saved"+added);if(st.tab==="watch")drawWatch();openDrawer(s,null,true)});
+  document.querySelectorAll(`[data-wl-date][data-sym="${CSS.escape(s)}"]`).forEach(inp=>inp.addEventListener("change",async()=>{await clLoad();const it=wlList(inp.dataset.wlDate).items.find(i=>i.s===s);if(!it||!inp.value)return;
+    it.d=inp.value>D.meta.asof?D.meta.asof:inp.value;const i=clIdx(it.d),c=CL.c[s],bc=CL.c[benchName()];if(i>=0&&c&&isNum(c[i]))it.p=c[i];if(i>=0&&bc&&isNum(bc[i]))it.b=bc[i];wlSave();if(st.tab==="watch")drawWatch();openDrawer(s,null,true)}));
+  document.querySelectorAll(`[data-wl-p][data-sym="${CSS.escape(s)}"]`).forEach(inp=>inp.addEventListener("change",()=>{const it=wlList(inp.dataset.wlP).items.find(i=>i.s===s);const v=parseFloat(inp.value);if(it&&isFinite(v)&&v>0){it.p=v;wlSave();if(st.tab==="watch")drawWatch();openDrawer(s,null,true)}}))}
+function priceChart(s){const c=CL?.c?.[s];if(!c||c.filter(isNum).length<30)return "";
+  const n=c.length,W=460,H=250,pl=50,pr=8,pt=10,pb=26,m=wlGet().meta[s]||{},ma=c.map((v,i)=>sma50(c,i));
+  const items=wlListsOf(s).map(l=>l.items.find(i=>i.s===s)).filter(Boolean);
+  const v=c.filter(isNum);let lo=Math.min(...v),hi=Math.max(...v);
+  for(const k of ["pivot","stop","target"])if(isNum(m[k])&&m[k]>lo*.6&&m[k]<hi*1.5){lo=Math.min(lo,m[k]);hi=Math.max(hi,m[k])}
+  const pad=(hi-lo)*.06;lo-=pad;hi+=pad;
+  const x=i=>pl+i*(W-pl-pr)/(n-1),y=t=>pt+(1-(t-lo)/(hi-lo))*(H-pt-pb);
+  let g="";const ticks=4;for(let k=0;k<=ticks;k++){const t=lo+(hi-lo)*k/ticks;g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(t)}" y2="${y(t)}" stroke="var(--track)"/><text x="${pl-8}" y="${y(t)+4}" text-anchor="end">${t>=1000?Math.round(t).toLocaleString("en-IN"):t.toFixed(t>=100?0:1)}</text>`}
+  const step=Math.ceil(n/4);for(let i=Math.floor(step/2);i<n;i+=step)g+=`<text x="${x(i)}" y="${H-6}" text-anchor="middle">${new Date(CL.dates[i]+"T00:00:00").toLocaleDateString("en-IN",{month:"short",year:"2-digit"})}</text>`;
+  const line=(arr,st)=>`<polyline points="${arr.map((t,i)=>isNum(t)?`${x(i).toFixed(1)},${y(t).toFixed(1)}`:null).filter(Boolean).join(" ")}" fill="none" ${st}/>`;
+  g+=line(ma,`stroke="var(--s2)" stroke-width="1.8"`)+line(c,`stroke="var(--s1)" stroke-width="2" stroke-linejoin="round"`);
+  const hl=(val,col,lab,below)=>isNum(val)&&val>=lo&&val<=hi?`<line x1="${pl}" x2="${W-pr}" y1="${y(val)}" y2="${y(val)}" stroke="${col}" stroke-width="1.6" stroke-dasharray="6 4"/><text x="${pl+6}" y="${below?y(val)+16:y(val)-5}" style="fill:${col};font-weight:700">${lab} ${inr(val)}</text>`:"";
+  g+=hl(m.pivot,"var(--up-t)","Pivot")+hl(m.stop,"var(--down-t)","Stop",1)+hl(m.target,"var(--muted)","Target");
+  for(const it of items){const i=clIdx(it.d);if(i>=0&&isNum(c[i]))g+=`<circle cx="${x(i)}" cy="${y(c[i])}" r="5" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>`}
+  g+=`<line class="xh" x1="0" x2="0" y1="${pt}" y2="${H-pb}" stroke="var(--muted)" opacity="0"/>`;
+  return `<div class="dsec pchart" id="pchart"><h4>Price, last 12 months</h4><div class="legend"><span><i style="--c:var(--s1)"></i>Close</span><span><i style="--c:var(--s2)"></i>50-day average</span>${items.length?`<span>◯ Added</span>`:""}</div>
+    <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(s)} daily closes for the last 12 months with 50-day average" style="display:block;touch-action:pan-y">${g}<rect x="${pl}" y="0" width="${W-pl-pr}" height="${H}" fill="transparent"/></svg><div class="tip" hidden></div></div>`}
+function wirePriceChart(s){const box=$("#pchart");if(!box)return;const svg=box.querySelector("svg"),tip=box.querySelector(".tip"),xh=svg.querySelector(".xh"),c=CL.c[s],n=c.length,W=460,pl=50,pr=8;
+  const mv=e=>{const r=svg.getBoundingClientRect(),cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left,i=Math.max(0,Math.min(n-1,Math.round((cx/r.width*W-pl)/((W-pl-pr)/(n-1))))),sx=pl+i*(W-pl-pr)/(n-1);
+    xh.setAttribute("x1",sx);xh.setAttribute("x2",sx);xh.setAttribute("opacity",".7");const a=sma50(c,i);
+    tip.hidden=false;tip.innerHTML=`<b>${new Date(CL.dates[i]+"T00:00:00").toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}</b><br>Close ₹${inr(c[i])}${isNum(a)?`<br>50-day avg ₹${inr(Math.round(a*100)/100)}`:""}`;
+    const bx=box.getBoundingClientRect();let left=sx/W*r.width+(r.left-bx.left)+12;if(left+tip.offsetWidth>bx.width-6)left-=tip.offsetWidth+24;tip.style.left=Math.max(4,left)+"px";tip.style.top="56px"};
+  const out=()=>{tip.hidden=true;xh.setAttribute("opacity","0")};svg.addEventListener("mousemove",mv);svg.addEventListener("touchmove",mv,{passive:true});svg.addEventListener("touchstart",mv,{passive:true});svg.addEventListener("mouseleave",out);svg.addEventListener("touchend",out)}
+
+/* ── events ── */
+document.addEventListener("click",e=>{
+  const star=e.target.closest(".wlbtn[data-wl]");if(star){e.stopPropagation();e.preventDefault();if(!$("#wlpop").hidden&&POPA===star){wlPopClose();return}wlPopStock(star,star.dataset.wl);return}
+  const pop=$("#wlpop");if(!pop.hidden&&!e.target.closest("#wlpop")&&!e.target.closest("[data-wl-addall]")&&!e.target.closest("[data-wl-mv]")){wlPopClose()}
+  const lv=e.target.closest("[data-wl-levels]");if(lv){wlPopClose();openDrawer(lv.dataset.wlLevels,null,true);return}
+  const many=e.target.closest("[data-wl-many]");if(many){const syms=JSON.parse(pop.dataset.many||"[]");let n=0;syms.forEach(s=>{if(wlAdd(many.dataset.wlMany,s))n++});wlSave();wlPopClose();toast(`${n} added to “${wlList(many.dataset.wlMany).name}”${syms.length-n?` (${syms.length-n} were already there)`:""}`);return}
+  const mvTo=e.target.closest("[data-wl-mvto]");if(mvTo){const s=pop.dataset.sym,w=wlGet(),from=wlList(w.active),it=from.items.find(i=>i.s===s);const to=wlList(mvTo.dataset.wlMvto);
+    if(it&&to&&!to.items.some(i=>i.s===s))to.items.push({...it});if(mvTo.dataset.copy!=="1")from.items=from.items.filter(i=>i.s!==s);wlSave();wlPopClose();drawWatch();toast(`${s} ${mvTo.dataset.copy==="1"?"copied":"moved"} to “${to.name}”`);return}
+  const ad=e.target.closest("[data-wl-addall]");if(ad){wlPopMany(ad,JSON.parse(ad.dataset.wlAddall),ad.dataset.label||"stocks");return}
+  const tg=e.target.closest("[data-wl-toggle]");if(tg){const s=tg.dataset.sym,l=wlList(tg.dataset.wlToggle);if(l.items.some(i=>i.s===s))wlRemove(l.id,s);else wlAdd(l.id,s);wlSave();if(st.tab==="watch")drawWatch();openDrawer(s,null,true);return}
+  const nc=e.target.closest("[data-wl-newcard]");if(nc){const s=nc.dataset.wlNewcard;askName("New list","",n=>{const w=wlGet(),id=wlNewId();w.lists.push({id,name:n,items:[]});wlAdd(id,s);wlSave();if(st.tab==="watch")drawWatch();openDrawer(s,null,true);toast(`Created “${n}” with ${s}`)});return}
+  const li=e.target.closest("[data-wl-list]");if(li){wlGet().active=li.dataset.wlList;st.wl.flag="";wlSave(true);drawWatch();return}
+  const fl=e.target.closest("[data-wl-flag]");if(fl){st.wl.flag=fl.dataset.wlFlag;drawWatch();return}
+  const qk=e.target.closest("[data-wl-quick]");if(qk){const w=wlGet();w.lists.push({id:wlNewId(),name:qk.dataset.wlQuick,items:[]});wlSave();drawWatch();return}
+  const ed=e.target.closest("[data-wl-edit]");if(ed){openDrawer(ed.dataset.wlEdit,null,true);return}
+  const rm=e.target.closest("[data-wl-rm]");if(rm){const w=wlGet(),s=rm.dataset.wlRm;wlRemove(w.active,s);wlSave();drawWatch();toast(`${s} removed — kept in your track record`);return}
+  const mv=e.target.closest("[data-wl-mv]");if(mv){const w=wlGet(),s=mv.dataset.wlMv,others=w.lists.filter(l=>l.id!==w.active);
+    if(!others.length){toast("Create another list first");return}
+    wlPop(mv,`<div class="wlpop-h"><b>${esc(s)}</b> — move or copy to</div>${others.map(l=>`<div class="wlrow" style="cursor:default"><span>${esc(l.name)}</span><button type="button" class="ghost" data-wl-mvto="${l.id}">Move</button><button type="button" class="ghost" data-wl-mvto="${l.id}" data-copy="1">Copy</button></div>`).join("")}`);$("#wlpop").dataset.sym=s;return}
+  const act=e.target.closest("[data-wl-act]");if(act){const w=wlGet(),L=wlList(w.active),a=act.dataset.wlAct;
+    if(a==="new")askName("New list","",n=>{const id=wlNewId();w.lists.push({id,name:n,items:[]});w.active=id;wlSave();drawWatch()});
+    else if(a==="rename")askName("Rename list",L.name,n=>{L.name=n;wlSave();drawWatch()});
+    else if(a==="dup"){const id=wlNewId();w.lists.push({id,name:L.name+" (copy)",items:L.items.map(i=>({...i}))});w.active=id;wlSave();drawWatch()}
+    else if(a==="del")modal(`<form><h3>Delete “${esc(L.name)}”?</h3><p>${L.items.length} stocks will be removed from this list (they stay in your other lists). Stocks are logged in your track record.</p><div class="acts"><button type="button" class="ghost" data-mclose>Cancel</button><button class="btn danger" type="submit">Delete list</button></div></form>`,()=>{
+      L.items.map(i=>i.s).forEach(s=>wlRemove(L.id,s));w.lists=w.lists.filter(l=>l!==L);if(!w.lists.length)w.lists.push({id:wlNewId(),name:"Watchlist",items:[]});w.active=w.lists[0].id;wlSave();drawWatch()});
+    else if(a==="import")wlImportDialog();
+    else if(a==="tv")wlExportTV();
+    else if(a==="share")wlShareLink();
+    else if(a==="backup"){dl(`watchlists_${D.meta.asof}.json`,JSON.stringify(wlGet(),null,1),"application/json");toast("Backup downloaded — restore it with Import")}
+    else if(a==="sync")syncDialog();
+    else if(a==="clearlog")modal(`<form><h3>Clear the track record?</h3><p>This removes the history of ${w.log.length} removed stocks.</p><div class="acts"><button type="button" class="ghost" data-mclose>Cancel</button><button class="btn danger" type="submit">Clear</button></div></form>`,()=>{w.log=[];wlSave();drawWatch()});
+    return}
+},true);
+document.addEventListener("change",e=>{const c=e.target.closest("[data-wl-chk]");if(!c)return;const s=c.dataset.sym,l=wlList(c.dataset.wlChk);
+  if(c.checked){wlAdd(l.id,s);toast(`${s} added to “${l.name}”`)}else{wlRemove(l.id,s);toast(`${s} removed from “${l.name}”`)}
+  wlSave();c.closest(".wlrow").querySelector(".c").textContent=l.items.length;if(st.tab==="watch")drawWatch()});
+document.addEventListener("submit",e=>{const f=e.target;
+  if(f.matches("[data-wl-newfor]")){e.preventDefault();const n=f.elements.n.value.trim();if(!n)return;const w=wlGet(),id=wlNewId(),s=f.dataset.wlNewfor;w.lists.push({id,name:n,items:[]});wlAdd(id,s);wlSave();wlPopStock(POPA||document.body,s);toast(`Created “${n}” with ${s}`);if(st.tab==="watch")drawWatch()}
+  if(f.matches("[data-wl-newmany]")){e.preventDefault();const n=f.elements.n.value.trim();if(!n)return;const w=wlGet(),id=wlNewId(),syms=JSON.parse($("#wlpop").dataset.many||"[]");w.lists.push({id,name:n,items:[]});syms.forEach(s=>wlAdd(id,s));wlSave();wlPopClose();toast(`Created “${n}” with ${syms.length} stocks`)}
+},true);
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("#mdl").hidden){modalClose();e.stopImmediatePropagation();return}if(!$("#wlpop").hidden){wlPopClose();e.stopImmediatePropagation()}},true);
+$("#mscrim").addEventListener("click",modalClose);
+
+wlGet();
 
 /* ════════════════════ routing & wiring ════════════════════ */
 function render(){
   renderPulse();
   document.querySelectorAll("#tabs .tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===st.tab));
-  ({rotation:renderRotation,breadth:renderBreadth,rs:renderRS,scanners:renderScanners,vpci:renderVpci})[st.tab]();
+  ({rotation:renderRotation,breadth:renderBreadth,rs:renderRS,scanners:renderScanners,watch:renderWatch,vpci:renderVpci})[st.tab]();
 }
 function go(tab){
   if(!TABS.includes(tab))tab="rotation";st.tab=tab;store.set("tab",tab);
@@ -933,6 +1402,7 @@ document.addEventListener("click",e=>{
     if(k==="vpmode"){VP.mode=v;renderVpci();return}
     if(k==="vpprorate"){VP.prorate=v==="on";renderVpci();return}
     if(k==="vview"){VP.view=v;vpTab();return}
+    if(k==="wlview"){st.wl.view=v;drawWatch();return}
     if(k==="scanTop"){st.scanTop=+v;store.set("scanTop",st.scanTop);renderScanners();return}
     if(k==="scanFund"){st.scanFund=+v;store.set("scanFund",st.scanFund);renderScanners();return}
     if(k==="fundmin"){st.rs.fmin=+v;store.set("rs",st.rs);s.parentElement.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b===s));drawRS();return}
@@ -954,7 +1424,7 @@ $("#themeBtn").addEventListener("click",()=>{const d=document.documentElement,cu
 (()=>{const t=store.get("theme",null);if(t)document.documentElement.dataset.theme=t;Object.assign(st,store.get("prefs",{}));Object.assign(st.rs,store.get("rs",{}));st.scan=store.get("scan2",st.scan);st.scanTop=+store.get("scanTop",0)||0;st.scanFund=+store.get("scanFund",0)||0;
   const h=location.hash.slice(1);st.tab=TABS.includes(h)?h:store.get("tab","rotation")})();
 
-load().then(()=>{index();renderHeader();renderFoot();render()}).catch(err=>{
+load().then(()=>{index();renderHeader();renderFoot();render();updateWlBadge();wlCheckShared();syncPull();vpxLoad().then(()=>{refreshStars();updateWlBadge()})}).catch(err=>{
   $("#asof").textContent="";
   $("#view").innerHTML=`<div class="err"><b>Data files could not be loaded.</b><br>${esc(err.message)}. The evening job may not have run yet — open the Actions tab on GitHub, run “Daily update” once, then reload.</div>`;
 });
