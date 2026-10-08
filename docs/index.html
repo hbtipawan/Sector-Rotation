@@ -49,6 +49,26 @@ a{color:inherit}
 h1,h2,h3,h4{font-family:var(--display);font-stretch:108%;margin:0;line-height:1.15;text-wrap:balance}
 [hidden]{display:none!important}
 
+/* ── Global stock search (in the band) ───────────────────── */
+.gsearch{position:relative;flex:1;max-width:560px;margin-inline:auto}
+.gsearch>svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--band-muted);pointer-events:none}
+.gsearch input{width:100%;min-height:48px;padding:0 48px 0 46px;border-radius:999px;border:1.5px solid var(--band-line);background:rgba(255,255,255,.08);color:var(--band-ink);font:inherit;font-size:17px;font-weight:500}
+.gsearch input::placeholder{color:var(--band-muted);opacity:1}
+.gsearch input:focus{outline:none;border-color:var(--accent);background:rgba(255,255,255,.13)}
+.gsearch input::-webkit-search-cancel-button{display:none}
+.gsearch kbd{position:absolute;right:16px;top:50%;transform:translateY(-50%);font:600 13px/1 inherit;color:var(--band-muted);border:1px solid var(--band-line);border-radius:6px;padding:4px 8px}
+.qres{position:absolute;left:0;right:0;top:calc(100% + 8px);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 20px 44px rgba(5,15,30,.32);z-index:70;max-height:min(70vh,560px);overflow:auto;padding:6px}
+.qres .opt{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px 14px;width:100%;text-align:left;padding:10px 12px;border:0;background:none;border-radius:10px;cursor:pointer;color:inherit;font:inherit}
+.qres .opt[aria-selected="true"],.qres .opt:hover{background:var(--soft)}
+.qres .opt b{font-size:17px;font-weight:700;letter-spacing:.01em}
+.qres .opt .nm{grid-column:1;font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qres .opt .rt{grid-row:1/3;grid-column:2;text-align:right;font-size:15px}
+.qres .opt .rt small{display:block;font-size:13px;color:var(--muted)}
+.qres .opt mark{background:none;color:var(--accent-ink);text-decoration:underline;text-underline-offset:3px}
+.qres .up{color:var(--up-t)}.qres .down{color:var(--down-t)}
+.qres .none{padding:14px;color:var(--muted);font-size:15px}
+.qres .hint{padding:8px 12px 4px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);margin-top:4px}
+
 /* ── Band: brand + market pulse ─────────────────────────── */
 .band{background:linear-gradient(180deg,var(--band) 0%,var(--band2) 100%);color:var(--band-ink);padding-top:env(safe-area-inset-top,0px)}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px 6px}
@@ -274,6 +294,13 @@ footer.foot p{margin:4px 0;max-width:110ch}
   :root{--fs:16px}
   .wrap{padding-inline:16px}
   .brand b{font-size:21px}
+  .topbar{flex-wrap:wrap}
+  .gsearch{order:3;flex-basis:100%;max-width:none;margin:4px 0 2px}
+  .gsearch kbd{display:none}
+  #themeBtn span{display:none}
+  .topbar .brand{flex:1;min-width:0}
+  #themeBtn{flex:none}
+  #themeBtn{padding:0 12px}
   .hero-idx .val{font-size:36px}
   .health{grid-template-columns:minmax(0,1fr)}
   .verdict .v{font-size:27px}
@@ -311,6 +338,13 @@ footer.foot p{margin:4px 0;max-width:110ch}
       <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17.5" fill="none" stroke="#3E5C85" stroke-width="2"/><circle cx="20" cy="20" r="11" fill="none" stroke="#3E5C85" stroke-width="2"/><path d="M20 20 L33 9" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/><circle cx="27" cy="25" r="2.6" fill="#5FD6B3"/><circle cx="13" cy="14" r="2" fill="#FF9479"/><circle cx="20" cy="20" r="2.4" fill="var(--accent)"/></svg>
       <div><b>PKC Sector Radar</b><span id="asof">Loading market data…</span></div>
     </a>
+    <div class="gsearch" role="search">
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M16 16l4.5 4.5"/></svg>
+      <input id="q" type="search" placeholder="Search any stock — symbol or company name" autocomplete="off" spellcheck="false"
+        role="combobox" aria-label="Search stocks" aria-autocomplete="list" aria-controls="qres" aria-expanded="false">
+      <kbd aria-hidden="true">/</kbd>
+      <div id="qres" class="qres" role="listbox" aria-label="Matching stocks" hidden></div>
+    </div>
     <button class="iconbtn" id="themeBtn" type="button" aria-label="Switch light or dark theme">
       <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg><span>Theme</span>
     </button>
@@ -340,7 +374,7 @@ footer.foot p{margin:4px 0;max-width:110ch}
 const PERIODS=["1D","1W","1M","3M","6M","YTD","1Y"];
 const PL={"1D":"Today","1W":"1W","1M":"1M","3M":"3M","6M":"6M","YTD":"YTD","1Y":"1Y"};
 const TABS=["rotation","breadth","rs","scanners","vpci"];
-const st={tab:"rotation",period:"1M",group:"Themes",agg:"mean",sort:"ret",view:"bars",open:null,scan:"up4",
+const st={tab:"rotation",period:"1M",group:"Themes",agg:"mean",sort:"ret",view:"bars",open:null,scan:"combo3",scanTop:0,
   rs:{q:"",sec:"",theme:"",min:0,tt:false,s2:false,a50:false},tbl:{}};
 let D={};
 const $=s=>document.querySelector(s);
@@ -456,14 +490,18 @@ const C={
   st:{k:"st",label:"Stage",l:1,fmt:r=>stagePill(r.st)},
   vr:{k:"vr",label:"Vol ×",fmt:r=>`<span class="num">${isNum(r.vr)?r.vr.toFixed(1):"–"}</span>`},
   to:{k:"to",label:"Turnover ₹Cr",fmt:r=>`<span class="num">${isNum(r.to)?r.to.toLocaleString("en-IN"):"–"}</span>`},
+  mc:{k:"mc",label:"Mcap ₹Cr",fmt:r=>`<span class="num">${isNum(r.mc)?Math.round(r.mc).toLocaleString("en-IN"):"–"}</span>`},
+  dcr:{k:"dcr",label:"Close range %",fmt:r=>`<span class="num">${isNum(r.dcr)?r.dcr.toFixed(0):"–"}</span>`},
+  adr:{k:"adr",label:"ADR %",fmt:r=>`<span class="num">${isNum(r.adr)?r.adr.toFixed(1):"–"}</span>`},
+  nsc:{k:"nsc",label:"Signal groups",fmt:r=>`<span class="num">${isNum(r.nsc)&&r.nsc>0?r.nsc.toFixed(0):"–"}</span>`},
   rsi:{k:"rsi",label:"RSI",fmt:r=>`<span class="num">${isNum(r.rsi)?r.rsi.toFixed(0):"–"}</span>`},
   sec:{k:"sec",label:"Sector / industry",l:1,fmt:r=>esc(r.ind||r.sec||"–"),sort:r=>r.ind||r.sec||""},
   themes:{k:"th",label:"Themes",l:1,td:()=>"wrapcell",fmt:r=>esc((D.themesOf[r.s]||[]).join(", ")||"–"),sort:r=>(D.themesOf[r.s]||[]).join(",")},
 };
 
 /* ════════════════════ ROTATION ════════════════════ */
-function groupStats(prev,period=st.period){
-  const g=D.groups[st.group]||{},key=prev?"rp":"r",out=[];
+function groupStats(prev,period=st.period,group=st.group){
+  const g=D.groups[group]||{},key=prev?"rp":"r",out=[];
   for(const [name,syms] of Object.entries(g)){
     const live=syms.filter(s=>D.by[s]);
     const pairs=live.map(s=>[s,D.by[s][key]?.[period]]).filter(([,v])=>isNum(v));
@@ -506,7 +544,7 @@ function renderRotation(){
   $("#view").innerHTML=h;wireTables($("#view"),renderRotation);
 }
 function members(g){
-  return `<div class="members"><div class="meta">${g.adv.toFixed(0)}% of stocks up over ${st.period==="1D"?"today":PL[st.period]} · ${g.br==null?"–":g.br.toFixed(0)+"%"} above 50 DMA</div>${dtable("grp_"+g.name,g.syms.map(s=>D.by[s]),[C.stock,C.ret(st.period),C.px,C.rs,C.h52,C.st,C.vr],{limit:60,csv:false})}</div>`;
+  return `<div class="members"><div class="meta">${g.adv.toFixed(0)}% of stocks up over ${st.period==="1D"?"today":PL[st.period]} · ${g.br==null?"–":g.br.toFixed(0)+"%"} above 50 DMA</div>${dtable("grp_"+g.name,g.syms.map(s=>D.by[s]),[C.stock,C.ret(st.period),C.px,C.mc,C.rs,C.h52,C.st,C.vr],{limit:60,csv:false})}</div>`;
 }
 function heatmap(rows){
   const stats=Object.fromEntries(PERIODS.map(p=>[p,Object.fromEntries(groupStats(false,p).map(g=>[g.name,g.v]))]));
@@ -586,32 +624,37 @@ function drawRS(){
   const f=st.rs,q=f.q.trim().toUpperCase();
   const rows=D.stocks.filter(x=>(!q||x.s.includes(q)||x.n.toUpperCase().includes(q))&&(!f.sec||x.sec===f.sec||x.ind===f.sec)&&(!f.theme||(D.themesOf[x.s]||[]).includes(f.theme))&&(x.rs??0)>=f.min&&(!f.tt||x.tt)&&(!f.s2||x.st===2)&&(!f.a50||x.a50));
   if(!st.tbl.rs)st.tbl.rs={key:"rs",dir:-1,show:100};
-  $("#rsT").innerHTML=dtable("rs",rows,[C.stock,C.rs,C.drs,C.px,C.ret("1D"),C.ret("1W"),C.ret("1M"),C.ret("3M"),C.ret("6M"),C.ret("1Y"),C.h52,C.st,C.rsi,C.vr,C.to,C.sec],{empty:"No stocks match. Loosen the RS minimum or clear a filter."});
+  $("#rsT").innerHTML=dtable("rs",rows,[C.stock,C.rs,C.drs,C.px,C.mc,C.ret("1D"),C.ret("1W"),C.ret("1M"),C.ret("3M"),C.ret("6M"),C.ret("1Y"),C.h52,C.st,C.rsi,C.adr,C.nsc,C.vr,C.to,C.sec],{empty:"No stocks match. Loosen the RS minimum or clear a filter."});
   wireTables($("#rsT"),drawRS);
 }
 
 /* ════════════════════ SCANNERS ════════════════════ */
-function fmtMetric(m,v){if(!isNum(v))return "–";return m.fmt==="pct"?sgn(v,1):m.fmt==="x"?v.toFixed(1)+"×":v.toFixed(Math.abs(v)<100?1:0)}
+function fmtMetric(m,v){if(!isNum(v))return "–";return m.fmt==="pct"?sgn(v,1):m.fmt==="x"?v.toFixed(1)+"×":m.fmt==="int"?v.toFixed(0):v.toFixed(Math.abs(v)<100?1:0)}
 function renderScanners(){
   const S=D.scans;if(!S?.meta){$("#view").innerHTML=`<div class="err">Scanner data is in an older format. Run “Daily update” once.</div>`;return}
   if(!D.scanMeta[st.scan])st.scan=S.meta[0].id;
   const m=D.scanMeta[st.scan],hits=S.hits[m.id]||[];
   const rail=S.cats.map(c=>`<h4>${esc(c)}</h4>`+S.meta.filter(x=>x.cat===c).map(x=>{const n=(S.hits[x.id]||[]).length;return `<button type="button" data-scan="${x.id}" aria-current="${x.id===m.id}"><span>${esc(x.name)}</span><span class="c ${n?"":"z"}">${n}</span></button>`}).join("")).join("");
   const pick=`<select class="select" id="scanSel" style="width:100%" aria-label="Choose a scanner">${S.cats.map(c=>`<optgroup label="${esc(c)}">${S.meta.filter(x=>x.cat===c).map(x=>`<option value="${x.id}" ${x.id===m.id?"selected":""}>${esc(x.name)} (${(S.hits[x.id]||[]).length})</option>`).join("")}</optgroup>`).join("")}</select>`;
-  const rows=hits.map(s=>D.by[s]).filter(Boolean),metric=S.metric?.[m.id]||{};
-  const cols=[C.stock,C.px,C.ret("1D")];
-  const DUP={"Day %":"r.1D","Vol ×":"vr","From 52wH %":"h52"},dup=DUP[m.metric];
+  let rows=hits.map(s=>D.by[s]).filter(Boolean);const metric=S.metric?.[m.id]||{};
+  let topNote="";
+  if(st.scanTop){const top=new Set(groupStats(false,st.period,"Themes").sort((a,b)=>b.v-a.v).slice(0,st.scanTop).map(g=>g.name));
+    const before=rows.length;rows=rows.filter(r=>(D.themesOf[r.s]||[]).some(t=>top.has(t)));
+    topNote=`${rows.length} of ${before} stocks are in the top ${st.scanTop} themes by ${PL[st.period]||st.period} return: ${[...top].join(", ")}.`}
+  const cols=[C.stock,C.px,C.mc,C.ret("1D")];
+  const DUP={"Day %":"r.1D","Vol ×":"vr","From 52wH %":"h52","Close range %":"dcr","ADR %":"adr"},dup=DUP[m.metric];
   if(m.metric&&!dup)cols.push({k:"metric",label:m.metric,fmt:r=>`<span class="num">${fmtMetric(m,metric[r.s])}</span>`,sort:r=>metric[r.s]});
-  cols.push(C.ret("1M"),C.vr,C.rs,C.h52,C.st,C.sec,C.themes);
+  cols.push(C.ret("1M"),C.vr,C.dcr,C.adr,C.rs,C.h52,C.st,C.sec,C.themes);
   const tid="scan_"+m.id,mk=dup||"metric";
   if(!st.tbl[tid])st.tbl[tid]={key:m.sort==="metric"||m.sort==="metric_asc"?mk:"rs",dir:m.sort==="metric_asc"?1:-1,show:100};
   $("#view").innerHTML=`<div class="sec-head"><div><h2>Scanner library</h2><p>${S.meta.length} technical scans run on every stock after the close. Tap any stock for its detail card, including every other scan it appears in.</p></div></div>
   <div class="scan-pick">${pick}</div>
   <div class="scan-layout"><nav class="card rail" aria-label="Scanners">${rail}</nav>
-  <section class="card"><div class="scan-head"><h3>${esc(m.name)}<span class="cnt num">${hits.length}</span></h3><p>${esc(m.desc)}</p><div class="catchips"><span class="pill p-acc">${esc(m.cat)}</span></div></div>
+  <section class="card"><div class="scan-head"><h3>${esc(m.name)}<span class="cnt num">${hits.length}</span></h3><p>${esc(m.desc)}</p><div class="catchips"><span class="pill p-acc">${esc(m.cat)}</span></div>
+  <div class="ctl" style="margin-top:12px"><span>Stocks shown</span>${seg("scanTop",["0","5","10"],String(st.scanTop),{"0":"All","5":"Top 5 themes","10":"Top 10 themes"})}</div>${topNote?`<p class="note" style="margin:8px 0 0">${esc(topNote)}</p>`:""}</div>
   <div id="scanT">${dtable(tid,rows,cols,{empty:"No stocks triggered this scan today."})}</div></section></div>`;
   wireTables($("#scanT"),renderScanners);
-  $("#scanSel").addEventListener("change",e=>{st.scan=e.target.value;store.set("scan",st.scan);renderScanners()});
+  $("#scanSel").addEventListener("change",e=>{st.scan=e.target.value;store.set("scan2",st.scan);renderScanners()});
 }
 
 /* ════════════════════ VPCI ════════════════════ */
@@ -754,21 +797,27 @@ let lastFocus=null;
 async function openDrawer(sym,ex){
   lastFocus=document.activeElement;
   const x=D.by[sym];let vr=null;
+  let vrun=null;
   try{const d=await vpLoad("completed");vr=objs(d.results).find(r=>r.symbol===sym)||null}catch(e){}
+  try{const d=await vpLoad("running");vrun=objs(d.results).find(r=>r.symbol===sym)||null}catch(e){}
+  const rankOf=grp=>{const g=groupStats(false,st.period,grp).sort((a,b)=>b.v-a.v);const m={};g.forEach((x,i)=>m[x.name]={rank:i+1,of:g.length,v:x.v});return m};
+  const thR=rankOf("Themes"),secR=rankOf("Sector");
   const per=x?PERIODS.map(p=>`<div><dt>${p}</dt><dd class="num ${cls(x.r[p])}">${sgn(x.r[p],1)}</dd></div>`).join(""):"";
   const kv=(k,v)=>`<div><dt>${k}</dt><dd class="num">${v}</dd></div>`;
   const scans=(D.scansOf[sym]||[]).map(id=>D.scanMeta[id]).filter(Boolean);
   const name=x?.n||vr?.["Company Name"]||"",sector=x?.ind||x?.sec||vr?.Sector||"";
   $("#drawer").innerHTML=`<header><div><h2 id="dTitle">${esc(sym)}</h2><div class="co">${esc(name)}${sector?` · ${esc(sector)}`:""}</div></div><button class="close" type="button" data-close aria-label="Close">×</button></header>
   <div class="body">
-    ${x?`<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span class="num" style="font-family:var(--display);font-weight:800;font-size:34px">₹${inr(x.px)}</span><span class="num ${cls(x.r["1D"])}" style="font-weight:700;font-size:19px">${sgn(x.r["1D"])} today</span></div>
+    ${x?`<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span class="num" style="font-family:var(--display);font-weight:800;font-size:34px">₹${inr(x.px)}</span><span class="num ${cls(x.r["1D"])}" style="font-weight:700;font-size:19px">${sgn(x.r["1D"])} today</span>${isNum(x.mc)?`<span class="num" style="font-size:17px;color:var(--muted)">Mcap ₹${Math.round(x.mc).toLocaleString("en-IN")} Cr</span>`:""}</div>
     <div class="dsec"><h4>Returns</h4><dl class="dgrid">${per}</dl></div>
     <div class="dsec"><h4>Trend and strength</h4><dl class="dgrid">${kv("RS rating",rsPill(x.rs))}${kv("RS a week ago",x.rs1w??"–")}${kv("Stage",stagePill(x.st))}${kv("Trend template",x.tt?'<span class="up">Pass</span>':'<span style="color:var(--muted)">No</span>')}
       ${kv("Above 20 / 50 / 200",[x.a20,x.a50,x.a200].map(b=>b==null?"–":b?'<span class="up">✓</span>':'<span class="down">✗</span>').join(" "))}${kv("From 52W high",sgn(x.h52,1))}${kv("Above 52W low",sgn(x.l52,1))}${kv("RSI 14",isNum(x.rsi)?x.rsi.toFixed(0):"–")}
-      ${kv("ADX 14",isNum(x.adx)?x.adx.toFixed(0):"–")}${kv("ATR % of price",isNum(x.atrp)?x.atrp.toFixed(1)+"%":"–")}${kv("Volume × 50d",isNum(x.vr)?x.vr.toFixed(1):"–")}${kv("Turnover ₹Cr/day",isNum(x.to)?x.to:"–")}</dl></div>`:`<p class="note" style="margin:0">This symbol is outside the main NSE universe (BSE-only, or below the liquidity filter), so only its VPCI read is shown.</p>`}
+      ${kv("ADX 14",isNum(x.adx)?x.adx.toFixed(0):"–")}${kv("ATR % of price",isNum(x.atrp)?x.atrp.toFixed(1)+"%":"–")}${kv("Volume × 50d",isNum(x.vr)?x.vr.toFixed(1):"–")}${kv("Turnover ₹Cr/day",isNum(x.to)?x.to:"–")}
+      ${kv("Close range today",isNum(x.dcr)?x.dcr.toFixed(0)+"%":"–")}${kv("ADR % (20d)",isNum(x.adr)?x.adr.toFixed(1)+"%":"–")}${kv("Signal groups today",isNum(x.nsc)?x.nsc.toFixed(0)+" / 7":"–")}</dl></div>`:`<p class="note" style="margin:0">This symbol is outside the main NSE universe (BSE-only, or below the liquidity filter), so only its VPCI read is shown.</p>`}
     ${vr?`<div class="dsec"><h4>VPCI screener · completed weeks</h4><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">${statusPill(vr.status)}${gateDots(vr)}<span style="color:var(--muted)">${esc(vr.position_state||"")}</span></div>
-      <dl class="dgrid">${kv("Gates",vr.gate_count+"/7")}${kv("VPCI",isNum(vr.vpci)?vr.vpci.toFixed(2):"–")}${kv("Trail stop","₹"+inr(vr.trail_stop))}${kv("Risk",isNum(vr.risk_pct)?vr.risk_pct.toFixed(1)+"%":"–")}</dl></div>`:""}
-    ${(D.themesOf[sym]||[]).length?`<div class="dsec"><h4>Themes</h4><div class="chips">${D.themesOf[sym].map(t=>`<button type="button" class="chipbtn" data-theme-go="${esc(t)}">${esc(t)}</button>`).join("")}</div></div>`:""}
+      <dl class="dgrid">${kv("Gates",vr.gate_count+"/7")}${kv("VPCI",isNum(vr.vpci)?vr.vpci.toFixed(2):"–")}${kv("Trail stop","₹"+inr(vr.trail_stop))}${kv("Risk",isNum(vr.risk_pct)?vr.risk_pct.toFixed(1)+"%":"–")}</dl>
+      ${vrun?`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px"><span style="color:var(--muted);font-weight:600">Running week (live, pro-rated):</span>${statusPill(vrun.status)}${gateDots(vrun)}<span class="num">${vrun.gate_count}/7</span></div>`:""}</div>`:""}
+    ${(D.themesOf[sym]||[]).length||x?.sec?`<div class="dsec"><h4>Groups · rank by ${esc(PL[st.period]||st.period)} return</h4><div class="chips">${(D.themesOf[sym]||[]).map(t=>{const r=thR[t];return `<button type="button" class="chipbtn" data-theme-go="${esc(t)}">${esc(t)}${r?` · #${r.rank} of ${r.of} <span class="num ${cls(r.v)}">${sgn(r.v,1)}</span>`:""}</button>`}).join("")}${x?.sec&&secR[x.sec]?`<span class="chipbtn" style="cursor:default">Sector: ${esc(x.sec)} · #${secR[x.sec].rank} of ${secR[x.sec].of} <span class="num ${cls(secR[x.sec].v)}">${sgn(secR[x.sec].v,1)}</span></span>`:""}</div></div>`:""}
     <div class="dsec"><h4>In today's scanners</h4>${scans.length?`<div class="chips">${scans.map(m=>`<button type="button" class="chipbtn" data-scan-go="${m.id}">${esc(m.name)}</button>`).join("")}</div>`:`<p class="note" style="margin:0">None today.</p>`}</div>
     <div><a class="btn" href="${tv(sym,ex||vr?.exchange)}" target="_blank" rel="noopener">Open chart on TradingView ↗</a></div>
   </div>`;
@@ -788,6 +837,41 @@ function go(tab){
   render();const nav=document.querySelector(".tabbar");if(getComputedStyle(nav).position==="sticky"&&window.scrollY>nav.offsetTop)window.scrollTo(0,nav.offsetTop);
   if(getComputedStyle(nav).position==="fixed")window.scrollTo(0,Math.max(0,$("#view").offsetTop-8));
 }
+/* ════════════════════ global search ════════════════════ */
+const QS={list:null,sel:0,items:[]};
+async function searchList(){
+  if(QS.list)return QS.list;if(!D.stocks)return [];
+  const L=D.stocks.map(x=>({s:x.s,n:x.n||"",x})),have=new Set(L.map(o=>o.s));
+  try{const d=await vpLoad("completed");for(const r of objs(d.results))if(r.symbol&&!have.has(r.symbol)){have.add(r.symbol);L.push({s:r.symbol,n:r["Company Name"]||"",ex:r.exchange})}}catch(e){}
+  return QS.list=L;
+}
+function qScore(o,q){const s=o.s,n=o.n.toUpperCase();if(s===q)return 0;if(s.startsWith(q))return 1;if(n.startsWith(q))return 2;if(s.includes(q))return 3;if(n.split(/[\s.&()-]+/).some(w=>w.startsWith(q)))return 4;return n.includes(q)?5:9}
+function hl(t,q){const i=t.toUpperCase().indexOf(q);return i<0?esc(t):esc(t.slice(0,i))+"<mark>"+esc(t.slice(i,i+q.length))+"</mark>"+esc(t.slice(i+q.length))}
+function closeSearch(){$("#qres").hidden=true;$("#q").setAttribute("aria-expanded","false")}
+async function runSearch(){
+  const inp=$("#q"),box=$("#qres"),raw=inp.value.trim(),q=raw.toUpperCase();
+  if(!q){closeSearch();return}
+  const L=await searchList();if(inp.value.trim().toUpperCase()!==q)return;
+  const res=L.map(o=>[qScore(o,q),o]).filter(a=>a[0]<9).sort((a,b)=>a[0]-b[0]||(b[1].x?.mc||0)-(a[1].x?.mc||0)).slice(0,10).map(a=>a[1]);
+  QS.items=res;QS.sel=0;
+  box.innerHTML=res.length?res.map((o,i)=>{const x=o.x,right=x?`<span class="num ${cls(x.r["1D"])}">${sgn(x.r["1D"])}</span><small>₹${inr(x.px)}${isNum(x.mc)?` · ₹${Math.round(x.mc).toLocaleString("en-IN")} Cr`:""}</small>`:`<small>VPCI list only</small>`;
+      return `<button type="button" class="opt" role="option" id="qo${i}" aria-selected="${i===0}" data-i="${i}"><b>${hl(o.s,q)}</b><span class="rt">${right}</span><span class="nm">${hl(o.n,q)}</span></button>`}).join("")+`<div class="hint">↑ ↓ to move · Enter to open · Esc to close</div>`
+    :`<div class="none">No stock matches “${esc(raw)}”. Searchable: NSE stocks that pass the liquidity filter (price ≥ ₹20, median turnover ≥ ₹1 Cr) plus every stock in the VPCI list.</div>`;
+  box.hidden=false;inp.setAttribute("aria-expanded","true");
+}
+function pickSearch(i){const o=QS.items[i];if(!o)return;const inp=$("#q");closeSearch();inp.value="";inp.blur();openDrawer(o.s,o.ex)}
+$("#q").addEventListener("input",runSearch);
+$("#q").addEventListener("focus",()=>{searchList();if($("#q").value.trim())runSearch()});
+$("#q").addEventListener("blur",()=>setTimeout(closeSearch,150));
+$("#q").addEventListener("keydown",e=>{const box=$("#qres");
+  if(e.key==="Escape"){e.stopPropagation();closeSearch();e.target.blur();return}
+  if(box.hidden||!QS.items.length)return;
+  if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();QS.sel=(QS.sel+(e.key==="ArrowDown"?1:-1)+QS.items.length)%QS.items.length;
+    box.querySelectorAll(".opt").forEach((b,i)=>b.setAttribute("aria-selected",i===QS.sel));$("#qo"+QS.sel)?.scrollIntoView({block:"nearest"})}
+  if(e.key==="Enter"){e.preventDefault();pickSearch(QS.sel)}});
+$("#qres").addEventListener("mousedown",e=>{const b=e.target.closest(".opt");if(b){e.preventDefault();pickSearch(+b.dataset.i)}});
+document.addEventListener("keydown",e=>{if(e.key==="/"&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||"")&&$("#drawer").hidden){e.preventDefault();$("#q").focus()}});
+
 $("#tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(b)go(b.dataset.v)});
 document.addEventListener("click",e=>{
   const sb=e.target.closest(".symbtn");if(sb){openDrawer(sb.dataset.sym,sb.dataset.ex);return}
@@ -799,11 +883,12 @@ document.addEventListener("click",e=>{
     if(k==="vpmode"){VP.mode=v;renderVpci();return}
     if(k==="vpprorate"){VP.prorate=v==="on";renderVpci();return}
     if(k==="vview"){VP.view=v;vpTab();return}
+    if(k==="scanTop"){st.scanTop=+v;store.set("scanTop",st.scanTop);renderScanners();return}
     if(k==="rsmin"){st.rs.min=+v;store.set("rs",st.rs);s.parentElement.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b===s));drawRS();return}
     st[k]=v;if(k==="group")st.open=null;store.set("prefs",{period:st.period,group:st.group,agg:st.agg,sort:st.sort,view:st.view});
     if(k==="period")renderPulse();renderRotation();return}
   const vt=e.target.closest("[data-vtab]");if(vt){VP.tab=vt.dataset.vtab;document.querySelectorAll("[data-vtab]").forEach(b=>b.setAttribute("aria-pressed",b===vt));vpTab();return}
-  const sc=e.target.closest("[data-scan]");if(sc){st.scan=sc.dataset.scan;store.set("scan",st.scan);renderScanners();return}
+  const sc=e.target.closest("[data-scan]");if(sc){st.scan=sc.dataset.scan;store.set("scan2",st.scan);renderScanners();return}
   const hp=e.target.closest("[data-hp]");if(hp){st.period=hp.dataset.hp;st.sort="ret";renderPulse();renderRotation();return}
   if(e.target.closest(".members")||e.target.closest("details")||e.target.closest("#drawer"))return;
   const r=e.target.closest(".brow,.heat tr.hr");if(r){st.open=st.open===r.dataset.g?null:r.dataset.g;renderRotation();return}
@@ -814,7 +899,7 @@ document.addEventListener("keydown",e=>{
 });
 window.addEventListener("hashchange",()=>{const t=location.hash.slice(1);if(TABS.includes(t)&&t!==st.tab)go(t)});
 $("#themeBtn").addEventListener("click",()=>{const d=document.documentElement,cur=d.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");d.dataset.theme=cur==="dark"?"light":"dark";store.set("theme",d.dataset.theme)});
-(()=>{const t=store.get("theme",null);if(t)document.documentElement.dataset.theme=t;Object.assign(st,store.get("prefs",{}));Object.assign(st.rs,store.get("rs",{}));st.scan=store.get("scan",st.scan);
+(()=>{const t=store.get("theme",null);if(t)document.documentElement.dataset.theme=t;Object.assign(st,store.get("prefs",{}));Object.assign(st.rs,store.get("rs",{}));st.scan=store.get("scan2",st.scan);st.scanTop=+store.get("scanTop",0)||0;
   const h=location.hash.slice(1);st.tab=TABS.includes(h)?h:store.get("tab","rotation")})();
 
 load().then(()=>{index();renderHeader();renderFoot();render()}).catch(err=>{
