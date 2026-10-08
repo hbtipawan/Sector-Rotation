@@ -75,6 +75,50 @@ def rs_score(C, end=-1):
     return sc
 
 
+def nse_mcap(asof):
+    """Official NSE market cap (Rs crore) per symbol from the daily PR bundle (mcapDDMMYYYY.csv).
+
+    Display only - it does not filter the universe. Tries the as-of date and four days before;
+    if NSE can't be reached, the last saved copy (config/mcap_nse.csv) is used.
+    """
+    import io
+    import zipfile
+    import requests
+    saved = CFG / "mcap_nse.csv"
+    d0 = datetime.strptime(asof, "%Y-%m-%d").date()
+    for back in range(5):
+        d = d0 - timedelta(days=back)
+        url = f"https://nsearchives.nseindia.com/archives/equities/bhavcopy/pr/PR{d:%d%m%y}.zip"
+        try:
+            r = None
+            for _ in range(3):
+                try:
+                    r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=60)
+                    break
+                except requests.RequestException:
+                    continue
+            if r is None or r.status_code != 200 or r.content[:2] != b"PK":
+                continue
+            z = zipfile.ZipFile(io.BytesIO(r.content))
+            name = next(n for n in z.namelist() if n.lower().startswith("mcap"))
+            m = pd.read_csv(z.open(name))
+            m.columns = [c.strip() for c in m.columns]
+            m["Symbol"], m["Series"] = m["Symbol"].str.strip(), m["Series"].str.strip()
+            m = m[m["Series"].isin(S["include_series"])]
+            close_col = next(c for c in m.columns if c.startswith("Close Price"))
+            out = pd.DataFrame({"Symbol": m["Symbol"], "MarketCapCr": (m["Market Cap(Rs.)"] / 1e7).round(2),
+                                "Close": m[close_col], "Date": d.isoformat()}).drop_duplicates("Symbol")
+            out.to_csv(saved, index=False)
+            print(f"NSE market cap: {len(out)} symbols for {d}")
+            return out.set_index("Symbol")
+        except Exception as e:  # network or format problem - try an earlier day
+            print(f"  mcap {d}: {type(e).__name__}")
+    if saved.exists():
+        print("NSE market cap: using saved copy")
+        return pd.read_csv(saved).set_index("Symbol")
+    return None
+
+
 def pct_rank(s):
     return (s.rank(pct=True) * 98 + 1).round()
 
@@ -156,6 +200,13 @@ def main():
 
     rows = []
     vr = Vu.iloc[-1] / avgv50.iloc[-1]
+    if mcap is not None:
+        mc_show = mcap
+    else:
+        # NSE figure, rolled forward to today's close if the file is from an earlier day
+        m = nse_mcap(last)
+        mc_show = pd.Series(dtype=float) if m is None else \
+            (m["MarketCapCr"] * (c.reindex(m.index) / m["Close"]).fillna(1.0)).dropna()
     for s in U:
         rows.append({
             "s": s, "n": str(stocks.loc[s, "name"])[:40], "sec": sec.get(s), "ind": ind.get(s),
@@ -170,7 +221,7 @@ def main():
             "a200": bool(c[s] > sma[200].iloc[-1][s]) if pd.notna(sma[200].iloc[-1][s]) else None,
             "tt": bool(tt[s]), "st": stage(s),
             "to": r2(med_to[s], 1), "vr": r2(vr[s], 1),
-            "mc": r2(mcap.get(s), 0) if mcap is not None else None,
+            "mc": r2(mc_show.get(s), 0),
         })
 
     # ---------------- groups (membership only; maths happens in the browser)
