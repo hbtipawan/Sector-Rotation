@@ -24,7 +24,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -50,7 +50,12 @@ jobs:
       - name: Fall back to Yahoo if Upstox failed
         if: steps.upstox.outcome != 'success'
         run: python scripts/fetch_prices.py --source yahoo
-        
+
+      - name: Fundamentals from NSE filings (new results and shareholding only)
+        continue-on-error: true
+        timeout-minutes: 45
+        run: python scripts/fetch_fundamentals.py
+
       - name: All-time-high reference (rebuilt weekly, ~5 min)
         continue-on-error: true
         run: python scripts/fetch_ath.py
@@ -66,10 +71,13 @@ jobs:
         run: |
           git config user.name "radar-bot"
           git config user.email "radar-bot@users.noreply.github.com"
-          git add docs/data config
+          # Keep only what the next run needs (config incl. fundamentals, weekly VPCI sector snapshots).
+          # The website's data files are published straight to Pages below, so they are not
+          # committed every night - that keeps the repository small.
+          git add config docs/data/vpci/history
           git diff --cached --quiet || git commit -m "Data update $(date -u +%F)"
           # Take in any commit made while this job ran (e.g. an edit to themes.csv)
-          git pull --rebase -X theirs origin main
+          git pull --rebase --autostash -X theirs origin main
           git push
 
       # Commits made by this job do not trigger a GitHub Pages rebuild,
