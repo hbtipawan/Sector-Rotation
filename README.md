@@ -15,7 +15,8 @@ GitHub Actions (6:40 PM IST, Mon–Fri, free)
    ├─ update_reference.py   sector + NSE index lists      (niftyindices.com)
    ├─ fetch_prices.py       2 years of daily candles       (Upstox → NSE bhavcopy for today; Yahoo backup)
    ├─ compute.py            returns, RS, breadth, scans    → docs/data/*.json
-   └─ commit docs/data      → website updates itself
+   ├─ fetch_fundamentals.py new NSE results + shareholding (config/fund_*.csv)
+   └─ publish docs/ to Pages → website updates itself
 ```
 
 Cost: ₹0. Setup: about 20 minutes, once.
@@ -80,6 +81,22 @@ python scripts\pc_bse_industry.py
 Upload the `config/industry_bse.csv` it writes to `config/` on GitHub. From the next run you get an **Industry** tab covering all stocks, and stocks below ₹500 Cr are dropped. Re-run monthly.
 
 Without it, the universe is filtered by liquidity: price ≥ ₹20 and median daily turnover ≥ ₹1 Cr over 50 days (about 1,550 stocks).
+
+## Fundamentals (automatic, from NSE filings)
+
+`scripts/fetch_fundamentals.py` reads the companies' own quarterly filings on NSE every evening — no login, no uploads:
+
+- **Quarterly results** (about 10 quarters per stock): revenue, every expense line, profit before tax, net profit attributable to shareholders, EPS; balance sheet and cash flow from the half-year (Sep) and year-end (Mar) filings.
+- **Shareholding pattern** (latest 5+ quarters): promoter, FII, DII, mutual funds, retail, number of shareholders.
+- **Results calendar** (board meetings for the next 60 days) and **industry** (Yahoo Finance classification).
+
+The first run downloads everything (~35,000 small files, about 45 min); after that each run fetches only filings published since the previous one, usually a few minutes. Data is kept in `config/fund_results.csv`, `config/fund_holdings.csv` and `config/fund_info.csv`.
+
+`scripts/fundamentals.py` turns this into: profit and revenue growth (YoY, QoQ, trailing four quarters), three-quarter earnings acceleration, operating margin and its change, P/E, P/S and PEG on today's market cap, ROE, ROCE, debt/equity, free cash flow, CWIP share of assets, and shareholding changes over 1 quarter and 1 year. A **Fund rating 1–99** (70% growth, 30% quality, percentile across the universe; loss-makers capped low) sits next to the RS rating, and every scanner can be limited to Fund 60+ or 80+.
+
+Fundamental scanners: growth leaders 25/25, earnings acceleration, CANSLIM-style, SEPA, margin expansion, revenue streak, turnaround, post-results breakout, results in the next 7 days, quality compounders, GARP, capex cycle, net-cash small caps, smart-money accumulation, mutual funds moving in, promoter buying, under-followed leaders, and fundamental red flags.
+
+Banks and lenders skip margin, ROCE, debt and cash-flow tests. Growth is only computed from a profitable base.
 
 ## VPCI Screener
 
