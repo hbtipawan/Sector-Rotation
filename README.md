@@ -6,6 +6,7 @@ A free, ScreeningMantis-style dashboard for NSE stocks:
 - **Breadth** – % of stocks above 20/50/200 DMA, advance/decline, 52-week highs/lows, 4% movers, one year of history.
 - **RS ranking** – every stock ranked 1–99 by relative strength, filterable by sector, theme, Stage 2, Minervini trend template.
 - **Scanners** – 59 scans in 9 groups (`scripts/scanners.py`), led by a **Confluence** list (stocks firing in 4+ of the 7 bullish groups). Momentum (4% day, burst, gap-up, RS jump, power trend, ants, high-octane, 3/6/12-month swing leaders, episodic pivot, buyable gap-up), breakouts (52-week / 2-year / all-time highs, strong-close highs, Darvas, Bollinger, Stage 2, VCP, 3 weeks tight, launch pad, IPO high), volume, trend & pullbacks (incl. power of 3, wedge pop), price action (outside day, open = low, hammer at 50 DMA, double inside day, bull snort), oscillators, RS-line new highs (1/3/6/12 months) and weakness (incl. leader down on volume). Any scan can be limited to the top 5 or 10 themes.
+- **Watchlists** – multiple lists, return since added, pivot/stop/target with buy-zone alerts, notes, flags, track record, import/export, phone ↔ PC sync.
 - **VPCI Screener** – your Streamlit screener (`vpci/` folder, files unchanged) run every evening: Fresh Signals, Buyable, Watchlist, All Results, Ranked, G4 Pending, New Listings, Sector Leadership, Sector Rotation — for both completed weeks and the running week.
 
 **No broker login, no API key, no password.** Prices come from Upstox's public historical-candle service, which answers without an account. Today's candle is added from NSE's official bhavcopy. Yahoo Finance is wired in as a backup.
@@ -81,6 +82,21 @@ python scripts\pc_bse_industry.py
 Upload the `config/industry_bse.csv` it writes to `config/` on GitHub. From the next run you get an **Industry** tab covering all stocks, and stocks below ₹500 Cr are dropped. Re-run monthly.
 
 Without it, the universe is filtered by liquidity: price ≥ ₹20 and median daily turnover ≥ ₹1 Cr over 50 days (about 1,550 stocks).
+
+## Watchlists
+
+Tap **☆** next to any stock name (Rotation, RS ranking, Scanners, VPCI, stock card) to put it in one or more lists. The **Watchlists** tab then shows, per list:
+
+- **Since added** — price and NIFTY 500 level are recorded on the day you add a stock: return since added, return vs NIFTY, days on the list, best gain and worst dip since added, 3-month sparkline. The added date/price can be edited (change the date and the price fills in from that day's close).
+- **Your levels** — pivot (buy-above), stop, target, flag colour and a note. Setup column: below pivot / near pivot / **buy zone** (pivot to +5%, IBD) / extended / below stop / target hit. Risk %, reward/risk and a position-size calculator from your risk per trade.
+- **Needs your attention today** — stop hit, breakout above your pivot, buy zone, near pivot or stop, target reached, warnings (4% breakdown, lost 50 DMA, RS falling below 70, red flags), new hits in key scans, results due within 7 days, fresh VPCI signals. The tab shows a count of urgent items.
+- Columns: Tracking / Performance / Fundamentals; sort and CSV like every table.
+- **Track record** — removed stocks are logged with their return and return vs NIFTY, giving your hit rate.
+- Import (paste symbols, TradingView `.txt`, Kite lists), export to TradingView, backup file, share link, and **☆ Add all** on every scanner.
+
+Watchlists are saved in your browser. **Sync devices** keeps phone and PC identical through a secret GitHub gist: create a token with only the `gist` permission (the button links to the right GitHub page), paste it once on each device. The first connect on a device that already has lists merges both.
+
+`compute.py` also writes `docs/data/closes.json` (one year of daily closes, ~0.8 MB compressed) for the sparklines, back-dated adds and the 12-month chart in every stock card.
 
 ## Fundamentals (automatic, from NSE filings)
 
