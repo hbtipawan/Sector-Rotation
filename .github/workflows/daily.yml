@@ -50,6 +50,10 @@ jobs:
       - name: Fall back to Yahoo if Upstox failed
         if: steps.upstox.outcome != 'success'
         run: python scripts/fetch_prices.py --source yahoo
+        
+      - name: All-time-high reference (rebuilt weekly, ~5 min)
+        continue-on-error: true
+        run: python scripts/fetch_ath.py
 
       - name: Compute dashboard data
         run: python scripts/compute.py
