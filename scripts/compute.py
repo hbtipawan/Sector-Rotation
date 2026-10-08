@@ -295,7 +295,40 @@ def main():
     for r in rows:
         for k, ser in per_stock.items():
             r[k] = r2(ser.get(r["s"]), 1)
-    scans = {"cats": SC.CATS, "meta": sc_meta, "hits": sc_hits, "metric": sc_metric}
+    cats = list(SC.CATS)
+
+    # ---------------- fundamentals (NSE filings, from fetch_fundamentals.py)
+    FR = None
+    try:
+        import fundamentals as FD
+        st_series = pd.Series({s: stage(s) for s in U})
+        a_of = lambda n: pd.Series({s: (bool(c[s] > sma[n].iloc[-1][s]) if pd.notna(sma[n].iloc[-1][s]) else None) for s in U})
+        FR = FD.build(U, {"mcap": mc_show.reindex(U), "c": c, "rs": rs_now, "st": st_series, "tt": tt, "a200": a_of(200),
+                          "a50": a_of(50), "h52": (c / hi52.iloc[-1] - 1) * 100, "vr": vr, "C": Cu, "dates": list(dates),
+                          "sector": sec.reindex(U)})
+    except Exception as e:  # fundamentals are optional - never break the daily run
+        import traceback
+        traceback.print_exc()
+        print(f"fundamentals skipped: {e}")
+    if FR:
+        for r in rows:
+            r.update(FR["per_stock"].get(r["s"], {}))
+            if not r.get("ind") and FR["industry"].get(r["s"]):
+                r["ind"] = FR["industry"][r["s"]]
+        sc_meta += FR["meta"]
+        sc_hits.update(FR["hits"])
+        sc_metric.update(FR["metric"])
+        cats = [k for k in cats if k != "Weakness"] + FR["cats"][:3] + ["Weakness", FR["cats"][3]]
+        if "Industry" not in groups and FR["industry"]:
+            iu = pd.Series(FR["industry"])
+            groups["Industry"] = {k: sorted(iu.index[iu == k]) for k in sorted(iu.unique())}
+        dump_later = {"fund.json": FR["detail"]}
+        filed = [v.get("filed") for v in FR["per_stock"].values() if v.get("filed")]
+        fund_meta = {"stocks": sum(1 for v in FR["per_stock"].values() if "fr" in v), "latest_filing": max(filed) if filed else None}
+        print(f"fundamentals: {fund_meta['stocks']} stocks rated, latest filing {fund_meta['latest_filing']}")
+    else:
+        dump_later, fund_meta = {}, None
+    scans = {"cats": cats, "meta": sc_meta, "hits": sc_hits, "metric": sc_metric}
 
     ist = timezone(timedelta(hours=5, minutes=30))
     fm = json.loads((CACHE / "fetch_meta.json").read_text()) if (CACHE / "fetch_meta.json").exists() else {}
@@ -304,7 +337,7 @@ def main():
             "failed": fm.get("failed_count"), "indices": indices,
             "filters": {"min_price": S["min_price"], "min_median_turnover_cr": S["min_median_turnover_cr"],
                         "min_market_cap_cr": S["min_market_cap_cr"] if mcap is not None else None},
-            "min_group_size": S["min_group_size"]}
+            "min_group_size": S["min_group_size"], "fund": fund_meta}
 
     def dump(name, obj):
         (OUT / name).write_text(json.dumps(obj, separators=(",", ":"), allow_nan=False))
@@ -313,6 +346,8 @@ def main():
     dump("groups.json", groups)
     dump("breadth.json", breadth)
     dump("scans.json", scans)
+    for name, obj in dump_later.items():
+        dump(name, obj)
     print("scans: " + ", ".join(f"{k}={len(v)}" for k, v in scans["hits"].items()))
     print(f"breadth today: >50DMA {breadth['a50'][-1]}%  >200DMA {breadth['a200'][-1]}%  "
           f"A/D {breadth['adv'][-1]}/{breadth['dec'][-1]}")
