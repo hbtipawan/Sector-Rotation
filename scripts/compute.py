@@ -348,6 +348,18 @@ def main():
     dump("scans.json", scans)
     for name, obj in dump_later.items():
         dump(name, obj)
+
+    # ---------------- last ~1 year of closes for watchlists (sparklines, since-added, stock-card chart)
+    def rd(v):
+        if v is None or not np.isfinite(v):
+            return None
+        v = round(float(v), 0 if v >= 1000 else 1 if v >= 100 else 2)
+        return int(v) if v == int(v) else v
+    tail = Cu.iloc[-260:]
+    closes = {"dates": list(tail.index), "c": {s: [rd(v) for v in tail[s].tolist()] for s in U}}
+    if bench in W["close"]:
+        closes["c"][bench] = [rd(v) for v in W["close"][bench].reindex(tail.index).ffill().tolist()]
+    dump("closes.json", closes)
     print("scans: " + ", ".join(f"{k}={len(v)}" for k, v in scans["hits"].items()))
     print(f"breadth today: >50DMA {breadth['a50'][-1]}%  >200DMA {breadth['a200'][-1]}%  "
           f"A/D {breadth['adv'][-1]}/{breadth['dec'][-1]}")
