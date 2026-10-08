@@ -224,10 +224,23 @@ def main():
 
     # ---------------- scanners (library in scanners.py)
     bench_s = W["close"][bench].reindex(Cu.index).ffill() if bench in W["close"] else Cu.mean(axis=1)
+    # All-time high before today: monthly history (config/ath.csv, from fetch_ath.py) + daily highs since.
+    ath_prior = None
+    if (CFG / "ath.csv").exists():
+        a = pd.read_csv(CFG / "ath.csv", dtype={"symbol": str}).drop_duplicates("symbol").set_index("symbol")
+        cutoff = str(a["cutoff"].iloc[0]) if len(a) else last
+        since = Hu.loc[(Hu.index >= cutoff) & (Hu.index < last)].max()
+        ath_prior = pd.Series(np.fmax(a["ath_before"].reindex(U).to_numpy(dtype=float), since.reindex(U).to_numpy(dtype=float)), index=U)
+        # stocks missing from the file: only trust the daily data if the whole listed life is inside it
+        first = raw_close[U].apply(lambda s_: s_.first_valid_index())
+        inside = first > dates[5]
+        miss = ath_prior.index[a["ath_before"].reindex(U).isna()]
+        ath_prior[miss] = np.where(inside[miss], Hu[miss].iloc[:-1].max(), np.nan)
+        print(f"ATH reference: {int(ath_prior.notna().sum())} of {len(U)} stocks")
     sc_meta, sc_hits, sc_metric, per_stock = SC.run_all({
         "O": Ou, "H": Hu, "L": Lu, "C": Cu, "V": Vu, "bench": bench_s, "sma": sma,
         "ema20": ema20, "ema50": ema50, "rs_now": rs_now, "rs_prev": rs_prev.reindex(U),
-        "hi52": hi52, "lo52": lo52, "avgv50": avgv50, "vr": vr, "tt": tt})
+        "hi52": hi52, "lo52": lo52, "avgv50": avgv50, "vr": vr, "tt": tt, "ath_prior": ath_prior})
     for r in rows:
         for k, ser in per_stock.items():
             r[k] = r2(ser.get(r["s"]), 1)

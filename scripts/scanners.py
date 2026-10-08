@@ -78,7 +78,11 @@ def crossed_down(a, b, k=1):
 
 
 # ───────────────────────────────────────────────────────────── scanner set
-CATS = ["Momentum", "Breakouts", "Volume", "Trend & pullbacks", "Oscillators", "Relative strength", "Weakness"]
+CATS = ["Confluence", "Momentum", "Breakouts", "Volume", "Trend & pullbacks", "Price action", "Oscillators",
+        "Relative strength", "Weakness"]
+
+# Broad "state" lists left out of the confluence count.
+NOT_COUNTED = {"trend_template", "adx_strong", "leaders", "high_octane", "strong_3612"}
 
 
 def run_all(x):
@@ -118,6 +122,16 @@ def run_all(x):
     st = supertrend_dir(H, L, C)
     rng = (H - L)
     rsl = C.div(x["bench"], axis=0)                       # RS line vs benchmark
+    e10, e21 = C.ewm(span=10, adjust=False).mean(), C.ewm(span=21, adjust=False).mean()
+    e10l, e21l = e10.iloc[-1], e21.iloc[-1]
+    rng_l = (h - l)
+    dcr = ((c - l) / rng_l.where(rng_l > 0) * 100).fillna(50)   # daily closing range, 0 = low, 100 = high
+    adr = ((H / L - 1) * 100).iloc[-20:].mean()                  # average daily range %, 20 sessions
+    atr_prev = atr14.iloc[-2]
+    first_bar = C.apply(lambda s_: s_.first_valid_index())
+    pos = {d: i for i, d in enumerate(C.index)}
+    age = pd.Series({k: (len(C) - 1 - pos[d]) if d is not None else np.nan for k, d in first_bar.items()})
+    young = age < 252                                            # listed within the last year
 
     hits, metric, meta = {}, {}, []
 
@@ -147,6 +161,40 @@ def run_all(x):
         (rs_now - rs_prev >= 15) & (rs_now >= 70), "RS Δ1W", rs_now - rs_prev, "num", "metric")
     add("leaders", "Leaders near highs", "Momentum",
         "RS 90+ and within 5% of the 52-week high.", (rs_now >= 90) & (c >= 0.95 * hi52))
+    lowp = L.iloc[-10:].gt(e21.iloc[-10:]).all()
+    add("power_trend", "Power trend", "Momentum",
+        "Low above the 21 EMA for 10 straight sessions, 21 EMA above the 50 DMA, 50 DMA rising for 5 sessions, "
+        "and an up close today (Morales & Kacher). The strongest kind of trend — buy pullbacks, don't short it.",
+        lowp & (e21l > s50l) & (s50l > s50.iloc[-6]) & (c > pc), "ADR %", adr, "pct")
+    r15 = C.iloc[-1] / C.iloc[-16] - 1
+    ups15 = (C.diff() > 0).iloc[-15:].sum()
+    v15 = V.iloc[-15:].mean() / V.iloc[-65:-15].mean()
+    add("ants", "Ants (steady accumulation)", "Momentum",
+        "Up on 12 or more of the last 15 sessions, +20% over those 15 sessions, with average volume 20%+ above "
+        "the prior 50 sessions (Morales & Kacher) — institutions buying day after day.",
+        (ups15 >= 12) & (r15 >= 0.20) & (v15 >= 1.2), "15-day %", r15 * 100, "pct", "metric")
+    add("high_octane", "High-octane leaders", "Momentum",
+        "Average daily range 5% or more, RS 90+, above the 21 EMA and 50 DMA and within 10% of the 52-week high — "
+        "the fast movers swing traders want (Deepvue 'High Octane RS'; thresholds raised for Indian small caps).",
+        (adr >= 5) & (rs_now >= 90) & (c > e21l) & (c > s50l) & (pct_from_hi >= -10), "ADR %", adr, "pct", "metric")
+    rr3, rr6, rr12 = (C.iloc[-1] / C.iloc[-n - 1] - 1 for n in (63, 126, 252))
+    top = lambda r_: r_.rank(pct=True) >= 0.90
+    add("strong_3612", "Swing leaders: 3, 6 and 12 months", "Momentum",
+        "In the top 10% of the universe on 3-month, 6-month AND 12-month return, and above the 21 EMA "
+        "(Mike Webster's swing-trading list).",
+        top(rr3) & top(rr6) & top(rr12) & (c > e21l), "3M %", rr3 * 100, "pct", "metric")
+    ep_gap = o / pc - 1
+    add("episodic_pivot", "Episodic pivot", "Momentum",
+        "Gapped up 10% or more on at least 3× average volume and held the gap (close no more than 2% under the "
+        "open), after a quiet quarter (not up more than 30% in the prior 3 months). Pradeep Bonde's EP — "
+        "usually news-driven; check the news.",
+        (ep_gap >= 0.10) & (vr >= 3) & (c >= o * 0.98) & ((C.iloc[-2] / C.iloc[-65] - 1) <= 0.30),
+        "Gap %", ep_gap * 100, "pct", "metric")
+    gap_atr = (o - ph) / atr_prev
+    add("bgu", "Buyable gap up", "Momentum",
+        "Opened above yesterday's high by at least 0.75 × ATR, volume 1.5× average or more, closed in the upper half "
+        "of the day's range and not below the open by more than 1% (Gil Morales). Stop just under the gap-day low.",
+        (gap_atr >= 0.75) & (vr >= 1.5) & (dcr >= 50) & (c >= o * 0.99), "Gap / ATR", gap_atr, "x", "metric")
 
     # ── Breakouts
     prior_hi = C.iloc[-253:-1].max()
@@ -156,6 +204,37 @@ def run_all(x):
     add("high2y", "Highest close in 2 years", "Breakouts",
         "Today's close is the highest of the full ~2-year history held for the site.",
         (c >= C.max()) & (bars >= 400), "Vol ×", vr, "x")
+    add("high52_dcr", "52-week high, strong close", "Breakouts",
+        "New 52-week closing high with the close in the top third of the day's range — buyers held it into the "
+        "bell (Deepvue's DCR rule).",
+        (c > prior_hi) & (bars >= 200) & (dcr >= 67), "Close range %", dcr, "num")
+    ath_prior = x.get("ath_prior")
+    if ath_prior is not None:
+        add("ath", "Green line breakout (all-time high)", "Breakouts",
+            "Closed above the highest price in the stock's entire listed history, on volume at least 1.2× average "
+            "and a close in the upper half of the day's range. No overhead supply at all.",
+            (c > ath_prior.reindex(c.index)) & (vr >= 1.2) & (dcr >= 50), "Vol ×", vr, "x")
+    Wk = C.copy()
+    Wk.index = pd.to_datetime(Wk.index)
+    wk = Wk.resample("W-FRI").last().iloc[-3:]
+    w3 = (wk.max() / wk.min() - 1) * 100
+    add("tight3w", "3 weeks tight", "Breakouts",
+        "The last three weekly closes (this week's so far included) within 1.5% of each other, in a Stage-2 "
+        "uptrend (William O'Neil). Buy point: above the high of the tight area.",
+        (w3 <= 1.5) & uptrend, "3-week spread %", w3, "pct", "metric_asc")
+    mx = np.fmax(np.fmax(e10l, e21l), s50l)
+    mn = np.fmin(np.fmin(e10l, e21l), s50l)
+    spread = (mx / mn - 1) * 100
+    add("launchpad", "Launch pad", "Breakouts",
+        "10 EMA, 21 EMA and 50 DMA bunched within 2% of each other with price above the 21 EMA, 50 DMA above the "
+        "200 DMA and within 10% of the 52-week high — energy stored before a move (Deepvue).",
+        (spread <= 2) & (c > e21l) & (s50l > s200l) & (pct_from_hi >= -10), "MA spread %", spread, "pct", "metric_asc")
+    ipo_hi = pd.Series({k: H[k].iloc[-int(age[k]) - 1:-1].max() if young.get(k) and age[k] >= 10 else np.nan
+                        for k in C.columns})
+    add("ipo_bo", "IPO high breakout", "Breakouts",
+        "Listed within the last year (10+ sessions ago) and closed above its highest price since listing, on 1.5× "
+        "average volume — new leaders often start here.",
+        young & (c > ipo_hi) & (vr >= 1.5), "Days listed", age, "int")
     box_top, box_bot = H.iloc[-21:-1].max(), L.iloc[-21:-1].min()
     add("darvas", "Darvas box breakout", "Breakouts",
         "Prior 20-day range no wider than 15%, closed above the box top on 1.5× average volume.",
@@ -226,6 +305,41 @@ def run_all(x):
     add("inside", "Inside day in uptrend", "Trend & pullbacks",
         "Today's high and low sit inside yesterday's range, in a Stage-2 stock with RS ≥ 70.",
         (h <= ph) & (l >= pl) & uptrend & (rs_now >= 70))
+    add("power3", "Power of 3", "Trend & pullbacks",
+        "In one up session the stock started below the 10 EMA, 21 EMA and 50 DMA (low under all three) and closed "
+        "above all three — a decisive reclaim (Deepvue).",
+        (l <= mn) & (c > mx) & (c > pc), "Vol ×", vr, "x")
+    below21 = C.iloc[-6:-1].lt(e21.iloc[-6:-1]).sum()
+    add("wedge_pop", "EMA reclaim (wedge pop)", "Trend & pullbacks",
+        "Closed back above the 10 and 21 EMA after at least 3 of the previous 5 closes below the 21 EMA, on 1.5× "
+        "average volume, with the 50 DMA above the 200 DMA (Oliver Kell's wedge pop / EMA crossback).",
+        (below21 >= 3) & (c > e10l) & (c > e21l) & (vr >= 1.5) & (s50l > s200l), "Vol ×", vr, "x", "metric")
+
+    # ── Price action (single- and two-bar signals)
+    add("outside_day", "Bullish outside day", "Price action",
+        "Today's range engulfs yesterday's (higher high and lower low), closed up, in the top 30% of the range, "
+        "on above-average volume — a reversal of control to buyers.",
+        (h > ph) & (l < pl) & (c > pc) & (dcr >= 70) & (vr >= 1), "Close range %", dcr, "num")
+    add("open_low", "Open = low, strong close", "Price action",
+        "Opened at the day's low (no dip below the open) and closed 2%+ above it on above-average volume — "
+        "buyers in control from the first trade.",
+        ((o - l).abs() <= o * 0.0005) & (c >= o * 1.02) & (vr >= 1), "Day %", d1 * 100, "pct", "metric")
+    body = (c - o).abs()
+    lw, uw = np.fmin(o, c) - l, h - np.fmax(o, c)
+    add("hammer50", "Hammer at the 50 DMA", "Price action",
+        "Hammer candle (lower wick at least twice the body, small upper wick) whose low tested the 50 DMA and "
+        "closed above it, in a Stage-2 uptrend — support confirmed.",
+        (lw >= 2 * body) & (uw <= body) & (l <= s50l * 1.01) & (c > s50l) & uptrend,
+        "Dist to 50DMA %", (c / s50l - 1) * 100, "pct")
+    ins = (H < H.shift(1)) & (L > L.shift(1))
+    add("inside2", "Double inside day", "Price action",
+        "Two inside days in a row in a Stage-2 uptrend — a tighter coil than a single inside day. Buy the break "
+        "of the mother bar's high.", ins.iloc[-1] & ins.iloc[-2] & uptrend, "Range %", rng.iloc[-1] / c * 100, "pct")
+    dn3 = (C.diff() < 0).iloc[-4:-1].sum()
+    add("bull_snort", "Bull snort", "Price action",
+        "After 2+ down closes in the prior 3 sessions, a 3%+ up day on at least 2× average volume closing in the "
+        "top quarter of its range, above the 200 DMA (Oliver Kell) — a forceful turn.",
+        (dn3 >= 2) & (d1 >= 0.03) & (vr >= 2) & (dcr >= 75) & (c > s200l), "Vol ×", vr, "x", "metric")
 
     # ── Oscillators
     add("rsi60", "RSI crossed above 60", "Oscillators",
@@ -244,7 +358,13 @@ def run_all(x):
 
     # ── Relative strength
     rsl_hi = rsl.iloc[-1] >= rsl.iloc[-252:].max()
-    add("rsline_lead", "RS line at new high before price", "Relative strength",
+    for n_, lab, nm in ((21, "1m", "1-month"), (63, "3m", "3-month"), (126, "6m", "6-month")):
+        add(f"rsnh_{lab}", f"RS line new {nm} high before price", "Relative strength",
+            f"RS line vs NIFTY 500 at a new {nm} high while price is still 2%+ below its own {nm} closing high, "
+            "RS rating 70+ — strength showing before the breakout (Deepvue 'RS New Highs Before Price').",
+            (rsl.iloc[-1] >= rsl.iloc[-n_:].max()) & (c < 0.98 * C.iloc[-n_:].max()) & (rs_now >= 70),
+            "From 52wH %", pct_from_hi, "pct")
+    add("rsline_lead", "RS line new 12-month high before price", "Relative strength",
         "The stock's relative-strength line vs NIFTY 500 hit a 52-week high while price is still below its own high — "
         "a classic leadership tell (O'Neil's 'blue dot').",
         rsl_hi & (c < 0.98 * hi52) & (bars >= 200), "From 52wH %", pct_from_hi, "pct")
@@ -257,6 +377,9 @@ def run_all(x):
     add("down4", "4% breakdown day", "Weakness",
         "Down 4% or more today on volume above yesterday's. Exit check on holdings.",
         (d1 <= -0.04) & (v > pv), "Day %", d1 * 100, "pct", "metric_asc")
+    add("leader_down", "Leader down on volume", "Weakness",
+        "RS 80+ stock down 2% or more on at least 1.5× average volume — distribution in a leader. Check if you hold it.",
+        (d1 <= -0.02) & (vr >= 1.5) & (rs_now >= 80), "Day %", d1 * 100, "pct", "metric_asc")
     add("ema_down", "20 EMA crossed below 50 EMA", "Weakness",
         "Bearish crossover in the last 3 sessions, price below the 20 EMA.",
         crossed_down(ema20, ema50, 3) & (c < e20))
@@ -272,5 +395,25 @@ def run_all(x):
         "Opened 2%+ below yesterday's close, stayed below yesterday's low, and closed below the open.",
         (gap <= -0.02) & (h < pl) & (c < o), "Gap %", gap * 100, "pct", "metric_asc")
 
-    per_stock = {"rsi": rsi_l, "adx": adx_l, "atrp": atrp}
+    # ── Confluence: in how many different signal GROUPS (categories) is each stock today?
+    # Counting categories rather than scans stops one big up-day (which trips 4% day, volume spike,
+    # pocket pivot, Bollinger, RSI…) from looking like broad confirmation.
+    cat_of = {m["id"]: m["cat"] for m in meta}
+    groups_hit = {}
+    for i, syms_ in hits.items():
+        if cat_of[i] in ("Weakness", "Confluence") or i in NOT_COUNTED:
+            continue
+        for sym in syms_:
+            groups_hit.setdefault(sym, set()).add(cat_of[i])
+    cnt = pd.Series({k: float(len(groups_hit.get(k, ()))) for k in c.index})
+    n_groups = len([k for k in CATS if k not in ("Weakness", "Confluence")])
+    add("combo3", "Confluence: 4+ signal groups", "Confluence",
+        f"Stocks firing bullish scans in at least 4 of the {n_groups} groups (momentum, breakouts, volume, trend, "
+        "price action, oscillators, relative strength) today — independent confirmation, the day's strongest "
+        "shortlist. Broad lists (trend template, ADX, leaders near highs, high-octane, swing leaders) don't count. "
+        "Open a stock to see every scan it is in.",
+        cnt >= 4, "Groups", cnt, "int", "metric")
+    meta.insert(0, meta.pop())        # show it first
+
+    per_stock = {"rsi": rsi_l, "adx": adx_l, "atrp": atrp, "dcr": dcr, "adr": adr, "nsc": cnt}
     return meta, hits, metric, per_stock
