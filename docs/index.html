@@ -376,13 +376,35 @@ details.exp>summary{cursor:pointer;padding:12px 16px;font-weight:600}
 details.exp>div{padding:0 0 8px}
 
 /* ── Drawer ───────────────────────────────────────────── */
-.scrim{position:fixed;inset:0;background:rgba(5,12,22,.45);z-index:60}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:min(480px,100%);background:var(--card);z-index:61;box-shadow:-8px 0 30px rgba(0,0,0,.25);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
-.drawer header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:18px 20px 12px;border-bottom:1px solid var(--line)}
-.drawer h2{font-size:30px;font-weight:800}
-.drawer .co{color:var(--muted);margin-top:2px}
-.drawer .body{overflow:auto;padding:16px 20px calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:16px}
-.drawer .close{border:1.5px solid var(--line);background:var(--card);border-radius:999px;width:44px;height:44px;cursor:pointer;font-size:22px;flex:none}
+.scrim{position:fixed;inset:0;background:rgba(5,12,22,.62);z-index:60}
+/* Stock window: a large centred window on PC, full screen on phones */
+.drawer{position:fixed;z-index:61;top:2.5vh;left:0;right:0;margin-inline:auto;width:min(1280px,96vw);height:95vh;background:var(--card);color:var(--ink);border-radius:16px;box-shadow:0 28px 80px rgba(0,0,0,.45);display:flex;flex-direction:column;overflow:hidden}
+.drawer header{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px 20px;padding:16px 22px 12px;border-bottom:1px solid var(--line);background:var(--card)}
+.drawer h2{font-size:34px;font-weight:800;line-height:1.05}
+.drawer .co{color:var(--muted);margin-top:3px;font-size:16px}
+.drawer .dprice{display:flex;align-items:baseline;gap:6px 14px;flex-wrap:wrap;justify-content:flex-end;text-align:right}
+.drawer .dprice .px{font-family:var(--display);font-weight:800;font-size:32px}
+.drawer .dprice .chg{font-weight:700;font-size:19px}
+.drawer .dprice .mc{font-size:16px;color:var(--muted);flex-basis:100%}
+.drawer .dacts{display:flex;gap:8px;align-items:center}
+.drawer .dacts .ghost{min-height:44px;display:inline-flex;align-items:center;text-decoration:none;font-size:16px;padding:0 14px}
+.drawer .close{display:inline-flex;align-items:center;gap:8px;border:2px solid var(--ink);background:var(--card);color:var(--ink);border-radius:10px;min-height:44px;padding:0 16px;cursor:pointer;font-size:17px;font-weight:800;flex:none}
+.drawer .close:hover{background:var(--ink);color:var(--card)}
+.drawer .close b{font-size:22px;line-height:1}
+.dnav{grid-column:1/-1;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:2px -4px 0;padding:2px 4px}
+.dnav::-webkit-scrollbar{display:none}
+.dnav button{flex:none;border:1.5px solid var(--line);background:var(--soft);border-radius:999px;padding:5px 13px;font-size:15px;font-weight:600;cursor:pointer;color:var(--ink)}
+.dnav button:hover{border-color:var(--accent)}
+.drawer .body{overflow:auto;overscroll-behavior:contain;padding:18px 22px calc(28px + env(safe-area-inset-bottom,0px));scroll-padding-top:12px}
+.dcols{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:22px;align-items:start}
+.dcol{display:flex;flex-direction:column;gap:18px;min-width:0}
+.dcol .dsec{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.dcol .dsec h4{font-size:16px}
+.dcol>div:empty{display:none}
+@media (max-width:1000px){
+  .drawer{top:0;width:100%;height:100%;height:100dvh;border-radius:0;padding-top:env(safe-area-inset-top,0px)}
+  .dcols{grid-template-columns:minmax(0,1fr)}
+}
 .fscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:10px;border:1px solid var(--line);border-radius:10px}
 .ftbl{width:100%;border-collapse:collapse;font-size:15px}
 .ftbl th,.ftbl td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -451,11 +473,20 @@ footer.foot p{margin:4px 0;max-width:110ch}
   .frow{grid-template-columns:120px minmax(0,1fr) 54px}
   .frow .lbl small{display:none}
   .dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .drawer{top:auto;height:92vh;width:100%;border-radius:16px 16px 0 0}
+  .drawer header{grid-template-columns:minmax(0,1fr) auto;padding:12px 14px 10px;gap:6px 10px}
+  .drawer h2{font-size:27px}
+  .drawer .co{font-size:15px}
+  .drawer .dprice{grid-column:1/-1;grid-row:2;justify-content:flex-start;text-align:left}
+  .drawer .dprice .px{font-size:28px}.drawer .dprice .mc{flex-basis:auto}
+  .drawer .dacts{grid-column:2;grid-row:1;align-self:start}
+  .drawer .dacts .tvl{display:none}
+  .drawer .close{min-height:46px;padding:0 14px}
+  .drawer .body{padding:12px 12px calc(28px + env(safe-area-inset-bottom,0px))}
+  .dcol{gap:14px}.dcol .dsec{padding:12px}
 }
 @media (prefers-reduced-motion:no-preference){
   .fill,.meter i,.tile .bar i,.frow .bar{transition:width .35s ease,left .35s ease}
-  .drawer{animation:slidein .22s ease}
+  .drawer{animation:slidein .2s ease}
   @keyframes slidein{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
 }
 </style>
@@ -828,10 +859,10 @@ function bStatus(b,long){
   return h}
 const bInner=b=>b.ib&&b.ib.len>=100&&b.ib.ext<=5;   // a long-base breakout inside an even longer base
 function scorePill(v){if(!isNum(v))return "–";const c=v>=80?"rs-a":v>=70?"rs-b":v>=55?"rs-c":"rs-d";return `<span class="rs ${c}">${v}</span>`}
-function bchart(s,big){
+function bchart(s,big,wpx){
   const ch=BASES?.charts?.[s],b=BASES?.by?.[s];if(!ch||!b)return "–";
   const c=ch.c,n=c.length;if(n<3)return "–";
-  const W=big?460:156,H=big?230:48,pl=big?58:2,pr=big?8:2,pt=big?14:4,pb=big?28:4;
+  const W=big?Math.max(320,Math.min(900,(wpx||460)-12)):156,H=big?Math.round(Math.min(300,Math.max(220,W*.45))):48,pl=big?58:2,pr=big?8:2,pt=big?14:4,pb=big?28:4;
   const v=c.filter(isNum);let lo=Math.min(...v,b.fl),hi=Math.max(...v,b.piv);if(isNum(b.tgt)&&big&&b.tgt<hi*1.25)hi=Math.max(hi,b.tgt);const pad=(hi-lo)*.07;lo-=pad;hi+=pad;
   const x=i=>pl+i*(W-pl-pr)/(n-1),y=t=>pt+(1-(t-lo)/(hi-lo))*(H-pt-pb);
   const e=ch.b!=null?ch.b-1:n-1;
@@ -926,13 +957,13 @@ function bPreset(id){const f=st.bx;Object.assign(f,{q:"",depth:"0",type:"all",s2
   if(id==="bo")Object.assign(f,{status:"bo",min:"25"});
   if(id==="top")Object.assign(f,{status:"act",min:"200",score:"70"});
   st.tbl.bases={key:"len",dir:-1,show:100};store.set("bx",f);renderBases()}
-function baseSection(sym){
+function baseSection(sym,wpx){
   const b=BASES?.by?.[sym];
   if(!b)return BASES?`<div class="dsec"><h4>Base</h4><p class="note" style="margin:0">Not in a daily base of 25+ days right now (trending, or more than 50% below its last high).</p></div>`:"";
   const kv=(k,v)=>`<div><dt>${k}</dt><dd class="num">${v}</dd></div>`,p=b.scp||[];
   const parts=[["Base length",p[0],25],["RS rating",p[1],25],["Uptrend",p[2],20],["Tight right side",p[3],15],["Built after an advance",p[4],10],["Little overhead supply",p[5],5]];
   return `<div class="dsec" id="basesec"><h4>Base · <span style="color:var(--ink)">${b.len.toLocaleString("en-IN")}${b.cap?"+":""} trading days</span> (${bdur(b.len)}) since ${esc(fmtDate(b.start))}${b.lst?" — since listing":""}${b.bse?" — includes BSE history before the NSE listing":""}</h4>
-    <div class="bchwrap">${bchart(sym,true)}</div>
+    <div class="bchwrap">${bchart(sym,true,wpx?wpx-30:0)}</div>
     <div style="margin:10px 0 8px">${bStatus(b,true)}</div>
     <dl class="dgrid">${kv("Pivot (closing high)","₹"+inr(b.piv))}${kv("Base low","₹"+inr(b.fl))}${kv("Depth",isNum(b.depth)?b.depth.toFixed(1)+"%":"–")}${kv("Built after",b.type==="C"?"an advance":"a decline")}
       ${kv("Pivot tests",b.tc)}${kv("Base-low tests",b.tf)}${kv("Last 15 days range",isNum(b.tight)?b.tight.toFixed(1)+"%":"–")}${kv("Volume 10d ÷ base avg",isNum(b.dry)?b.dry.toFixed(2)+"×":"–")}
@@ -1192,32 +1223,47 @@ async function openDrawer(sym,ex,focusWl){
   const kv=(k,v)=>`<div><dt>${k}</dt><dd class="num">${v}</dd></div>`;
   const scans=(D.scansOf[sym]||[]).map(id=>D.scanMeta[id]).filter(Boolean);
   const name=x?.n||vr?.["Company Name"]||"",sector=x?.ind||x?.sec||vr?.Sector||"";
-  $("#drawer").innerHTML=`<header><div><h2 id="dTitle">${esc(sym)}</h2><div class="co">${esc(name)}${sector?` · ${esc(sector)}`:""}</div></div><button class="close" type="button" data-close aria-label="Close">×</button></header>
-  <div class="body">
-    ${x?`<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span class="num" style="font-family:var(--display);font-weight:800;font-size:34px">₹${inr(x.px)}</span><span class="num ${cls(x.r["1D"])}" style="font-weight:700;font-size:19px">${sgn(x.r["1D"])} today</span>${isNum(x.mc)?`<span class="num" style="font-size:17px;color:var(--muted)">Mcap ₹${Math.round(x.mc).toLocaleString("en-IN")} Cr</span>`:""}</div>
-    <div id="pchartSlot"></div>${wlCardHtml(sym)}
-    <div class="dsec"><h4>Returns</h4><dl class="dgrid">${per}</dl></div>
-    <div class="dsec"><h4>Trend and strength</h4><dl class="dgrid">${kv("RS rating",rsPill(x.rs))}${kv("RS a week ago",x.rs1w??"–")}${kv("Stage",stagePill(x.st))}${kv("Trend template",x.tt?'<span class="up">Pass</span>':'<span style="color:var(--muted)">No</span>')}
+  const [S2B,BB]=await Promise.all([s2Load().catch(()=>null),basesLoad().catch(()=>null)]);
+  const hasS2=!!S2B?.by?.[sym],hasB=!!BB?.by?.[sym];
+  const navs=[["pchart","Chart"],["wlsec","Watchlist"],hasS2&&["s2sec","Stage 2"],hasB&&["basesec","Base"],x&&["retsec","Returns"],x&&["trendsec","Trend"],fundHtml&&["fundsec","Fundamentals"],vr&&["vpcisec","VPCI"],["scansec","Scanners"]].filter(Boolean);
+  $("#drawer").innerHTML=`<header><div><h2 id="dTitle">${esc(sym)}</h2><div class="co">${esc(name)}${sector?` · ${esc(sector)}`:""}</div></div>
+    ${x?`<div class="dprice"><span class="px num">₹${inr(x.px)}</span><span class="chg num ${cls(x.r["1D"])}">${sgn(x.r["1D"])} today</span>${isNum(x.mc)?`<span class="mc num">Mcap ₹${Math.round(x.mc).toLocaleString("en-IN")} Cr</span>`:""}</div>`:`<div></div>`}
+    <div class="dacts"><a class="ghost tvl" href="${tv(sym,ex||vr?.exchange)}" target="_blank" rel="noopener">TradingView ↗</a><button class="close" type="button" data-close aria-label="Close ${esc(sym)}"><b aria-hidden="true">✕</b> Close</button></div>
+    <nav class="dnav" aria-label="Sections">${navs.map(([id,l])=>`<button type="button" data-jump="${id}">${l}</button>`).join("")}</nav></header>
+  <div class="body"><div class="dcols"><div class="dcol">
+    ${x?`<div id="pchartSlot"></div>${wlCardHtml(sym)}
+    <div id="s2Slot">${hasS2?stage2Section(sym):""}</div><div id="baseSlot"></div>
+    <div class="dsec" id="retsec"><h4>Returns</h4><dl class="dgrid">${per}</dl></div>
+    <div class="dsec" id="trendsec"><h4>Trend and strength</h4><dl class="dgrid">${kv("RS rating",rsPill(x.rs))}${kv("RS a week ago",x.rs1w??"–")}${kv("Stage",stagePill(x.st))}${kv("Trend template",x.tt?'<span class="up">Pass</span>':'<span style="color:var(--muted)">No</span>')}
       ${kv("Above 20 / 50 / 200",[x.a20,x.a50,x.a200].map(b=>b==null?"–":b?'<span class="up">✓</span>':'<span class="down">✗</span>').join(" "))}${kv("From 52W high",sgn(x.h52,1))}${kv("Above 52W low",sgn(x.l52,1))}${kv("RSI 14",isNum(x.rsi)?x.rsi.toFixed(0):"–")}
       ${kv("ADX 14",isNum(x.adx)?x.adx.toFixed(0):"–")}${kv("ATR % of price",isNum(x.atrp)?x.atrp.toFixed(1)+"%":"–")}${kv("Volume × 50d",isNum(x.vr)?x.vr.toFixed(1):"–")}${kv("Turnover ₹Cr/day",isNum(x.to)?x.to:"–")}
       ${kv("Close range today",isNum(x.dcr)?x.dcr.toFixed(0)+"%":"–")}${kv("ADR % (20d)",isNum(x.adr)?x.adr.toFixed(1)+"%":"–")}${kv("Signal groups today",isNum(x.nsc)?x.nsc.toFixed(0)+" / 7":"–")}</dl></div>`:`<p class="note" style="margin:0">This symbol is outside the main NSE universe (BSE-only, or below the liquidity filter), so only its VPCI read is shown.</p><div id="pchartSlot"></div>${wlCardHtml(sym)}`}
-    <div id="s2Slot"></div><div id="baseSlot"></div>
-    ${fundHtml}
-    ${vr?`<div class="dsec"><h4>VPCI screener · completed weeks</h4><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">${statusPill(vr.status)}${gateDots(vr)}<span style="color:var(--muted)">${esc(vr.position_state||"")}</span></div>
+    </div><div class="dcol">
+    ${fundHtml?`<div id="fundsec">${fundHtml}</div>`:""}
+    ${vr?`<div class="dsec" id="vpcisec"><h4>VPCI screener · completed weeks</h4><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">${statusPill(vr.status)}${gateDots(vr)}<span style="color:var(--muted)">${esc(vr.position_state||"")}</span></div>
       <dl class="dgrid">${kv("Gates",vr.gate_count+"/7")}${kv("VPCI",isNum(vr.vpci)?vr.vpci.toFixed(2):"–")}${kv("Trail stop","₹"+inr(vr.trail_stop))}${kv("Risk",isNum(vr.risk_pct)?vr.risk_pct.toFixed(1)+"%":"–")}</dl>
       ${vrun?`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px"><span style="color:var(--muted);font-weight:600">Running week (live, pro-rated):</span>${statusPill(vrun.status)}${gateDots(vrun)}<span class="num">${vrun.gate_count}/7</span></div>`:""}</div>`:""}
     ${(D.themesOf[sym]||[]).length||x?.sec?`<div class="dsec"><h4>Groups · rank by ${esc(PL[st.period]||st.period)} return</h4><div class="chips">${(D.themesOf[sym]||[]).map(t=>{const r=thR[t];return `<button type="button" class="chipbtn" data-theme-go="${esc(t)}">${esc(t)}${r?` · #${r.rank} of ${r.of} <span class="num ${cls(r.v)}">${sgn(r.v,1)}</span>`:""}</button>`}).join("")}${x?.sec&&secR[x.sec]?`<span class="chipbtn" style="cursor:default">Sector: ${esc(x.sec)} · #${secR[x.sec].rank} of ${secR[x.sec].of} <span class="num ${cls(secR[x.sec].v)}">${sgn(secR[x.sec].v,1)}</span></span>`:""}</div></div>`:""}
-    <div class="dsec"><h4>In today's scanners</h4>${scans.length?`<div class="chips">${scans.map(m=>`<button type="button" class="chipbtn" data-scan-go="${m.id}">${esc(m.name)}</button>`).join("")}</div>`:`<p class="note" style="margin:0">None today.</p>`}</div>
+    <div class="dsec" id="scansec"><h4>In today's scanners</h4>${scans.length?`<div class="chips">${scans.map(m=>`<button type="button" class="chipbtn" data-scan-go="${m.id}">${esc(m.name)}</button>`).join("")}</div>`:`<p class="note" style="margin:0">None today.</p>`}</div>
     <div><a class="btn" href="${tv(sym,ex||vr?.exchange)}" target="_blank" rel="noopener">Open chart on TradingView ↗</a></div>
-  </div>`;
+  </div></div></div>`;
   $("#drawer").hidden=false;$("#scrim").hidden=false;document.body.style.overflow="hidden";
+  // phone back button / browser back closes the stock window instead of leaving the page
+  if(!reopen&&!history.state?.card)history.pushState({...(history.state||{}),card:sym},"",location.href);
+  else if(history.state?.card)history.replaceState({...history.state,card:sym},"",location.href);
   wireWlCard(sym);
+  if(!focusWl)$("#drawer .body").scrollTop=0;
   if(focusWl)$("#wlsec")?.scrollIntoView({block:"start"});else if(!reopen)$("#drawer .close").focus();
-  s2Load().then(B=>{const slot=$("#s2Slot");if(B&&slot&&$("#dTitle")?.textContent===sym)slot.outerHTML=stage2Section(sym)});
-  basesLoad().then(B=>{const slot=$("#baseSlot");if(B&&slot&&$("#dTitle")?.textContent===sym)slot.outerHTML=baseSection(sym)});
-  clLoad().then(()=>{const slot=$("#pchartSlot");if(slot&&$("#dTitle")?.textContent===sym){slot.outerHTML=priceChart(sym);wirePriceChart(sym);if(focusWl)$("#wlsec")?.scrollIntoView({block:"start"})}});
+  const colW=el=>Math.round(el?.parentElement?.getBoundingClientRect().width||0);   // empty slots are hidden, so measure the column
+  const bslot=$("#baseSlot");if(BB&&bslot)bslot.outerHTML=baseSection(sym,colW(bslot));
+  clLoad().then(()=>{const slot=$("#pchartSlot");if(slot&&$("#dTitle")?.textContent===sym){PCW=Math.max(300,Math.min(900,(colW(slot)||494)-34));slot.outerHTML=priceChart(sym);wirePriceChart(sym);if(focusWl)$("#wlsec")?.scrollIntoView({block:"start"})}});
 }
-function closeDrawer(){if($("#drawer").hidden)return;$("#drawer").hidden=true;$("#scrim").hidden=true;document.body.style.overflow="";lastFocus?.focus?.()}
+/* nav: true when closing because the user picked a link inside the window (keeps history tidy) */
+function closeDrawer(nav){if($("#drawer").hidden)return;$("#drawer").hidden=true;$("#scrim").hidden=true;document.body.style.overflow="";
+  if(history.state?.card){const {card,...rest}=history.state;if(nav)history.replaceState(Object.keys(rest).length?rest:null,"",location.href);else{DRAWER_BACK=true;history.back()}}
+  if(!nav)lastFocus?.focus?.()}
+let DRAWER_BACK=false;
+window.addEventListener("popstate",()=>{if(DRAWER_BACK){DRAWER_BACK=false;return}if(!$("#drawer").hidden&&!history.state?.card){$("#drawer").hidden=true;$("#scrim").hidden=true;document.body.style.overflow=""}});
 
 /* ════════════════════ WATCHLISTS ════════════════════
    Stored in this browser (localStorage). Optional sync between devices through a private
@@ -1531,7 +1577,7 @@ function wireWlCard(s){const f=document.querySelector(`[data-wl-form="${CSS.esca
     it.d=inp.value>D.meta.asof?D.meta.asof:inp.value;const i=clIdx(it.d),c=CL.c[s],bc=CL.c[benchName()];if(i>=0&&c&&isNum(c[i]))it.p=c[i];if(i>=0&&bc&&isNum(bc[i]))it.b=bc[i];wlSave();if(st.tab==="watch")drawWatch();openDrawer(s,null,true)}));
   document.querySelectorAll(`[data-wl-p][data-sym="${CSS.escape(s)}"]`).forEach(inp=>inp.addEventListener("change",()=>{const it=wlList(inp.dataset.wlP).items.find(i=>i.s===s);const v=parseFloat(inp.value);if(it&&isFinite(v)&&v>0){it.p=v;wlSave();if(st.tab==="watch")drawWatch();openDrawer(s,null,true)}}))}
 function priceChart(s){const c=CL?.c?.[s];if(!c||c.filter(isNum).length<30)return "";
-  const n=c.length,W=460,H=250,pl=50,pr=8,pt=10,pb=26,m=wlGet().meta[s]||{},ma=c.map((v,i)=>sma50(c,i));
+  const n=c.length,W=PCW,H=Math.round(Math.min(330,Math.max(230,PCW*.46))),pl=50,pr=8,pt=10,pb=26,m=wlGet().meta[s]||{},ma=c.map((v,i)=>sma50(c,i));
   const items=wlListsOf(s).map(l=>l.items.find(i=>i.s===s)).filter(Boolean);
   const v=c.filter(isNum);let lo=Math.min(...v),hi=Math.max(...v);
   for(const k of ["pivot","stop","target"])if(isNum(m[k])&&m[k]>lo*.6&&m[k]<hi*1.5){lo=Math.min(lo,m[k]);hi=Math.max(hi,m[k])}
@@ -1547,7 +1593,8 @@ function priceChart(s){const c=CL?.c?.[s];if(!c||c.filter(isNum).length<30)retur
   g+=`<line class="xh" x1="0" x2="0" y1="${pt}" y2="${H-pb}" stroke="var(--muted)" opacity="0"/>`;
   return `<div class="dsec pchart" id="pchart"><h4>Price, last 12 months</h4><div class="legend"><span><i style="--c:var(--s1)"></i>Close</span><span><i style="--c:var(--s2)"></i>50-day average</span>${items.length?`<span>◯ Added</span>`:""}</div>
     <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(s)} daily closes for the last 12 months with 50-day average" style="display:block;touch-action:pan-y">${g}<rect x="${pl}" y="0" width="${W-pl-pr}" height="${H}" fill="transparent"/></svg><div class="tip" hidden></div></div>`}
-function wirePriceChart(s){const box=$("#pchart");if(!box)return;const svg=box.querySelector("svg"),tip=box.querySelector(".tip"),xh=svg.querySelector(".xh"),c=CL.c[s],n=c.length,W=460,pl=50,pr=8;
+let PCW=460;   // price-chart width in px, set from the stock window so text stays at its real size
+function wirePriceChart(s){const box=$("#pchart");if(!box)return;const svg=box.querySelector("svg"),tip=box.querySelector(".tip"),xh=svg.querySelector(".xh"),c=CL.c[s],n=c.length,W=PCW,pl=50,pr=8;
   const mv=e=>{const r=svg.getBoundingClientRect(),cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left,i=Math.max(0,Math.min(n-1,Math.round((cx/r.width*W-pl)/((W-pl-pr)/(n-1))))),sx=pl+i*(W-pl-pr)/(n-1);
     xh.setAttribute("x1",sx);xh.setAttribute("x2",sx);xh.setAttribute("opacity",".7");const a=sma50(c,i);
     tip.hidden=false;tip.innerHTML=`<b>${new Date(CL.dates[i]+"T00:00:00").toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}</b><br>Close ₹${inr(c[i])}${isNum(a)?`<br>50-day avg ₹${inr(Math.round(a*100)/100)}`:""}`;
@@ -1679,8 +1726,9 @@ $("#tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(b)go
 document.addEventListener("click",e=>{
   const sb=e.target.closest(".symbtn");if(sb){openDrawer(sb.dataset.sym,sb.dataset.ex);return}
   if(e.target.closest("[data-close]")||e.target.id==="scrim"){closeDrawer();return}
-  const sg=e.target.closest("[data-scan-go]");if(sg){closeDrawer();st.scan=sg.dataset.scanGo;st.scanView="lib";go("scanners");return}
-  const tg=e.target.closest("[data-theme-go]");if(tg){closeDrawer();st.group="Themes";st.open=tg.dataset.themeGo;st.view="bars";go("rotation");setTimeout(()=>document.querySelector(`.brow[data-g="${CSS.escape(st.open)}"]`)?.scrollIntoView({block:"center"}),60);return}
+  const jp=e.target.closest("[data-jump]");if(jp){document.getElementById(jp.dataset.jump)?.scrollIntoView({behavior:"smooth",block:"start"});return}
+  const sg=e.target.closest("[data-scan-go]");if(sg){closeDrawer(true);st.scan=sg.dataset.scanGo;st.scanView="lib";go("scanners");return}
+  const tg=e.target.closest("[data-theme-go]");if(tg){closeDrawer(true);st.group="Themes";st.open=tg.dataset.themeGo;st.view="bars";go("rotation");setTimeout(()=>document.querySelector(`.brow[data-g="${CSS.escape(st.open)}"]`)?.scrollIntoView({block:"center"}),60);return}
   const s=e.target.closest("[data-seg]");
   if(s){const k=s.dataset.seg,v=s.dataset.val;
     if(k==="vpmode"){VP.mode=v;renderVpci();return}
