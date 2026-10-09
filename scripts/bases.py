@@ -148,11 +148,11 @@ def base_stats(c, a, e, from_above, zone):
 @njit(cache=True)
 def recent_breakouts(c, first, dmax, zone, min_len):
     """Breakout bars t >= first (close above a whole base of >= min_len bars).
-    Rows: t, start, ceiling, floor, from_above, prev_higher_idx, tests, floor_tests"""
+    Rows: t, start, ceiling, floor, from_above, prev_higher_idx, tests, floor_tests, ceiling_idx"""
     n = len(c)
     pg = prev_ge(c)
     s = depth_start(c, dmax)
-    out = np.empty((max(n - first, 1), 8))
+    out = np.empty((max(n - first, 1), 9))
     k = 0
     for t in range(max(first, 2), n):
         e = t - 1
@@ -165,7 +165,7 @@ def recent_breakouts(c, first, dmax, zone, min_len):
         if c[t] <= ce or e - st + 1 < min_len:
             continue
         out[k, 0] = t; out[k, 1] = st; out[k, 2] = ce; out[k, 3] = fl
-        out[k, 4] = 1.0 if fa else 0.0; out[k, 5] = p; out[k, 6] = tc; out[k, 7] = tf
+        out[k, 4] = 1.0 if fa else 0.0; out[k, 5] = p; out[k, 6] = tc; out[k, 7] = tf; out[k, 8] = ci
         k += 1
     return out[:k]
 

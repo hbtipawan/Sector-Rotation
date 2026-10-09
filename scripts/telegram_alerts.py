@@ -124,7 +124,7 @@ def lists_of(wl, s):
 
 # ───────────────────────────────────────────── evening digest
 BULL = ["combo3", "up4", "high52_dcr", "ath", "vcp", "pocket_pivot", "tight3w", "power3", "bgu", "episodic_pivot", "darvas",
-        "stage2_bo", "bull_snort", "wedge_pop", "f_post", "f_accel", "lb_breakout", "lb_near"]
+        "stage2_bo", "bull_snort", "wedge_pop", "f_post", "f_accel", "lb_breakout", "lb_near", "s2_early"]
 BEAR = ["down4", "leader_down", "below200", "ema_down", "death", "gap_down", "f_red"]
 ICON = {"crit": "🛑", "warn": "⚠️", "good": "🚀", "info": "📅"}
 
@@ -257,7 +257,7 @@ def evening():
 
     top = lambda ids, n=8: sorted(ids, key=lambda s: -((by.get(s) or {}).get("rs") or 0))[:n]
     lines += ["", "<b>🔎 Today's scans</b>"]
-    for sid, label in (("combo3", "Confluence (4+ signal groups)"), ("lb_breakout", "Long-base breakouts (100+ day bases)"), ("f_post", "Post-results breakouts"), ("high52_dcr", "52-week highs, strong close"), ("vcp", "VCP setups")):
+    for sid, label in (("combo3", "Confluence (4+ signal groups)"), ("lb_breakout", "Long-base breakouts (100+ day bases)"), ("s2_early", "Early Stage 2, score 70+"), ("f_post", "Post-results breakouts"), ("high52_dcr", "52-week highs, strong close"), ("vcp", "VCP setups")):
         h = scans["hits"].get(sid) or []
         if h:
             lines.append(f"{label}: <b>{len(h)}</b> — " + ", ".join(sym(s) for s in top(h)))

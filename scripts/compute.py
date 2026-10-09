@@ -355,6 +355,26 @@ def main():
         import traceback
         traceback.print_exc()
         print(f"bases skipped: {e}")
+
+    # ---------------- Stage 2 phase: early / mid / late (stage2.py; checked on 20 years of NSE data)
+    s2_meta = None
+    try:
+        import stage2 as S2
+        SR = S2.build(LONG, [r["s"] for r in rows if r.get("st") == 2], rs_now)
+        for r in rows:
+            r.update(SR["per_stock"].get(r["s"], {}))
+        sm, sh, smet = S2.scans(SR)
+        sc_meta += sm
+        sc_hits.update(sh)
+        sc_metric.update(smet)
+        at = cats.index("Bases") + 1 if "Bases" in cats else len(cats)
+        cats = cats[:at] + ["Stage 2"] + cats[at:]
+        dump_later["stage2.json"] = {"asof": last, "rows": SR["rows"], "evidence": SR["evidence"]}
+        s2_meta = {"stocks": len(SR["rows"])}
+    except Exception as e:  # never break the daily run
+        import traceback
+        traceback.print_exc()
+        print(f"stage 2 phases skipped: {e}")
     scans = {"cats": cats, "meta": sc_meta, "hits": sc_hits, "metric": sc_metric}
 
     ist = timezone(timedelta(hours=5, minutes=30))
@@ -364,7 +384,7 @@ def main():
             "failed": fm.get("failed_count"), "indices": indices,
             "filters": {"min_price": S["min_price"], "min_median_turnover_cr": S["min_median_turnover_cr"],
                         "min_market_cap_cr": S["min_market_cap_cr"] if mcap is not None else None},
-            "min_group_size": S["min_group_size"], "fund": fund_meta, "bases": base_meta}
+            "min_group_size": S["min_group_size"], "fund": fund_meta, "bases": base_meta, "stage2": s2_meta}
 
     def dump(name, obj):
         (OUT / name).write_text(json.dumps(obj, separators=(",", ":"), allow_nan=False))
