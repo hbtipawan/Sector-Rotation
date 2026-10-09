@@ -1,6 +1,7 @@
 {
   "_comment": "Edit these to change the universe and behaviour. Turnover is in Rs crore.",
   "history_calendar_days": 760,
+  "base_history_calendar_days": 2300,
   "min_price": 20,
   "min_median_turnover_cr": 1.0,
   "min_market_cap_cr": 500,
