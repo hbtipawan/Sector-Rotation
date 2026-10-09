@@ -6,7 +6,7 @@ symbol,industry,sector,ind_date,nse_industry,next_results
 3IINFOLTD,Information Technology Services,Technology,2026-10-08,,
 3MINDIA,Conglomerates,Industrials,2026-10-08,Trading,
 3PLAND,Real Estate Services,Real Estate,2026-10-08,,
-5PAISA,Capital Markets,Financial Services,2026-10-08,,
+5PAISA,Capital Markets,Financial Services,2026-10-08,,2026-10-15
 63MOONS,Software - Application,Technology,2026-10-08,,
 A2ZINFRA,Engineering & Construction,Industrials,2026-10-08,,
 AAATECH,Information Technology Services,Technology,2026-10-08,,
@@ -18,7 +18,7 @@ AARON,Specialty Industrial Machinery,Industrials,2026-10-08,,
 AARTECH,Electrical Equipment & Parts,Industrials,2026-10-08,,
 AARTIDRUGS,Drug Manufacturers - Specialty & Generic,Healthcare,2026-10-08,Pharmaceuticals,
 AARTIIND,Specialty Chemicals,Basic Materials,2026-10-08,Chemicals - Speciality,
-AARTIPHARM,Drug Manufacturers - Specialty & Generic,Healthcare,2026-10-08,,
+AARTIPHARM,Drug Manufacturers - Specialty & Generic,Healthcare,2026-10-08,,2026-10-28
 AARTISURF,Specialty Chemicals,Basic Materials,2026-10-08,,
 AARVI,Staffing & Employment Services,Industrials,2026-10-08,,
 AASTHA,Textile Manufacturing,Consumer Cyclical,2026-10-08,,
@@ -275,7 +275,7 @@ BAJAJ-AUTO,Auto Manufacturers,Consumer Cyclical,2026-10-08,Automobiles - 2 And 3
 BAJAJCON,Household & Personal Products,Consumer Defensive,2026-10-08,,2026-10-14
 BAJAJELEC,"Furnishings, Fixtures & Appliances",Consumer Cyclical,2026-10-08,Consumer Durables,2026-10-28
 BAJAJFINSV,Financial Conglomerates,Financial Services,2026-10-08,Finance,2026-11-03
-BAJAJHCARE,Drug Manufacturers - Specialty & Generic,Healthcare,2026-10-08,,
+BAJAJHCARE,Drug Manufacturers - Specialty & Generic,Healthcare,2026-10-08,,2026-10-17
 BAJAJHFL,Mortgage Finance,Financial Services,2026-10-08,,2026-10-16
 BAJAJHIND,Confectioners,Consumer Defensive,2026-10-08,Sugar,
 BAJAJHLDNG,Asset Management,Financial Services,2026-10-08,Finance,2026-11-03
@@ -289,7 +289,7 @@ BALAMINES,Specialty Chemicals,Basic Materials,2026-10-08,Chemicals - Inorganic,
 BALAXI,Drug Manufacturers - Specialty & Generic,Healthcare,2026-10-08,,
 BALKRISHNA,Packaging & Containers,Consumer Cyclical,2026-10-08,,
 BALKRISIND,Auto Parts,Consumer Cyclical,2026-10-08,Tyres,
-BALMLAWRIE,Conglomerates,Industrials,2026-10-08,Travel And Transport,
+BALMLAWRIE,Conglomerates,Industrials,2026-10-08,Travel And Transport,2026-11-02
 BALPHARMA,Drug Manufacturers - Specialty & Generic,Healthcare,2026-10-08,Pharmaceuticals,
 BALRAMCHIN,Confectioners,Consumer Defensive,2026-10-08,Sugar,
 BALUFORGE,Metal Fabrication,Industrials,2026-10-08,,
@@ -415,7 +415,7 @@ CALSOFT,Software - Application,Technology,2026-10-08,Computers - Software,
 CAMLINFINE,Specialty Chemicals,Basic Materials,2026-10-08,,
 CAMPUS,Footwear & Accessories,Consumer Cyclical,2026-10-08,,
 CAMS,Information Technology Services,Technology,2026-10-08,,2026-10-29
-CANBK,Banks - Regional,Financial Services,2026-10-08,Banks,
+CANBK,Banks - Regional,Financial Services,2026-10-08,Banks,2026-10-14
 CANFINHOME,Mortgage Finance,Financial Services,2026-10-08,Finance - Housing,2026-10-09
 CANHLIFE,Insurance - Life,Financial Services,2026-10-08,,2026-10-09
 CANTABIL,Apparel Manufacturing,Consumer Cyclical,2026-10-08,Miscellaneous,
@@ -524,7 +524,7 @@ CSBBANK,Banks - Regional,Financial Services,2026-10-08,,2026-10-23
 CSLFINANCE,Credit Services,Financial Services,2026-10-08,,
 CSM,Information Technology Services,Technology,2026-10-08,,
 CTE,Information Technology Services,Technology,2026-10-08,Computers - Software,
-CUB,Banks - Regional,Financial Services,2026-10-08,Banks,
+CUB,Banks - Regional,Financial Services,2026-10-08,Banks,2026-10-28
 CUBEXTUB,Copper,Basic Materials,2026-10-08,Metals,
 CUMMINSIND,Specialty Industrial Machinery,Industrials,2026-10-08,Diesel Engines,2026-11-04
 CUPID,Household & Personal Products,Consumer Defensive,2026-10-08,,
@@ -971,7 +971,7 @@ HPAL,Specialty Chemicals,Basic Materials,2026-10-08,,
 HPIL,Specialty Chemicals,Basic Materials,2026-10-08,,
 HPL,Electrical Equipment & Parts,Industrials,2026-10-08,,
 HRYNSHP,Waste Management,Industrials,2026-10-08,,
-HSCL,Specialty Chemicals,Basic Materials,2026-10-08,,
+HSCL,Specialty Chemicals,Basic Materials,2026-10-08,,2026-10-16
 HTEL,Specialty Industrial Machinery,Industrials,2026-10-08,,
 HTMEDIA,Publishing,Communication Services,2026-10-08,Printing And Publishing,
 HUBTOWN,Real Estate - Development,Real Estate,2026-10-08,Construction,
@@ -1114,7 +1114,7 @@ JGCHEM,Other Industrial Metals & Mining,Basic Materials,2026-10-08,,
 JHS,Household & Personal Products,Consumer Defensive,2026-10-08,Personal Care,
 JINDALPHOT,Asset Management,Financial Services,2026-10-08,Miscellaneous,
 JINDALPOLY,Packaging & Containers,Consumer Cyclical,2026-10-08,Packaging,
-JINDALSAW,Steel,Basic Materials,2026-10-08,Steel And Steel Products,
+JINDALSAW,Steel,Basic Materials,2026-10-08,Steel And Steel Products,2026-10-16
 JINDALSTEL,Steel,Basic Materials,2026-10-08,Steel And Steel Products,2026-10-23
 JINDRILL,Oil & Gas Equipment & Services,Energy,2026-10-08,Oil Exploration/Production,
 JINDWORLD,Textile Manufacturing,Consumer Cyclical,2026-10-08,Textile Products,
@@ -1387,7 +1387,7 @@ MANYAVAR,Apparel Manufacturing,Consumer Cyclical,2026-10-08,,
 MAPMYINDIA,Software - Infrastructure,Technology,2026-10-08,,
 MARALOVER,Textile Manufacturing,Consumer Cyclical,2026-10-08,Textiles - Cotton,
 MARATHON,Real Estate - Development,Real Estate,2026-10-08,,
-MARICO,Household & Personal Products,Consumer Defensive,2026-10-08,Personal Care,
+MARICO,Household & Personal Products,Consumer Defensive,2026-10-08,Personal Care,2026-11-02
 MARINE,Electrical Equipment & Parts,Industrials,2026-10-08,,
 MARKOLINES,Infrastructure Operations,Industrials,2026-10-08,,
 MARKSANS,Drug Manufacturers - General,Healthcare,2026-10-08,Pharmaceuticals,
@@ -1820,7 +1820,7 @@ RAJRATAN,Steel,Basic Materials,2026-10-08,,
 RAJRILTD,Textile Manufacturing,Consumer Cyclical,2026-10-08,,
 RAJSREESUG,Confectioners,Consumer Defensive,2026-10-08,Sugar,
 RAJTV,Broadcasting,Communication Services,2026-10-08,Media & Entertainment,
-RALLIS,Agricultural Inputs,Basic Materials,2026-10-08,Pesticides And Agrochemicals,
+RALLIS,Agricultural Inputs,Basic Materials,2026-10-08,Pesticides And Agrochemicals,2026-10-22
 RAMANEWS,Beverages - Non-Alcoholic,Consumer Defensive,2026-10-08,Paper And Paper Products,
 RAMAPHO,Agricultural Inputs,Basic Materials,2026-10-08,,
 RAMASTEEL,Steel,Basic Materials,2026-10-08,,
@@ -1873,7 +1873,7 @@ RIIL,Engineering & Construction,Industrials,2026-10-08,Engineering,2026-10-14
 RIR,Semiconductors,Technology,2026-10-08,,
 RISHABH,Scientific & Technical Instruments,Technology,2026-10-08,,
 RITCO,Integrated Freight & Logistics,Industrials,2026-10-08,,
-RITES,Engineering & Construction,Industrials,2026-10-08,,
+RITES,Engineering & Construction,Industrials,2026-10-08,,2026-11-04
 RKDL,Beverages - Wineries & Distilleries,Consumer Defensive,2026-10-08,Brew/Distilleries,
 RKEC,Engineering & Construction,Industrials,2026-10-08,,
 RKFORGE,Metal Fabrication,Industrials,2026-10-08,Castings/Forgings,
@@ -1891,7 +1891,7 @@ ROSSELLIND,Conglomerates,Industrials,2026-10-08,Tea And Coffee,
 ROSSTECH,Aerospace & Defense,Industrials,2026-10-08,,
 ROTO,Specialty Industrial Machinery,Industrials,2026-10-08,,
 ROUTE,Telecom Services,Communication Services,2026-10-08,,
-RPEL,Chemicals,Basic Materials,2026-10-08,,
+RPEL,Chemicals,Basic Materials,2026-10-08,,2026-10-16
 RPGLIFE,Drug Manufacturers - Specialty & Generic,Healthcare,2026-10-08,Pharmaceuticals,
 RPOWER,Utilities - Independent Power Producers,Utilities,2026-10-08,Power,
 RPPINFRA,Engineering & Construction,Industrials,2026-10-08,Construction,
@@ -2003,7 +2003,7 @@ SENCO,Luxury Goods,Consumer Cyclical,2026-10-08,,
 SENORES,Drug Manufacturers - General,Healthcare,2026-10-08,,
 SEPC,Engineering & Construction,Industrials,2026-10-08,,
 SERVOTECH,Electrical Equipment & Parts,Industrials,2026-10-08,,
-SESHAPAPER,Paper & Paper Products,Basic Materials,2026-10-08,Paper And Paper Products,
+SESHAPAPER,Paper & Paper Products,Basic Materials,2026-10-08,Paper And Paper Products,2026-10-24
 SETCO,Auto Parts,Consumer Cyclical,2026-10-08,,
 SETL,Specialty Industrial Machinery,Industrials,2026-10-08,,
 SEYAIND,Specialty Chemicals,Basic Materials,2026-10-08,,
@@ -2109,7 +2109,7 @@ SMSPHARMA,Drug Manufacturers - General,Healthcare,2026-10-08,Pharmaceuticals,
 SNOWMAN,Integrated Freight & Logistics,Industrials,2026-10-08,,
 SOBHA,Real Estate - Development,Real Estate,2026-10-08,Construction,
 SOFTTECH,Software - Application,Technology,2026-10-08,,
-SOLARA,Drug Manufacturers - Specialty & Generic,Healthcare,2026-10-08,,
+SOLARA,Drug Manufacturers - Specialty & Generic,Healthcare,2026-10-08,,2026-10-16
 SOLARINDS,Specialty Chemicals,Basic Materials,2026-10-08,Chemicals - Speciality,
 SOLARWORLD,Solar,Technology,2026-10-08,,
 SOLEX,Solar,Technology,2026-10-08,,
@@ -2199,7 +2199,7 @@ SUNTECK,Real Estate - Development,Real Estate,2026-10-08,Construction,
 SUNTV,Broadcasting,Communication Services,2026-10-08,Media & Entertainment,
 SUPERHOUSE,Footwear & Accessories,Consumer Cyclical,2026-10-08,,
 SUPERSPIN,Textile Manufacturing,Consumer Cyclical,2026-10-08,Textiles - Cotton,
-SUPRAJIT,Auto Parts,Consumer Cyclical,2026-10-08,Auto Ancillaries,
+SUPRAJIT,Auto Parts,Consumer Cyclical,2026-10-08,Auto Ancillaries,2026-11-07
 SUPREME,Real Estate - Development,Real Estate,2026-10-08,,
 SUPREMEIND,Building Products & Equipment,Industrials,2026-10-08,Plastic And Plastic Products,
 SUPREMEINF,Engineering & Construction,Industrials,2026-10-08,Construction,
@@ -2313,15 +2313,15 @@ TIJARIA,Building Products & Equipment,Industrials,2026-10-08,Plastic And Plastic
 TIL,Farm & Heavy Construction Machinery,Industrials,2026-10-08,Engineering,
 TIMETECHNO,Packaging & Containers,Consumer Cyclical,2026-10-08,Plastic And Plastic Products,
 TIMEX,Luxury Goods,Consumer Cyclical,2026-10-08,,
-TIMKEN,Tools & Accessories,Industrials,2026-10-08,Bearings,
+TIMKEN,Tools & Accessories,Industrials,2026-10-08,Bearings,2026-10-29
 TINNARUBR,Specialty Chemicals,Basic Materials,2026-10-08,,
 TIPSFILMS,Entertainment,Communication Services,2026-10-08,,
-TIPSMUSIC,Entertainment,Communication Services,2026-10-08,,
+TIPSMUSIC,Entertainment,Communication Services,2026-10-08,,2026-10-15
 TIRUMALCHM,Specialty Chemicals,Basic Materials,2026-10-08,Chemicals - Organic,
 TIRUPATIFL,Metal Fabrication,Industrials,2026-10-08,,
 TITAGARH,Railroads,Industrials,2026-10-08,,
 TITAN,Luxury Goods,Consumer Cyclical,2026-10-08,Gems Jewellery And Watches,
-TMB,Banks - Regional,Financial Services,2026-10-08,,
+TMB,Banks - Regional,Financial Services,2026-10-08,,2026-10-26
 TMCV,Auto Manufacturers,Consumer Cyclical,2026-10-08,,2026-10-23
 TMPV,Auto Manufacturers,Consumer Cyclical,2026-10-08,,
 TNPETRO,Specialty Chemicals,Basic Materials,2026-10-08,Petrochemicals,
