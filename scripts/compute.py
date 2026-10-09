@@ -35,9 +35,17 @@ def r2(x, nd=2):
     return round(float(x), nd)
 
 
+LONG = None  # full download (about 6 years) for the long-base identifier
+
+
 def load():
+    global LONG
     p = pd.read_csv(CACHE / "prices.csv.gz", dtype={"symbol": str, "date": str})
     u = pd.read_csv(CACHE / "universe.csv", dtype={"symbol": str})
+    LONG = p[["symbol", "date", "close", "volume"]]
+    # everything except bases.py works on the usual window, exactly as before the longer download
+    cut = (datetime.now(timezone(timedelta(hours=5, minutes=30))).date() - timedelta(days=S["history_calendar_days"])).isoformat()
+    p = p[p.date >= cut]
     bench = S["benchmark"]
     cal = sorted(p.loc[p.symbol == bench, "date"].unique()) or sorted(p.date.unique())
     # Use the benchmark's trading calendar; drop stray non-session dates.
@@ -328,6 +336,25 @@ def main():
         print(f"fundamentals: {fund_meta['stocks']} stocks rated, latest filing {fund_meta['latest_filing']}")
     else:
         dump_later, fund_meta = {}, None
+    # ---------------- long-base identifier (bases.py; checked on 20 years of NSE data)
+    base_meta = None
+    try:
+        import bases as BS
+        BR = BS.build(LONG, U, rs_now)
+        for r in rows:
+            r.update(BR["per_stock"].get(r["s"], {}))
+        bm, bh, bmet = BS.scans(BR)
+        sc_meta += bm
+        sc_hits.update(bh)
+        sc_metric.update(bmet)
+        cats = cats[:cats.index("Breakouts") + 1] + ["Bases"] + cats[cats.index("Breakouts") + 1:] if "Breakouts" in cats else cats + ["Bases"]
+        dump_later["bases.json"] = {"asof": last, "rows": BR["rows"], "charts": BR["charts"], "evidence": BR["evidence"],
+                                    "params": {"d_max": BS.D_MAX, "zone": BS.ZONE, "min_len": BS.MIN_LEN, "recent": BS.RECENT}}
+        base_meta = {"stocks": len(BR["rows"]), "history_from": str(LONG.date.min())}
+    except Exception as e:  # never break the daily run
+        import traceback
+        traceback.print_exc()
+        print(f"bases skipped: {e}")
     scans = {"cats": cats, "meta": sc_meta, "hits": sc_hits, "metric": sc_metric}
 
     ist = timezone(timedelta(hours=5, minutes=30))
@@ -337,7 +364,7 @@ def main():
             "failed": fm.get("failed_count"), "indices": indices,
             "filters": {"min_price": S["min_price"], "min_median_turnover_cr": S["min_median_turnover_cr"],
                         "min_market_cap_cr": S["min_market_cap_cr"] if mcap is not None else None},
-            "min_group_size": S["min_group_size"], "fund": fund_meta}
+            "min_group_size": S["min_group_size"], "fund": fund_meta, "bases": base_meta}
 
     def dump(name, obj):
         (OUT / name).write_text(json.dumps(obj, separators=(",", ":"), allow_nan=False))
@@ -360,6 +387,9 @@ def main():
     if bench in W["close"]:
         closes["c"][bench] = [rd(v) for v in W["close"][bench].reindex(tail.index).ffill().tolist()]
     dump("closes.json", closes)
+    # instrument keys for the live Telegram alerts (telegram_alerts.py --live); changes rarely
+    if "key" in u.columns:
+        u.loc[u.kind == "stock", ["symbol", "key"]].dropna().sort_values("symbol").to_csv(CFG / "upstox_keys.csv", index=False)
     print("scans: " + ", ".join(f"{k}={len(v)}" for k, v in scans["hits"].items()))
     print(f"breadth today: >50DMA {breadth['a50'][-1]}%  >200DMA {breadth['a200'][-1]}%  "
           f"A/D {breadth['adv'][-1]}/{breadth['dec'][-1]}")

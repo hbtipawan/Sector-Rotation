@@ -169,7 +169,7 @@ def yahoo_candles(symbol, kind, days):
     if not ys:
         return None
     r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{quote(ys)}",
-                     params={"range": "2y" if days <= 730 else "5y", "interval": "1d"},
+                     params={"range": "2y" if days <= 730 else "5y" if days <= 1825 else "10y", "interval": "1d"},
                      headers={"User-Agent": UA}, timeout=30)
     if r.status_code != 200:
         return None
@@ -230,7 +230,8 @@ def main():
     u.to_csv(CACHE / "universe.csv", index=False)
     print(f"Universe: {(u.kind == 'stock').sum()} stocks + {(u.kind == 'index').sum()} indices; source={a.source}")
 
-    days = SETTINGS["history_calendar_days"]
+    # the long-base identifier (bases.py) needs ~6 years; everything else uses history_calendar_days
+    days = max(SETTINGS["history_calendar_days"], SETTINGS.get("base_history_calendar_days", 0))
     today = today_ist()
     frm, to = (today - timedelta(days=days)).isoformat(), today.isoformat()
     rows = list(u.itertuples())
