@@ -142,6 +142,39 @@ The **Long bases** tab lists every stock that is in a base on the daily chart, s
 - `fetch_bse_backfill.py` adds the older BSE closes for stocks that moved from BSE to NSE recently, so their bases are not cut at the NSE listing. Stocks with no older BSE data are remembered in `config/bse_skip.csv`.
 - The detection code is `scripts/bases.py`. It uses numba and runs in a few seconds.
 
+## Stage 2: early, mid or late
+
+**Scanners → Stage 2: early · mid · late** lists every stock in Stage 2 — the same stocks the Stage column marks as Stage 2, i.e. above a 150-day (30-week) line that rose 1%+ in 20 sessions. Each stock gets a **phase** and a **Stage 2 Score**. The list is sorted Early → Mid → Late, highest score first within each phase.
+
+- **When the advance started:** the first Stage 2 day after the last confirmed Stage 4 (10 of 20 sessions below a falling 150-day line).
+- **Phase points (0–9):**
+  - O'Neil base count since the start, 0–4. A base counts after a 20%+ gain from the last counted pivot, and undercutting the previous base's low restarts the count at 1. Two bases = 1 point, three = 2, four = 3, five or more = 4.
+  - Months in Stage 2, 0–2: 6–12 months = 1, over 12 months = 2.
+  - Gain from the low before the start, 0–2: 150–300% = 1, over 300% = 2.
+  - 150-day slope slowing, 0–1.
+  - **Early** 0–1 · **Mid** 2–4 · **Late** 5+.
+- **Stage 2 Score (0–100):**
+
+  | Part | Points |
+  |---|---|
+  | RS | 25 |
+  | 150-day slope | 20 |
+  | Close to the advance's peak | 20 |
+  | Above the 150-day (30–100% best) | 15 |
+  | Above the 50-day | 10 |
+  | Highest close in 6 years | 10 |
+
+- **Warnings:** below the 50-day, 15%+ off the peak, slope slowing, and climax (100%+ above the 200-day).
+- **Two scanners:** "Early Stage 2, score 70+" (also used in watchlist alerts and Telegram) and "Late Stage 2, weakening".
+
+**Checked on 20 years of NSE data** (119,000 Stage 2 snapshots, 2006–2026; full tables in the tab and in `config/stage2_evidence.json`):
+
+- **Late phase:** more risk in both halves of the period. 25–29% fell into Stage 4 within 6 months, against 17–19% for Early, and drawdowns were deeper. Lower returns showed up only in 2017–26 (+2.7% a year over NIFTY 500 vs +13.3% for Early); in 2007–16 there was no return gap.
+- **Distance above the moving averages** turned out to be bullish rather than a warning, so it is not counted as lateness.
+- **Best group:** Early with a score of 70+ (+23% a year, 6% fell into Stage 4). **Worst:** Late with a score under 55 (+1.5%, 40% fell into Stage 4).
+
+The code is `scripts/stage2.py`. It uses the long-base breakouts from `bases.py` to count bases.
+
 ## Telegram alerts
 
 Two kinds of message, both sent by your own Telegram bot:
