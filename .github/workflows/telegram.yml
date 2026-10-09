@@ -1,0 +1,52 @@
+name: Telegram live alerts
+
+# Checks your watchlist stocks against live prices during market hours and sends new
+# alerts (pivot crossed, stop broken, target hit, near pivot, big move) to Telegram.
+# Times are UTC: 03:45 = 9:15 IST, then every 15 min until 10:00 UTC = 3:30 PM IST.
+# GitHub may start scheduled runs a few minutes late at busy times.
+on:
+  schedule:
+    - cron: "45 3 * * 1-5"
+    - cron: "*/15 4-9 * * 1-5"
+    - cron: "0 10 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "test = send a test message (shows your chat id); live = check prices now"
+        type: choice
+        options: [test, live]
+        default: test
+
+permissions:
+  contents: read
+
+concurrency:
+  group: telegram-live
+  cancel-in-progress: true
+
+jobs:
+  alerts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            scripts
+            config
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Telegram alerts
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          MOVE_PCT: ${{ vars.MOVE_PCT }}
+        run: |
+          MODE="${{ inputs.mode }}"
+          if [ -z "$MODE" ]; then MODE=live; fi
+          if [ "$MODE" = "live" ] && [ "${{ github.event_name }}" = "workflow_dispatch" ]; then EXTRA=--force; fi
+          python scripts/telegram_alerts.py --$MODE $EXTRA
