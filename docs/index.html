@@ -52,6 +52,45 @@ a{color:inherit}
 h1,h2,h3,h4{font-family:var(--display);font-stretch:108%;margin:0;line-height:1.15;text-wrap:balance}
 [hidden]{display:none!important}
 
+/* ── Long bases ───────────────────────────────────────── */
+.bdays{display:block;font-family:var(--display);font-weight:800;font-stretch:108%;font-size:23px;line-height:1.1}
+.bsub{display:block;font-size:13.5px;color:var(--muted);font-weight:500;white-space:normal;max-width:260px}
+.bdays+.bsub{min-width:128px}
+.bch{display:block}.bch .box{fill:color-mix(in srgb,var(--accent) 20%,transparent)}
+.bch text{font-size:13px;fill:var(--muted)}
+.bchwrap{background:var(--soft);border-radius:10px;padding:8px 6px 2px}
+button.btile{text-align:left;cursor:pointer;font:inherit;color:inherit;width:100%}
+button.btile:hover{border-color:var(--accent)}
+.tiles.btiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+.bxhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;padding:12px 14px 4px;font-size:17px}
+.evid{margin-bottom:14px}
+.evid summary{cursor:pointer;padding:14px 16px;font-family:var(--display);font-weight:800;font-size:21px;list-style:none}
+.evid summary::-webkit-details-marker{display:none}
+.evid summary::before{content:"▸";display:inline-block;width:22px;color:var(--accent-ink);transition:transform .15s}
+.evid[open] summary::before{transform:rotate(90deg)}
+.evid summary span{font-family:var(--body);font-weight:600;font-size:16px;color:var(--muted)}
+.evb{padding:0 16px 14px}
+.evb h4{font-family:var(--body);font-size:16px;font-weight:700;margin:16px 0 6px}
+.evb .fl{margin:0;padding-left:22px}.evb .fl li{font-size:17px;margin:7px 0;max-width:95ch}
+.etab td,.etab th{padding:7px 10px}
+.ebar{display:inline-block;height:12px;background:var(--s1);border-radius:0 3px 3px 0;vertical-align:-1px;margin-right:8px}
+.scorebd{margin-top:10px;background:var(--soft);border-radius:10px;padding:10px 12px}
+.sbh{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:6px}
+.sbr{display:grid;grid-template-columns:minmax(0,1fr) 120px 52px;gap:10px;align-items:center;font-size:15px;padding:3px 0}
+.sbt{height:10px;background:var(--track);border-radius:5px;overflow:hidden}.sbt i{display:block;height:100%;background:var(--s1);border-radius:5px}
+.sbr .num{text-align:right;font-weight:700}
+@media (max-width:720px){.tiles.btiles{grid-template-columns:repeat(2,minmax(0,1fr))}.sbr{grid-template-columns:minmax(0,1fr) 80px 46px}}
+
+/* ── Stage 2 phases ───────────────────────────────────── */
+.subtabs{margin:0 0 14px}
+.subtabs .seg button{font-size:17px;padding:8px 16px}
+.phpill{display:inline-block;padding:2px 11px;border-radius:999px;font-size:15px;font-weight:800;letter-spacing:.2px;white-space:nowrap;line-height:1.45}
+.ph-e{background:var(--up);color:#fff}.ph-m{background:var(--accent);color:#1b1305}.ph-l{background:var(--down);color:#fff}
+.wchip{display:inline-block;font-size:13.5px;font-weight:600;padding:1px 8px;border-radius:6px;background:var(--warn-bg);color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);margin:1px 0;white-space:nowrap}
+.btile.t-e{box-shadow:inset 5px 0 0 var(--up),var(--shadow)}.btile.t-m{box-shadow:inset 5px 0 0 var(--accent),var(--shadow)}.btile.t-l{box-shadow:inset 5px 0 0 var(--down),var(--shadow)}
+.egrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 16px}
+@media (max-width:1000px){.egrid{grid-template-columns:minmax(0,1fr)}}
+
 /* ── Watchlists ───────────────────────────────────────── */
 .wlbtn{border:0;background:none;cursor:pointer;font-size:19px;line-height:1;color:var(--muted);min-width:30px;min-height:30px;padding:0 6px 0 0;margin:-6px 0 -6px -4px;vertical-align:-2px;border-radius:6px}
 .wlbtn:hover{color:var(--accent-ink)}
@@ -448,6 +487,7 @@ footer.foot p{margin:4px 0;max-width:110ch}
     <button class="tab" role="tab" data-v="breadth" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M3 13h4l2.5-6 4 11 2.5-6H21"/></svg>Breadth</button>
     <button class="tab" role="tab" data-v="rs" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M4 18l6-6 4 4 6-8M15 8h5v5"/></svg><span class="lf">RS ranking</span><span class="ls">RS rank</span></button>
     <button class="tab" role="tab" data-v="scanners" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M16 16l4.5 4.5"/></svg>Scanners<span class="cnt" id="scanCnt"></span></button>
+    <button class="tab" role="tab" data-v="bases" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M3 19h18M5 15c2-1 3 1 5 0s3-2 5-1 2 1 4 0"/><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-dasharray="3 2.4" stroke-linecap="round" d="M4 8h16"/></svg><span class="lf">Long bases</span><span class="ls">Bases</span></button>
     <button class="tab" role="tab" data-v="watch" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M12 3.6l2.5 5.2 5.6.7-4.1 3.9 1 5.6L12 16.3 7 19l1-5.6-4.1-3.9 5.6-.7z"/></svg><span class="lf">Watchlists</span><span class="ls">Watchlist</span><span class="cnt" id="wlCnt"></span></button>
     <button class="tab" role="tab" data-v="vpci" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg><span class="lf">VPCI screener</span><span class="ls">VPCI</span></button>
   </div>
@@ -467,7 +507,7 @@ footer.foot p{margin:4px 0;max-width:110ch}
 /* ════════════════════ state & helpers ════════════════════ */
 const PERIODS=["1D","1W","1M","3M","6M","YTD","1Y"];
 const PL={"1D":"Today","1W":"1W","1M":"1M","3M":"3M","6M":"6M","YTD":"YTD","1Y":"1Y"};
-const TABS=["rotation","breadth","rs","scanners","watch","vpci"];
+const TABS=["rotation","breadth","rs","scanners","bases","watch","vpci"];
 const st={tab:"rotation",period:"1M",group:"Themes",agg:"mean",sort:"ret",view:"bars",open:null,scan:"combo3",scanTop:0,scanFund:0,
   rs:{q:"",sec:"",theme:"",min:0,fmin:0,tt:false,s2:false,a50:false},tbl:{}};
 let D={};
@@ -731,7 +771,9 @@ function drawRS(){
 
 /* ════════════════════ SCANNERS ════════════════════ */
 function fmtMetric(m,v){if(!isNum(v))return "–";return m.fmt==="pct"?(v>=999?"≥999%":sgn(v,1)):m.fmt==="x"?v.toFixed(1)+"×":m.fmt==="int"?v.toFixed(0):v.toFixed(Math.abs(v)<100?1:0)}
+const scanViewSeg=()=>`<div class="subtabs">${seg("scanView",["lib","s2"],st.scanView,{lib:"Scanner library",s2:"Stage 2: early · mid · late"})}</div>`;
 function renderScanners(){
+  if(st.scanView==="s2"){renderStage2(scanViewSeg());return}
   const S=D.scans;if(!S?.meta){$("#view").innerHTML=`<div class="err">Scanner data is in an older format. Run “Daily update” once.</div>`;return}
   if(!D.scanMeta[st.scan])st.scan=S.meta[0].id;
   const m=D.scanMeta[st.scan],hits=S.hits[m.id]||[];
@@ -751,7 +793,7 @@ function renderScanners(){
   else cols.push(C.ret("1M"),C.vr,C.dcr,C.adr,C.rs,C.fr,C.h52,C.st,C.sec,C.themes);
   const tid="scan_"+m.id,mk=dup||"metric";
   if(!st.tbl[tid])st.tbl[tid]={key:m.sort==="metric"||m.sort==="metric_asc"?mk:"rs",dir:m.sort==="metric_asc"?1:-1,show:100};
-  $("#view").innerHTML=`<div class="sec-head"><div><h2>Scanner library</h2><p>${S.meta.length} scans run on every stock after the close${D.meta.fund?` — ${S.meta.filter(x=>!x.id.startsWith("f_")).length} technical and ${S.meta.filter(x=>x.id.startsWith("f_")).length} fundamental (from NSE filings)`:""}. Tap any stock for its detail card, including every other scan it appears in.</p></div></div>
+  $("#view").innerHTML=scanViewSeg()+`<div class="sec-head"><div><h2>Scanner library</h2><p>${S.meta.length} scans run on every stock after the close${D.meta.fund?` — ${S.meta.filter(x=>!x.id.startsWith("f_")).length} technical and ${S.meta.filter(x=>x.id.startsWith("f_")).length} fundamental (from NSE filings)`:""}. Tap any stock for its detail card, including every other scan it appears in.</p></div></div>
   <div class="scan-pick">${pick}</div>
   <div class="scan-layout"><nav class="card rail" aria-label="Scanners">${rail}</nav>
   <section class="card"><div class="scan-head"><h3>${esc(m.name)}<span class="cnt num">${hits.length}</span></h3><p>${esc(m.desc)}</p><div class="catchips"><span class="pill p-acc">${esc(m.cat)}</span>${rows.length?`<button type="button" class="ghost" data-wl-addall="${esc(JSON.stringify(rows.map(r=>r.s)))}" data-label="${esc(m.name)} stocks" style="margin-left:6px">☆ Add all ${rows.length} to a watchlist</button>`:""}</div>
@@ -761,6 +803,242 @@ function renderScanners(){
   wireTables($("#scanT"),renderScanners);
   $("#scanSel").addEventListener("change",e=>{st.scan=e.target.value;store.set("scan2",st.scan);renderScanners()});
 }
+
+/* ════════════════════ LONG BASES ════════════════════
+   bases.json (scripts/bases.py): one row per stock = its longest daily base.
+   len = trading days in the base, piv = pivot (highest close inside it), fl = lowest close,
+   st = status vs the pivot, ib = a breakout from a shorter base inside it (last 20 sessions). */
+let BASES=null;
+async function basesLoad(){
+  if(!BASES){if(window.EMBED?.bases)BASES=window.EMBED.bases;
+    else{if(!D.meta.bases)return null;try{const r=await fetch(`data/bases.json?v=${Date.now()}`);BASES=r.ok?await r.json():null}catch(e){BASES=null}}
+    if(BASES)BASES.by=Object.fromEntries(BASES.rows.map(x=>[x.s,x]))}
+  return BASES}
+const bdur=n=>n>=250?`${(n/250).toFixed(1)} yrs`:n>=42?`${Math.round(n/21)} months`:`${Math.round(n/5)} weeks`;
+const bmon=d=>{const t=new Date(String(d).slice(0,10)+"T00:00:00");return isNaN(t)?"":t.toLocaleDateString("en-IN",{month:"short",year:"numeric"})};
+const bFromPiv=b=>b.st==="bo0"||b.st==="bo"||b.st==="ext"?b.ext:isNum(b.dist)?(1/(1+b.dist/100)-1)*100:null;  // price vs pivot, %
+const BST={bo0:["Breakout today","p-up"],bo:["Breakout","p-up"],tb:["Back at the pivot","p-acc"],ext:["Extended","p-acc"],near:["Near pivot","p-acc"],w15:["5–15% below","p-mut"],in:["In base","p-mut"]};
+const BORDER={bo0:0,bo:1,near:2,ext:3,w15:4,in:5};
+function bStatus(b,long){
+  const tb=b.st==="bo"&&b.ext<0,[lab,c]=BST[tb?"tb":b.st]||["–","p-mut"],fp=bFromPiv(b);
+  let h=`<span class="pill ${c}">${esc(tb?lab:b.st==="bo"?`Breakout ${b.ago}d ago`:lab)}</span>`;
+  if(tb)h+=`<span class="bsub">Broke out ${b.ago}d ago, now testing the pivot from above (throwback)</span>`;
+  if(long)h+=` <span class="num" style="font-weight:700">${b.st==="bo0"||b.st==="bo"||b.st==="ext"?sgn(b.ext,1)+" above pivot":sgn(fp,1)+" from pivot"}</span>`;
+  if(b.ib)h+=`<span class="bsub">${b.ib.ago===0?"Today":b.ib.ago+"d ago"}: broke out of a ${b.ib.len}-day base inside it (₹${inr(b.ib.piv)})</span>`;
+  return h}
+const bInner=b=>b.ib&&b.ib.len>=100&&b.ib.ext<=5;   // a long-base breakout inside an even longer base
+function scorePill(v){if(!isNum(v))return "–";const c=v>=80?"rs-a":v>=70?"rs-b":v>=55?"rs-c":"rs-d";return `<span class="rs ${c}">${v}</span>`}
+function bchart(s,big){
+  const ch=BASES?.charts?.[s],b=BASES?.by?.[s];if(!ch||!b)return "–";
+  const c=ch.c,n=c.length;if(n<3)return "–";
+  const W=big?460:156,H=big?230:48,pl=big?58:2,pr=big?8:2,pt=big?14:4,pb=big?28:4;
+  const v=c.filter(isNum);let lo=Math.min(...v,b.fl),hi=Math.max(...v,b.piv);if(isNum(b.tgt)&&big&&b.tgt<hi*1.25)hi=Math.max(hi,b.tgt);const pad=(hi-lo)*.07;lo-=pad;hi+=pad;
+  const x=i=>pl+i*(W-pl-pr)/(n-1),y=t=>pt+(1-(t-lo)/(hi-lo))*(H-pt-pb);
+  const e=ch.b!=null?ch.b-1:n-1;
+  let g="";
+  if(big){for(let k=0;k<=3;k++){const t=lo+(hi-lo)*k/3;g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(t)}" y2="${y(t)}" stroke="var(--track)"/><text x="${pl-8}" y="${y(t)+4}" text-anchor="end">${t>=1000?Math.round(t).toLocaleString("en-IN"):t.toFixed(t>=100?0:1)}</text>`}
+    g+=`<text x="${x(ch.s)}" y="${H-8}" text-anchor="${ch.s<n*.15?"start":"middle"}">${esc(bmon(b.start))}</text><text x="${W-pr}" y="${H-8}" text-anchor="end">${esc(fmtDate(D.meta.asof))}</text>`}
+  g+=`<rect class="box" x="${x(ch.s)}" y="${y(b.piv)}" width="${Math.max(1,x(e)-x(ch.s))}" height="${Math.max(1,y(b.fl)-y(b.piv))}"/>`;
+  if(ch.ibp!=null&&ch.ibs!=null)g+=`<line x1="${x(ch.ibs)}" x2="${x(ch.ib)}" y1="${y(ch.ibp)}" y2="${y(ch.ibp)}" stroke="var(--s2)" stroke-width="${big?1.8:1.3}"/>`;
+  g+=`<line x1="${x(ch.s)}" x2="${W-pr}" y1="${y(b.piv)}" y2="${y(b.piv)}" stroke="var(--accent-ink)" stroke-width="${big?2:1.5}" stroke-dasharray="${big?"7 4":"4 3"}"/>`;
+  if(big){g+=`<text x="${pl+6}" y="${y(b.piv)-6}" style="fill:var(--accent-ink);font-weight:700">Pivot ${inr(b.piv)}</text><text x="${pl+6}" y="${y(b.fl)+17}" style="font-weight:700">Base low ${inr(b.fl)}</text>`;
+    if(isNum(b.tgt)&&b.tgt<=hi)g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(b.tgt)}" y2="${y(b.tgt)}" stroke="var(--muted)" stroke-width="1.4" stroke-dasharray="2 4"/><text x="${W-pr-4}" y="${y(b.tgt)-6}" text-anchor="end">Measured move ${inr(b.tgt)}</text>`}
+  g+=`<polyline points="${c.map((t,i)=>isNum(t)?`${x(i).toFixed(1)},${y(t).toFixed(1)}`:null).filter(Boolean).join(" ")}" fill="none" stroke="var(--s1)" stroke-width="${big?2:1.5}" stroke-linejoin="round"/>`;
+  if(ch.b!=null)g+=`<circle cx="${x(ch.b)}" cy="${y(c[ch.b])}" r="${big?5.5:3.2}" fill="var(--up)" stroke="var(--card)" stroke-width="2"/>`;
+  else if(ch.ib!=null)g+=`<circle cx="${x(ch.ib)}" cy="${y(c[ch.ib])}" r="${big?5:3}" fill="var(--s2)" stroke="var(--card)" stroke-width="2"/>`;
+  return `<svg class="bch${big?" big":""}" viewBox="0 0 ${W} ${H}" ${big?'style="width:100%;height:auto"':`width="${W}" height="${H}"`} role="img" aria-label="${esc(s)}: ${b.len}-day base since ${esc(bmon(b.start))}, pivot ${inr(b.piv)}, low ${inr(b.fl)}">${g}</svg>`}
+function bJoin(b){const x=D.by[b.s]||{};return {s:b.s,n:x.n,rs:x.rs,fr:x.fr,mc:x.mc,sec:x.sec,ind:x.ind,stage:x.st,px:x.px,b}}
+const BCOL={
+  len:{k:"len",label:"Base days",fmt:r=>`<span class="bdays num">${r.b.len.toLocaleString("en-IN")}${r.b.cap?"+":""}</span><span class="bsub">${bdur(r.b.len)} · from ${esc(bmon(r.b.start))}${r.b.lst?" (listing)":""}${r.b.cap?" (data limit)":""}</span>`,sort:r=>r.b.len,csv:r=>r.b.len},
+  ch:{k:"ch",label:"Base (shaded) and pivot",l:1,fmt:r=>bchart(r.s),sort:r=>r.b.len,csv:r=>r.b.start},
+  st:{k:"bst",label:"Status",l:1,fmt:r=>bStatus(r.b),sort:r=>BORDER[r.b.st]*1000-(r.b.len/10),csv:r=>(BST[r.b.st]||[""])[0]+(r.b.ib?` / inner breakout ${r.b.ib.len}d`:"")},
+  fp:{k:"fp",label:"From pivot",fmt:r=>{const v=bFromPiv(r.b);return `<span class="num ${v>=0?"up":""}" style="font-weight:700">${sgn(v,1)}</span>`},sort:r=>bFromPiv(r.b)},
+  piv:{k:"piv",label:"Pivot ₹",fmt:r=>`<span class="num">${inr(r.b.piv)}</span>`,sort:r=>r.b.piv},
+  depth:{k:"depth",label:"Depth %",fmt:r=>`<span class="num">${isNum(r.b.depth)?r.b.depth.toFixed(0):"–"}</span>`,sort:r=>r.b.depth},
+  sc:{k:"sc",label:"Base Score",fmt:r=>scorePill(r.b.sc),sort:r=>r.b.sc},
+  type:{k:"type",label:"Built after",l:1,fmt:r=>r.b.type==="C"?"an advance":`a decline`,sort:r=>r.b.type},
+  tc:{k:"tc",label:"Pivot tests",fmt:r=>`<span class="num">${r.b.tc}</span>`,sort:r=>r.b.tc},
+  tight:{k:"tight",label:"Last 15d range %",fmt:r=>`<span class="num">${isNum(r.b.tight)?r.b.tight.toFixed(1):"–"}</span>`,sort:r=>r.b.tight},
+  dry:{k:"dry",label:"Vol 10d ÷ base",fmt:r=>`<span class="num">${isNum(r.b.dry)?r.b.dry.toFixed(2):"–"}</span>`,sort:r=>r.b.dry},
+  tgt:{k:"tgt",label:"Measured move ₹",fmt:r=>`<span class="num">${inr(r.b.tgt)}</span> <span class="bsub" style="display:inline">${isNum(r.b.tgt)&&isNum(r.px)?sgn((r.b.tgt/r.px-1)*100,0):""}</span>`,sort:r=>isNum(r.b.tgt)&&isNum(r.px)?r.b.tgt/r.px:null,csv:r=>r.b.tgt},
+};
+if(!st.bx)st.bx={q:"",status:"act",min:"100",depth:"0",score:"0",type:"all",s2:false,rs70:false,f60:false};
+function bFilter(rows){
+  const f=st.bx,q=f.q.trim().toUpperCase(),min=+f.min,dep=+f.depth,sc=+f.score;
+  return rows.filter(b=>{const x=D.by[b.s]||{};
+    if(q&&!b.s.includes(q)&&!String(x.n||"").toUpperCase().includes(q))return false;
+    if(f.status==="act"&&!["bo0","bo","near","w15"].includes(b.st))return false;
+    if(f.status==="bo"&&!(["bo0","bo","ext"].includes(b.st)||bInner(b)))return false;
+    if(["near","w15","in"].includes(f.status)&&b.st!==f.status)return false;
+    if(b.len<min)return false;if(dep&&!(b.depth<=dep))return false;if(sc&&!(b.sc>=sc))return false;
+    if(f.type!=="all"&&b.type!==f.type)return false;
+    if(f.s2&&x.st!==2)return false;if(f.rs70&&!((x.rs??0)>=70))return false;if(f.f60&&!((x.fr??0)>=60))return false;
+    return true})}
+function bEvidence(E){
+  if(!E)return "";
+  const bar=(v,mx)=>`<span class="ebar" style="width:${Math.max(2,Math.round(Math.max(0,v)/mx*110))}px"></span><span class="num" style="font-weight:700">${sgn(v,1)}</span>`;
+  const mx=Math.max(...E.len_quality.map(r=>r.avg),...E.len_other.map(r=>r.avg),...E.score_all.map(r=>r.avg),1);
+  const oth=Object.fromEntries(E.len_other.map(r=>[r.label,r]));
+  const t1=`<div class="tscroll"><table class="dt etab"><thead><tr><th class="l">Base length (trading days)</th><th class="l">Avg 1 yr vs NIFTY 500</th><th>Median</th><th>Beat the index</th><th>Failed</th><th>Doubled</th><th>Breakouts</th><th class="l">Not in an uptrend: avg</th><th>Beat</th></tr></thead><tbody>`+
+    E.len_quality.map(r=>{const o=oth[r.label]||{};return `<tr><td class="l"><b>${esc(r.label)}</b></td><td class="l">${bar(r.avg,mx)}</td><td class="num">${sgn(r.med,1)}</td><td class="num">${r.win.toFixed(0)}%</td><td class="num">${r.fail.toFixed(0)}%</td><td class="num">${r.big.toFixed(0)}%</td><td class="num">${r.n.toLocaleString("en-IN")}</td><td class="l">${bar(o.avg,mx)}</td><td class="num">${isNum(o.win)?o.win.toFixed(0)+"%":"–"}</td></tr>`}).join("")+`</tbody></table></div>`;
+  const late=Object.fromEntries(E.score_late.map(r=>[r.label,r])),all=Object.fromEntries(E.score_all.map(r=>[r.label,r]));
+  const t2=`<div class="tscroll"><table class="dt etab"><thead><tr><th class="l">Base Score</th><th class="l">Avg 1 yr vs NIFTY 500, 2007–16</th><th class="l">Same, 2017–26</th><th>Median</th><th>Beat the index</th><th>Failed</th><th>Breakouts</th></tr></thead><tbody>`+
+    E.score_early.map(r=>{const l=late[r.label]||{},a=all[r.label]||{};return `<tr><td class="l"><b>${esc(r.label)}</b></td><td class="l">${bar(r.avg,mx)}</td><td class="l">${bar(l.avg,mx)}</td><td class="num">${sgn(a.med,1)}</td><td class="num">${a.win.toFixed(0)}%</td><td class="num">${a.fail.toFixed(0)}%</td><td class="num">${a.n.toLocaleString("en-IN")}</td></tr>`}).join("")+`</tbody></table></div>`;
+  return `<details class="card evid"${store.get("bxEv",false)?" open":""}><summary>${esc(E.title)} <span>— does a longer base mean a bigger move?</span></summary><div class="evb">
+    <ul class="fl">${E.findings.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
+    <h4>Breakouts in an uptrend (above a rising 150-day and the 200-day average) with RS 70+, by base length</h4>${t1}
+    <h4>All breakouts, by Base Score at the breakout</h4>${t2}
+    <p class="note">${esc(E.data)} ${esc(E.caveats)}</p>
+    <p class="note"><b>Base Score (0–100):</b> base length 25 (most for 200–399 days, then 400–799) · RS rating 25 · uptrend 20 (above a rising 150-day and the 200-day average) · tight right side 15 (last 15 sessions within 6%) · built after an advance 10 · little overhead supply 5. <b>Rules:</b> a base is the time a stock has spent below a closing high (the pivot) without falling more than 50% below it; it starts at the left-side high after an advance, or at the bar after the last close above the pivot if the stock fell into it. Breakout = close above the pivot; buy range = up to 5% above it (O'Neil). Measured move = pivot + 85% of the base height (Bulkowski).</p></div></details>`}
+async function renderBases(){
+  $("#view").innerHTML=`<div class="empty">Loading bases…</div>`;
+  const B=await basesLoad();if(st.tab!=="bases")return;
+  if(!B){$("#view").innerHTML=`<div class="err">Base data isn't there yet. It is made by the evening “Daily update” run — run it once from the Actions tab, then reload.</div>`;return}
+  const f=st.bx,R=B.rows,n200=R.filter(b=>b.len>=200).length,near=R.filter(b=>b.st==="near"),bo=R.filter(b=>["bo0","bo"].includes(b.st)||bInner(b)),top=R.filter(b=>b.sc>=70&&b.len>=200);
+  const tile=(id,k,v,d)=>`<button type="button" class="card tile btile" data-bpreset="${id}"><div class="k">${k}</div><div class="v num">${v.toLocaleString("en-IN")}</div><div class="d">${d}</div></button>`;
+  $("#view").innerHTML=`<div class="sec-head"><div><h2>Long-base identifier</h2><p>Every stock in a base on the daily chart, ranked by how many trading days it has spent there. A base is the time a stock has spent below a closing high (its pivot) without falling more than 50% below it — Weinstein's Stage 1, O'Neil's cups and flat bases, Wyckoff ranges. Tested on 20 years of NSE data below.</p></div></div>
+  <div class="tiles btiles">${tile("big","Bases of 200+ days",n200,`of ${R.length.toLocaleString("en-IN")} stocks in a base`)}${tile("near","Within 5% of the pivot",near.length,`${near.filter(b=>b.len>=200).length} of them in 200+ day bases`)}${tile("bo","Breakouts, last 20 days",bo.length,"still within 5% of the pivot")}${tile("top","Base Score 70+, 200+ days",top.length,"the best-scoring long bases")}</div>
+  ${bEvidence(B.evidence)}
+  <div class="card toolbar">
+    <div class="ctl"><span>Search</span><input class="search" type="search" id="bq" placeholder="Symbol or company" value="${esc(f.q)}" aria-label="Search bases"></div>
+    <div class="ctl"><span>Where price is</span>${seg("b_status",["act","bo","near","w15","in","all"],f.status,{act:"Breakouts + within 15%",bo:"Breakouts",near:"Within 5%",w15:"5–15% below",in:"15%+ below",all:"All"})}</div>
+    <div class="ctl"><span>Base at least</span>${seg("b_min",["25","100","200","400","800"],f.min,{"25":"25 days","100":"100 (~5 mo)","200":"200 (~10 mo)","400":"400 (~1.6 yr)","800":"800 (~3 yr)"})}</div>
+    <div class="ctl"><span>Depth</span>${seg("b_depth",["0","15","33"],f.depth,{"0":"Any (≤50%)","15":"Flat ≤15%","33":"≤33%"})}</div>
+    <div class="ctl"><span>Base Score</span>${seg("b_score",["0","55","70","80"],f.score,{"0":"Any","55":"55+","70":"70+","80":"80+"})}</div>
+    <div class="ctl"><span>Built after</span>${seg("b_type",["all","C","S"],f.type,{all:"Either",C:"An advance",S:"A decline"})}</div>
+    <div class="ctl"><span>Also</span><div style="display:flex;flex-wrap:wrap;gap:0 16px"><label class="check"><input type="checkbox" id="bs2" ${f.s2?"checked":""}>Stage 2</label><label class="check"><input type="checkbox" id="brs" ${f.rs70?"checked":""}>RS 70+</label>${D.meta.fund?`<label class="check"><input type="checkbox" id="bf6" ${f.f60?"checked":""}>Fund 60+</label>`:""}</div></div>
+  </div><div class="card" id="bxT"></div>`;
+  const on=(id,k)=>{const el=$(id);if(el)el.addEventListener(el.type==="checkbox"?"change":"input",e=>{f[k]=e.target.type==="checkbox"?e.target.checked:e.target.value;if(st.tbl.bases)st.tbl.bases.show=100;store.set("bx",f);drawBases()})};
+  on("#bq","q");on("#bs2","s2");on("#brs","rs70");on("#bf6","f60");
+  $("#view").querySelector(".evid")?.addEventListener("toggle",e=>store.set("bxEv",e.target.open));
+  drawBases()}
+function drawBases(){
+  const rows=bFilter(BASES.rows).map(bJoin);
+  if(!st.tbl.bases)st.tbl.bases={key:"len",dir:-1,show:100};
+  const cols=[C.stock,BCOL.len,BCOL.ch,BCOL.st,BCOL.fp,BCOL.piv,BCOL.depth,BCOL.sc,C.rs,BCOL.type,BCOL.tc,BCOL.tight,BCOL.dry,BCOL.tgt,C.mc];
+  if(D.meta.fund)cols.push(C.fr);cols.push(C.sec);
+  const tid="bases";
+  $("#bxT").innerHTML=(rows.length?`<div class="bxhead"><span><b class="num">${rows.length.toLocaleString("en-IN")}</b> stocks</span><button type="button" class="ghost" data-wl-addall="${esc(JSON.stringify(rows.slice(0,200).map(r=>r.s)))}" data-label="Long bases">☆ Add ${Math.min(200,rows.length)} to a watchlist</button></div>`:"")+dtable(tid,rows,cols,{empty:"No stocks match. Try a shorter minimum base or “All” in Where price is."});
+  wireTables($("#bxT"),drawBases)}
+function bPreset(id){const f=st.bx;Object.assign(f,{q:"",depth:"0",type:"all",s2:false,rs70:false,f60:false,score:"0"});
+  if(id==="big")Object.assign(f,{status:"all",min:"200"});
+  if(id==="near")Object.assign(f,{status:"near",min:"25"});
+  if(id==="bo")Object.assign(f,{status:"bo",min:"25"});
+  if(id==="top")Object.assign(f,{status:"act",min:"200",score:"70"});
+  st.tbl.bases={key:"len",dir:-1,show:100};store.set("bx",f);renderBases()}
+function baseSection(sym){
+  const b=BASES?.by?.[sym];
+  if(!b)return BASES?`<div class="dsec"><h4>Base</h4><p class="note" style="margin:0">Not in a daily base of 25+ days right now (trending, or more than 50% below its last high).</p></div>`:"";
+  const kv=(k,v)=>`<div><dt>${k}</dt><dd class="num">${v}</dd></div>`,p=b.scp||[];
+  const parts=[["Base length",p[0],25],["RS rating",p[1],25],["Uptrend",p[2],20],["Tight right side",p[3],15],["Built after an advance",p[4],10],["Little overhead supply",p[5],5]];
+  return `<div class="dsec" id="basesec"><h4>Base · <span style="color:var(--ink)">${b.len.toLocaleString("en-IN")}${b.cap?"+":""} trading days</span> (${bdur(b.len)}) since ${esc(fmtDate(b.start))}${b.lst?" — since listing":""}${b.bse?" — includes BSE history before the NSE listing":""}</h4>
+    <div class="bchwrap">${bchart(sym,true)}</div>
+    <div style="margin:10px 0 8px">${bStatus(b,true)}</div>
+    <dl class="dgrid">${kv("Pivot (closing high)","₹"+inr(b.piv))}${kv("Base low","₹"+inr(b.fl))}${kv("Depth",isNum(b.depth)?b.depth.toFixed(1)+"%":"–")}${kv("Built after",b.type==="C"?"an advance":"a decline")}
+      ${kv("Pivot tests",b.tc)}${kv("Base-low tests",b.tf)}${kv("Last 15 days range",isNum(b.tight)?b.tight.toFixed(1)+"%":"–")}${kv("Volume 10d ÷ base avg",isNum(b.dry)?b.dry.toFixed(2)+"×":"–")}
+      ${kv("Up/down volume 50d",isNum(b.ud)?b.ud.toFixed(2):"–")}${kv("Older high above pivot",isNum(b.over)&&b.over>0?"+"+b.over.toFixed(0)+"%":"None")}${kv("Measured move","₹"+inr(b.tgt))}${b.np?kv("Next pivot above",`₹${inr(b.np)} <span style="font-size:13px;color:var(--muted)">(${sgn(b.nd,1)}, ${b.nlen}d)</span>`):kv("Next pivot above","–")}</dl>
+    <div class="scorebd"><div class="sbh"><span>Base Score</span>${scorePill(b.sc)}</div>${parts.map(([k,v,mx])=>`<div class="sbr"><span>${k}</span><span class="sbt"><i style="width:${(v||0)/mx*100}%"></i></span><span class="num">${v??0}/${mx}</span></div>`).join("")}</div>
+  </div>`}
+
+/* ════════════════════ STAGE 2 PHASES (Scanners → Stage 2 phases) ════════════════════
+   stage2.json (scripts/stage2.py): every Stage 2 stock with its phase (E/M/L from maturity
+   points mp = [bases, time, gain, slope slowing]) and Stage 2 Score sc (parts sp). */
+let S2D=null;
+async function s2Load(){
+  if(!S2D){if(window.EMBED?.stage2)S2D=window.EMBED.stage2;
+    else{if(!D.meta.stage2)return null;try{const r=await fetch(`data/stage2.json?v=${Date.now()}`);S2D=r.ok?await r.json():null}catch(e){S2D=null}}
+    if(S2D)S2D.by=Object.fromEntries(S2D.rows.map(x=>[x.s,x]))}
+  return S2D}
+const PHL={E:["Early","ph-e"],M:["Mid","ph-m"],L:["Late","ph-l"]},PHO={E:0,M:1,L:2};
+const phPill=p=>{const [l,c]=PHL[p]||["–",""];return `<span class="phpill ${c}">${l}</span>`};
+const S2W={below50:"Below 50-day",offpeak:"15%+ off its peak",slowing:"150-day slope slowing",climax:"Climax: 100%+ above 200-day"};
+const s2wk=a=>{if(a>=260)return `${(a/250).toFixed(1)} yrs`;if(a>=42)return `${Math.round(a/21)} months`;const w=Math.max(1,Math.round(a/5));return w===1?"1 week":`${w} weeks`};
+if(!st.s2)st.s2={q:"",ph:"all",min:"0",rs70:false,f60:false,nowarn:false};
+const S2COL={
+  ph:{k:"ph",label:"Phase",l:1,fmt:r=>`${phPill(r.z.ph)} <span class="bsub" style="display:inline">${r.z.mat}/9</span>`,sort:r=>PHO[r.z.ph]*1000-r.z.sc,csv:r=>(PHL[r.z.ph]||[""])[0]},
+  sc:{k:"sc2",label:"Stage 2 Score",fmt:r=>scorePill(r.z.sc),sort:r=>r.z.sc,csv:r=>r.z.sc},
+  since:{k:"since",label:"In Stage 2 since",fmt:r=>`<span class="num" style="font-weight:700">${esc(bmon(r.z.start))}</span><span class="bsub">${s2wk(r.z.age)}${r.z.cap?" (data limit)":""}${r.z.young?" · new listing":""}</span>`,sort:r=>r.z.age,csv:r=>r.z.start},
+  bases:{k:"bases",label:"Bases",fmt:r=>`<span class="num" style="font-weight:700">${r.z.bases}</span>`,sort:r=>r.z.bases},
+  gain:{k:"gain",label:"Up from base low",fmt:r=>`<span class="num">${sgn(r.z.gain,0)}</span>`,sort:r=>r.z.gain},
+  e150:{k:"e150",label:"Above 150-day",fmt:r=>`<span class="num">${sgn(r.z.e150,0)}</span>`,sort:r=>r.z.e150},
+  e200:{k:"e200",label:"Above 200-day",fmt:r=>`<span class="num">${sgn(r.z.e200,0)}</span>`,sort:r=>r.z.e200},
+  pk:{k:"pk",label:"Off peak",fmt:r=>`<span class="num ${r.z.pk<=-15?"down":""}">${r.z.pk===0?"At peak":sgn(r.z.pk,1)}</span>`,sort:r=>r.z.pk},
+  slope:{k:"slope",label:"150-day rise, 20d",fmt:r=>`<span class="num">${sgn(r.z.slope,1)}</span>`,sort:r=>r.z.slope},
+  warn:{k:"warn",label:"Warnings",l:1,td:()=>"wrapcell",fmt:r=>r.z.warn.length?r.z.warn.map(w=>`<span class="wchip">${esc(S2W[w]||w)}</span>`).join(" "):`<span style="color:var(--muted)">–</span>`,sort:r=>r.z.warn.length,csv:r=>r.z.warn.map(w=>S2W[w]||w).join("; ")},
+};
+function s2Filter(rows){
+  const f=st.s2,q=f.q.trim().toUpperCase(),min=+f.min;
+  return rows.filter(z=>{const x=D.by[z.s]||{};
+    if(q&&!z.s.includes(q)&&!String(x.n||"").toUpperCase().includes(q))return false;
+    if(f.ph!=="all"&&z.ph!==f.ph)return false;if(min&&!(z.sc>=min))return false;
+    if(f.rs70&&!((x.rs??0)>=70))return false;if(f.f60&&!((x.fr??0)>=60))return false;if(f.nowarn&&z.warn.length)return false;
+    return true})}
+function s2Evidence(E){
+  if(!E)return "";
+  const all=[...E.phase_early,...E.phase_late,...E.score_all,...E.bases,...E.months,...E.ext150].map(r=>r.avg);const mx=Math.max(...all,1);
+  const bar=v=>`<span class="ebar" style="width:${Math.max(2,Math.round(Math.max(0,v)/mx*100))}px"></span><span class="num" style="font-weight:700">${sgn(v,1)}</span>`;
+  const pe=Object.fromEntries(E.phase_early.map(r=>[r.label,r])),pl=Object.fromEntries(E.phase_late.map(r=>[r.label,r]));
+  const t1=`<div class="tscroll"><table class="dt etab"><thead><tr><th class="l">Phase</th><th class="l">Avg 1 yr vs NIFTY 500, 2007–16</th><th class="l">Same, 2017–26</th><th>Fell to Stage 4 in 6 months, 2007–16</th><th>2017–26</th><th>Worst 6-month drop</th><th>Beat the index</th><th>Snapshots</th></tr></thead><tbody>`+
+    E.phase_all.map(r=>{const a=pe[r.label],b=pl[r.label];return `<tr><td class="l">${phPill(r.label[0])}</td><td class="l">${bar(a.avg)}</td><td class="l">${bar(b.avg)}</td><td class="num">${a.end.toFixed(0)}%</td><td class="num">${b.end.toFixed(0)}%</td><td class="num">${sgn(r.mdd,1)}</td><td class="num">${r.win.toFixed(0)}%</td><td class="num">${r.n.toLocaleString("en-IN")}</td></tr>`}).join("")+`</tbody></table></div>`;
+  const bands=["under 55","55–69","70+"],grid=E.grid;
+  const t2=`<div class="tscroll"><table class="dt etab"><thead><tr><th class="l">Phase ↓ · Stage 2 Score →</th>${bands.map(b=>`<th>${b}</th>`).join("")}</tr></thead><tbody>`+
+    ["Early","Mid","Late"].map(p=>`<tr><td class="l">${phPill(p[0])}</td>${bands.map(b=>{const g=grid.find(x=>x.phase===p&&x.band===b);return `<td class="num"><b>${sgn(g.avg,1)}</b><span class="bsub" style="display:block">${g.end.toFixed(0)}% fell to Stage 4</span></td>`}).join("")}</tr>`).join("")+`</tbody></table></div>`;
+  const sbar=v=>`<span class="ebar" style="width:${Math.max(2,Math.round(Math.max(0,v)/mx*60))}px"></span><span class="num" style="font-weight:700">${sgn(v,1)}</span>`;
+  const small=(title,rows,lab)=>`<div><h4>${title}</h4><div class="tscroll"><table class="dt etab"><thead><tr><th class="l">${lab}</th><th class="l">Avg 1 yr vs index</th><th>Median</th><th>To Stage 4</th></tr></thead><tbody>`+
+    rows.map(r=>`<tr><td class="l"><b>${esc(r.label)}</b></td><td class="l">${sbar(r.avg)}</td><td class="num">${sgn(r.med,1)}</td><td class="num">${r.end.toFixed(0)}%</td></tr>`).join("")+`</tbody></table></div></div>`;
+  const se=Object.fromEntries(E.score_early.map(r=>[r.label,r])),sl=Object.fromEntries(E.score_late.map(r=>[r.label,r]));
+  const t3=`<div class="tscroll"><table class="dt etab"><thead><tr><th class="l">Stage 2 Score</th><th class="l">Avg 1 yr vs NIFTY 500, 2007–16</th><th class="l">Same, 2017–26</th><th>Fell to Stage 4, 2007–16</th><th>2017–26</th></tr></thead><tbody>`+
+    E.score_all.map(r=>`<tr><td class="l"><b>${esc(r.label)}</b></td><td class="l">${bar(se[r.label].avg)}</td><td class="l">${bar(sl[r.label].avg)}</td><td class="num">${se[r.label].end.toFixed(0)}%</td><td class="num">${sl[r.label].end.toFixed(0)}%</td></tr>`).join("")+`</tbody></table></div>`;
+  return `<details class="card evid"${store.get("s2Ev",false)?" open":""}><summary>${esc(E.title)} <span>— how much does early vs late matter?</span></summary><div class="evb">
+    <ul class="fl">${E.findings.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
+    <h4>By phase</h4>${t1}
+    <h4>Phase and Stage 2 Score together (average 1-year return vs NIFTY 500)</h4>${t2}
+    <h4>By Stage 2 Score</h4>${t3}
+    <div class="egrid">${small("By O'Neil base count since the advance began",E.bases,"Bases")}${small("By months in Stage 2",E.months,"Months")}${small("By distance above the 150-day line",E.ext150,"Above 150-day")}</div>
+    <p class="note">${esc(E.data)} ${esc(E.caveats)}</p><p class="note"><b>Rules:</b> ${esc(E.rules)}</p></div></details>`}
+async function renderStage2(head){
+  $("#view").innerHTML=head+`<div class="empty">Loading Stage 2…</div>`;
+  const B=await s2Load();if(st.tab!=="scanners"||st.scanView!=="s2")return;
+  if(!B){$("#view").innerHTML=head+`<div class="err">Stage 2 data isn't there yet. It is made by the evening “Daily update” run — run it once from the Actions tab, then reload.</div>`;return}
+  const f=st.s2,R=B.rows,c=p=>R.filter(z=>z.ph===p);
+  const tile=(id,k,v,d,cls)=>`<button type="button" class="card tile btile ${cls||""}" data-s2preset="${id}"><div class="k">${k}</div><div class="v num">${v.toLocaleString("en-IN")}</div><div class="d">${d}</div></button>`;
+  $("#view").innerHTML=head+`<div class="sec-head"><div><h2>Stage 2: early, mid or late?</h2><p>All ${R.length.toLocaleString("en-IN")} stocks in Stage 2 (above a rising 150-day / 30-week line), sorted by how far into the advance they are — Early first — and by Stage 2 Score within each phase. Phase rules follow Weinstein (time in Stage 2), O'Neil (base count) and Minervini, and were tested on 20 years of NSE data below.</p></div></div>
+  <div class="tiles btiles">${tile("E","Early Stage 2",c("E").length,`${c("E").filter(z=>z.sc>=70).length} with a Stage 2 Score of 70+`,"t-e")}${tile("M","Mid Stage 2",c("M").length,`${c("M").filter(z=>z.sc>=70).length} with a score of 70+`,"t-m")}${tile("L","Late Stage 2",c("L").length,`${c("L").filter(z=>z.sc<55).length} weakening (score under 55)`,"t-l")}${tile("best","Early + score 70+",R.filter(z=>z.ph==="E"&&z.sc>=70).length,"the best group in the backtest")}</div>
+  ${s2Evidence(B.evidence)}
+  <div class="card toolbar">
+    <div class="ctl"><span>Search</span><input class="search" type="search" id="s2q" placeholder="Symbol or company" value="${esc(f.q)}" aria-label="Search Stage 2 stocks"></div>
+    <div class="ctl"><span>Phase</span>${seg("s2_ph",["all","E","M","L"],f.ph,{all:"All",E:"Early",M:"Mid",L:"Late"})}</div>
+    <div class="ctl"><span>Stage 2 Score</span>${seg("s2_min",["0","55","70","85"],f.min,{"0":"Any","55":"55+","70":"70+","85":"85+"})}</div>
+    <div class="ctl"><span>Also</span><div style="display:flex;flex-wrap:wrap;gap:0 16px"><label class="check"><input type="checkbox" id="s2rs" ${f.rs70?"checked":""}>RS 70+</label>${D.meta.fund?`<label class="check"><input type="checkbox" id="s2f6" ${f.f60?"checked":""}>Fund 60+</label>`:""}<label class="check"><input type="checkbox" id="s2nw" ${f.nowarn?"checked":""}>No warnings</label></div></div>
+  </div><div class="card" id="s2T"></div>`;
+  const on=(id,k)=>{const el=$(id);if(el)el.addEventListener(el.type==="checkbox"?"change":"input",e=>{f[k]=e.target.type==="checkbox"?e.target.checked:e.target.value;if(st.tbl.s2)st.tbl.s2.show=100;store.set("s2",f);drawStage2()})};
+  on("#s2q","q");on("#s2rs","rs70");on("#s2f6","f60");on("#s2nw","nowarn");
+  $("#view").querySelector(".evid")?.addEventListener("toggle",e=>store.set("s2Ev",e.target.open));
+  drawStage2()}
+function drawStage2(){
+  const rows=s2Filter(S2D.rows).map(z=>{const x=D.by[z.s]||{};return {s:z.s,n:x.n,rs:x.rs,fr:x.fr,mc:x.mc,sec:x.sec,ind:x.ind,z}});
+  if(!st.tbl.s2)st.tbl.s2={key:"ph",dir:1,show:100};
+  const cols=[C.stock,S2COL.ph,S2COL.sc,S2COL.since,S2COL.bases,S2COL.gain,S2COL.e150,S2COL.e200,S2COL.pk,S2COL.slope,C.rs,S2COL.warn,C.mc];
+  if(D.meta.fund)cols.push(C.fr);cols.push(C.sec);
+  $("#s2T").innerHTML=(rows.length?`<div class="bxhead"><span><b class="num">${rows.length.toLocaleString("en-IN")}</b> stocks</span><button type="button" class="ghost" data-wl-addall="${esc(JSON.stringify(rows.slice(0,200).map(r=>r.s)))}" data-label="Stage 2 stocks">☆ Add ${Math.min(200,rows.length)} to a watchlist</button></div>`:"")+dtable("s2",rows,cols,{empty:"No Stage 2 stocks match. Loosen a filter."});
+  wireTables($("#s2T"),drawStage2)}
+function s2Preset(id){const f=st.s2;Object.assign(f,{q:"",min:"0",rs70:false,f60:false,nowarn:false,ph:"all"});
+  if(["E","M","L"].includes(id))f.ph=id;if(id==="best")Object.assign(f,{ph:"E",min:"70"});
+  st.tbl.s2={key:id==="L"?"sc2":"ph",dir:id==="L"?1:1,show:100};store.set("s2",f);renderScanners()}
+function stage2Section(sym){
+  const z=S2D?.by?.[sym];if(!z)return "";
+  const kv=(k,v)=>`<div><dt>${k}</dt><dd class="num">${v}</dd></div>`;
+  const mp=z.mp||[],sp=z.sp||[];
+  const mrows=[["O'Neil base count",mp[0],4,`${z.bases} base${z.bases===1?"":"s"}`],["Time in Stage 2",mp[1],2,s2wk(z.age)],["Gain from the base low",mp[2],2,sgn(z.gain,0)],["150-day slope slowing",mp[3],1,sgn(z.slc,1)+" pts in 40 days"]];
+  const srows=[["RS rating",sp[0],25],["150-day slope",sp[1],20],["Close to the advance's peak",sp[2],20],["Above the 150-day",sp[3],15],["Above the 50-day",sp[4],10],["Highest close in 6 years",sp[5],10]];
+  const bar=(v,mx)=>`<span class="sbt"><i style="width:${(v||0)/mx*100}%"></i></span>`;
+  return `<div class="dsec" id="s2sec"><h4>Stage 2 · ${phPill(z.ph)} <span style="color:var(--ink)">since ${esc(fmtDate(z.start))}</span> (${s2wk(z.age)})${z.young?" — listed under a year ago, so measured from its 170th session":""}</h4>
+    <dl class="dgrid">${kv("Stage 2 Score",scorePill(z.sc))}${kv("Bases since the start",z.bases)}${kv("Up from base low",sgn(z.gain,0))}${kv("Up since Stage 2 began",sgn(z.gstart,0))}
+      ${kv("Above 150-day",sgn(z.e150,1))}${kv("Above 200-day",sgn(z.e200,1))}${kv("Off the advance's peak",z.pk===0?"At peak":sgn(z.pk,1))}${kv("150-day rise, 20 days",sgn(z.slope,1))}</dl>
+    ${z.warn.length?`<div style="margin-top:8px">${z.warn.map(w=>`<span class="wchip">${esc(S2W[w]||w)}</span>`).join(" ")}</div>`:""}
+    <div class="scorebd"><div class="sbh"><span>Maturity (Early 0–1 · Mid 2–4 · Late 5+)</span><span class="num">${z.mat}/9</span></div>${mrows.map(([k,v,mx,t])=>`<div class="sbr"><span>${k} <span style="color:var(--muted)">· ${esc(t)}</span></span>${bar(v,mx)}<span class="num">${v??0}/${mx}</span></div>`).join("")}</div>
+    <div class="scorebd"><div class="sbh"><span>Stage 2 Score</span>${scorePill(z.sc)}</div>${srows.map(([k,v,mx])=>`<div class="sbr"><span>${k}</span>${bar(v,mx)}<span class="num">${v??0}/${mx}</span></div>`).join("")}</div>
+  </div>`}
 
 /* ════════════════════ VPCI ════════════════════ */
 const VP={mode:"completed",prorate:true,tab:"fresh",cache:{},rot:null,q:"",sec:"",view:"cards",allcols:false};
@@ -923,6 +1201,7 @@ async function openDrawer(sym,ex,focusWl){
       ${kv("Above 20 / 50 / 200",[x.a20,x.a50,x.a200].map(b=>b==null?"–":b?'<span class="up">✓</span>':'<span class="down">✗</span>').join(" "))}${kv("From 52W high",sgn(x.h52,1))}${kv("Above 52W low",sgn(x.l52,1))}${kv("RSI 14",isNum(x.rsi)?x.rsi.toFixed(0):"–")}
       ${kv("ADX 14",isNum(x.adx)?x.adx.toFixed(0):"–")}${kv("ATR % of price",isNum(x.atrp)?x.atrp.toFixed(1)+"%":"–")}${kv("Volume × 50d",isNum(x.vr)?x.vr.toFixed(1):"–")}${kv("Turnover ₹Cr/day",isNum(x.to)?x.to:"–")}
       ${kv("Close range today",isNum(x.dcr)?x.dcr.toFixed(0)+"%":"–")}${kv("ADR % (20d)",isNum(x.adr)?x.adr.toFixed(1)+"%":"–")}${kv("Signal groups today",isNum(x.nsc)?x.nsc.toFixed(0)+" / 7":"–")}</dl></div>`:`<p class="note" style="margin:0">This symbol is outside the main NSE universe (BSE-only, or below the liquidity filter), so only its VPCI read is shown.</p><div id="pchartSlot"></div>${wlCardHtml(sym)}`}
+    <div id="s2Slot"></div><div id="baseSlot"></div>
     ${fundHtml}
     ${vr?`<div class="dsec"><h4>VPCI screener · completed weeks</h4><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">${statusPill(vr.status)}${gateDots(vr)}<span style="color:var(--muted)">${esc(vr.position_state||"")}</span></div>
       <dl class="dgrid">${kv("Gates",vr.gate_count+"/7")}${kv("VPCI",isNum(vr.vpci)?vr.vpci.toFixed(2):"–")}${kv("Trail stop","₹"+inr(vr.trail_stop))}${kv("Risk",isNum(vr.risk_pct)?vr.risk_pct.toFixed(1)+"%":"–")}</dl>
@@ -934,6 +1213,8 @@ async function openDrawer(sym,ex,focusWl){
   $("#drawer").hidden=false;$("#scrim").hidden=false;document.body.style.overflow="hidden";
   wireWlCard(sym);
   if(focusWl)$("#wlsec")?.scrollIntoView({block:"start"});else if(!reopen)$("#drawer .close").focus();
+  s2Load().then(B=>{const slot=$("#s2Slot");if(B&&slot&&$("#dTitle")?.textContent===sym)slot.outerHTML=stage2Section(sym)});
+  basesLoad().then(B=>{const slot=$("#baseSlot");if(B&&slot&&$("#dTitle")?.textContent===sym)slot.outerHTML=baseSection(sym)});
   clLoad().then(()=>{const slot=$("#pchartSlot");if(slot&&$("#dTitle")?.textContent===sym){slot.outerHTML=priceChart(sym);wirePriceChart(sym);if(focusWl)$("#wlsec")?.scrollIntoView({block:"start"})}});
 }
 function closeDrawer(){if($("#drawer").hidden)return;$("#drawer").hidden=true;$("#scrim").hidden=true;document.body.style.overflow="";lastFocus?.focus?.()}
@@ -1013,7 +1294,7 @@ function spark(s,added){const c=CL?.c?.[s];if(!c)return `<span style="color:var(
   return `<svg class="spark" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${s} last 3 months ${up?"up":"down"}"><polyline points="${pts}" fill="none" stroke="${up?"var(--up)":"var(--down)"}" stroke-width="2" stroke-linejoin="round"/>${dot}</svg>`}
 
 /* ── alerts: what needs attention today ── */
-const BULL_SCANS=["combo3","up4","high52_dcr","ath","vcp","pocket_pivot","tight3w","power3","bgu","episodic_pivot","darvas","stage2_bo","bull_snort","wedge_pop","f_post","f_accel"];
+const BULL_SCANS=["combo3","up4","high52_dcr","ath","vcp","pocket_pivot","tight3w","power3","bgu","episodic_pivot","darvas","stage2_bo","bull_snort","wedge_pop","f_post","f_accel","lb_breakout","lb_near","s2_early"];
 const BEAR_SCANS=["down4","leader_down","below200","ema_down","death","gap_down","f_red"];
 function sma50(c,i){if(!c||i<49)return null;let t=0;for(let k=i-49;k<=i;k++){if(!isNum(c[k]))return null;t+=c[k]}return t/50}
 function wlAlerts(syms){
@@ -1131,6 +1412,7 @@ let syncT=null;
 function syncPushSoon(){const c=syncCfg.get();if(!c)return;clearTimeout(syncT);syncT=setTimeout(async()=>{try{await gh("/gists/"+c.id,{method:"PATCH",body:JSON.stringify({files:{[GFILE]:{content:JSON.stringify(wlGet())}}})},c.tok);c.at=Date.now();c.err=null}catch(e){c.err=e.message;toast("Sync failed — saved on this device")}syncCfg.set(c)},1500)}
 function syncDialog(){const c=syncCfg.get();
   modal(c?`<form><h3>Sync is on</h3><p>Your watchlists are saved to a private GitHub gist and kept the same on every device where you connect the same token. Last synced: ${c.at?new Date(c.at).toLocaleString("en-IN"):"–"}.${c.err?`<br><span class="err">${esc(c.err)}</span>`:""}</p>
+      <p style="font-size:15px"><b>Telegram alerts:</b> save this same token as the <code>GIST_TOKEN</code> secret in your repository and the Telegram bot reads these lists — your pivot, stop and target levels — live during market hours (README → Telegram alerts).</p>
       <div class="acts"><button type="button" class="ghost" data-mclose>Close</button><button type="button" class="ghost" id="syncnow">Sync now</button><button class="btn danger" type="submit">Turn off on this device</button></div></form>`
     :`<form><h3>Sync across your devices</h3><p>Watchlists are saved in this browser. To see the same lists on your phone and PC, store them in a private GitHub gist (free, only you can change it):</p>
       <ol><li>Open <a href="https://github.com/settings/tokens/new?scopes=gist&description=PKC%20Sector%20Radar%20watchlists" target="_blank" rel="noopener">this GitHub page</a> (signed in as you). It creates a token that can only read and write gists. Choose an expiry, then click <b>Generate token</b>.</li>
@@ -1321,11 +1603,13 @@ wlGet();
 function render(){
   renderPulse();
   document.querySelectorAll("#tabs .tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===st.tab));
-  ({rotation:renderRotation,breadth:renderBreadth,rs:renderRS,scanners:renderScanners,watch:renderWatch,vpci:renderVpci})[st.tab]();
+  ({rotation:renderRotation,breadth:renderBreadth,rs:renderRS,scanners:renderScanners,bases:renderBases,watch:renderWatch,vpci:renderVpci})[st.tab]();
 }
 function go(tab){
+  if(tab==="stage2"){st.scanView="s2";store.set("scanView","s2");tab="scanners"}
   if(!TABS.includes(tab))tab="rotation";st.tab=tab;store.set("tab",tab);
-  if(location.hash.slice(1)!==tab)history.replaceState(null,"","#"+tab);
+  const hs=tab==="scanners"&&st.scanView==="s2"?"stage2":tab;
+  if(location.hash.slice(1)!==hs)history.replaceState(null,"","#"+hs);
   render();const nav=document.querySelector(".tabbar");if(getComputedStyle(nav).position==="sticky"&&window.scrollY>nav.offsetTop)window.scrollTo(0,nav.offsetTop);
   if(getComputedStyle(nav).position==="fixed")window.scrollTo(0,Math.max(0,$("#view").offsetTop-8));
 }
@@ -1395,7 +1679,7 @@ $("#tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(b)go
 document.addEventListener("click",e=>{
   const sb=e.target.closest(".symbtn");if(sb){openDrawer(sb.dataset.sym,sb.dataset.ex);return}
   if(e.target.closest("[data-close]")||e.target.id==="scrim"){closeDrawer();return}
-  const sg=e.target.closest("[data-scan-go]");if(sg){closeDrawer();st.scan=sg.dataset.scanGo;go("scanners");return}
+  const sg=e.target.closest("[data-scan-go]");if(sg){closeDrawer();st.scan=sg.dataset.scanGo;st.scanView="lib";go("scanners");return}
   const tg=e.target.closest("[data-theme-go]");if(tg){closeDrawer();st.group="Themes";st.open=tg.dataset.themeGo;st.view="bars";go("rotation");setTimeout(()=>document.querySelector(`.brow[data-g="${CSS.escape(st.open)}"]`)?.scrollIntoView({block:"center"}),60);return}
   const s=e.target.closest("[data-seg]");
   if(s){const k=s.dataset.seg,v=s.dataset.val;
@@ -1403,6 +1687,9 @@ document.addEventListener("click",e=>{
     if(k==="vpprorate"){VP.prorate=v==="on";renderVpci();return}
     if(k==="vview"){VP.view=v;vpTab();return}
     if(k==="wlview"){st.wl.view=v;drawWatch();return}
+    if(k==="scanView"){st.scanView=v;store.set("scanView",v);if(location.hash.slice(1)!==(v==="s2"?"stage2":"scanners"))history.replaceState(null,"","#"+(v==="s2"?"stage2":"scanners"));renderScanners();return}
+    if(k.startsWith("s2_")){st.s2[k.slice(3)]=v;store.set("s2",st.s2);if(st.tbl.s2)st.tbl.s2.show=100;s.parentElement.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b===s));drawStage2();return}
+    if(k.startsWith("b_")){st.bx[k.slice(2)]=v;store.set("bx",st.bx);if(st.tbl.bases)st.tbl.bases.show=100;s.parentElement.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b===s));drawBases();return}
     if(k==="scanTop"){st.scanTop=+v;store.set("scanTop",st.scanTop);renderScanners();return}
     if(k==="scanFund"){st.scanFund=+v;store.set("scanFund",st.scanFund);renderScanners();return}
     if(k==="fundmin"){st.rs.fmin=+v;store.set("rs",st.rs);s.parentElement.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b===s));drawRS();return}
@@ -1410,6 +1697,8 @@ document.addEventListener("click",e=>{
     st[k]=v;if(k==="group")st.open=null;store.set("prefs",{period:st.period,group:st.group,agg:st.agg,sort:st.sort,view:st.view});
     if(k==="period")renderPulse();renderRotation();return}
   const vt=e.target.closest("[data-vtab]");if(vt){VP.tab=vt.dataset.vtab;document.querySelectorAll("[data-vtab]").forEach(b=>b.setAttribute("aria-pressed",b===vt));vpTab();return}
+  const bp=e.target.closest("[data-bpreset]");if(bp){bPreset(bp.dataset.bpreset);return}
+  const s2p=e.target.closest("[data-s2preset]");if(s2p){s2Preset(s2p.dataset.s2preset);return}
   const sc=e.target.closest("[data-scan]");if(sc){st.scan=sc.dataset.scan;store.set("scan2",st.scan);renderScanners();return}
   const hp=e.target.closest("[data-hp]");if(hp){st.period=hp.dataset.hp;st.sort="ret";renderPulse();renderRotation();return}
   if(e.target.closest(".members")||e.target.closest("details")||e.target.closest("#drawer"))return;
@@ -1419,10 +1708,10 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Escape"){closeDrawer();return}
   const r=e.target.closest?.(".brow,.heat tr.hr,[data-hp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click();document.querySelector(`[data-g="${CSS.escape(r.dataset.g||"")}"]`)?.focus()}
 });
-window.addEventListener("hashchange",()=>{const t=location.hash.slice(1);if(TABS.includes(t)&&t!==st.tab)go(t)});
+window.addEventListener("hashchange",()=>{const t=location.hash.slice(1);if(t==="stage2"){if(st.tab!=="scanners"||st.scanView!=="s2")go("stage2");return}if(TABS.includes(t)&&(t!==st.tab||(t==="scanners"&&st.scanView==="s2"))){if(t==="scanners")st.scanView="lib";go(t)}});
 $("#themeBtn").addEventListener("click",()=>{const d=document.documentElement,cur=d.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");d.dataset.theme=cur==="dark"?"light":"dark";store.set("theme",d.dataset.theme)});
-(()=>{const t=store.get("theme",null);if(t)document.documentElement.dataset.theme=t;Object.assign(st,store.get("prefs",{}));Object.assign(st.rs,store.get("rs",{}));st.scan=store.get("scan2",st.scan);st.scanTop=+store.get("scanTop",0)||0;st.scanFund=+store.get("scanFund",0)||0;
-  const h=location.hash.slice(1);st.tab=TABS.includes(h)?h:store.get("tab","rotation")})();
+(()=>{const t=store.get("theme",null);if(t)document.documentElement.dataset.theme=t;Object.assign(st,store.get("prefs",{}));Object.assign(st.rs,store.get("rs",{}));Object.assign(st.bx,store.get("bx",{}));Object.assign(st.s2,store.get("s2",{}));st.scanView=store.get("scanView","lib");st.scan=store.get("scan2",st.scan);st.scanTop=+store.get("scanTop",0)||0;st.scanFund=+store.get("scanFund",0)||0;
+  const h=location.hash.slice(1);if(h==="stage2"){st.scanView="s2";st.tab="scanners"}else{if(h==="scanners")st.scanView="lib";st.tab=TABS.includes(h)?h:store.get("tab","rotation")}})();
 
 load().then(()=>{index();renderHeader();renderFoot();render();updateWlBadge();wlCheckShared();syncPull();vpxLoad().then(()=>{refreshStars();updateWlBadge()})}).catch(err=>{
   $("#asof").textContent="";
