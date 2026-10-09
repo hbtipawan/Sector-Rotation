@@ -51,6 +51,11 @@ jobs:
         if: steps.upstox.outcome != 'success'
         run: python scripts/fetch_prices.py --source yahoo
 
+      - name: Older BSE prices for stocks recently listed on NSE (for the long-base identifier)
+        continue-on-error: true
+        timeout-minutes: 10
+        run: python scripts/fetch_bse_backfill.py
+
       - name: Fundamentals from NSE filings (new results and shareholding only)
         continue-on-error: true
         timeout-minutes: 45
@@ -67,6 +72,15 @@ jobs:
         continue-on-error: true
         run: python scripts/vpci_app_run.py
 
+      - name: Telegram evening digest (only if the Telegram secrets are set)
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: python scripts/telegram_alerts.py --evening
+
       - name: Save data to the repository
         run: |
           git config user.name "radar-bot"
@@ -82,9 +96,9 @@ jobs:
 
       # Commits made by this job do not trigger a GitHub Pages rebuild,
       # so the job publishes the website itself.
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: docs
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
