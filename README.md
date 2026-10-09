@@ -98,6 +98,71 @@ Watchlists are saved in your browser. **Sync devices** keeps phone and PC identi
 
 `compute.py` also writes `docs/data/closes.json` (one year of daily closes, ~0.8 MB compressed) for the sparklines, back-dated adds and the 12-month chart in every stock card.
 
+## Long-base identifier
+
+The **Long bases** tab lists every stock that is in a base on the daily chart, sorted by how many trading days it has been there.
+
+- **Definition.** A base is the stretch a stock has spent below a closing high (the **pivot**) without falling more than 50% below it. All of it is measured on daily closes, so one wick does not move the pivot.
+- **Where the count starts.** After an advance, it starts at the left-side high: the first close within 5% of the pivot. If the stock fell into the base, it starts at the bar after the last close above the pivot. The advance or decline that led into the base is not counted.
+- **What each stock shows:**
+  - base days (and years), the start date, pivot, base low and depth;
+  - where the price is (breakout, back at the pivot, extended, within 5%, 5–15% below, deeper);
+  - how many times the pivot was tested;
+  - the last-15-day range (tightness) and volume dry-up;
+  - up/down volume, an older high above the pivot (overhead supply), and the next pivot above;
+  - a measured-move target (pivot + 85% of the base height);
+  - a breakout from a shorter base inside the long one in the last 20 sessions;
+  - a mini chart.
+- **Stock card.** It shows the same with a large chart and the Base Score broken down.
+- **Base Score (0–100), built from the backtest:**
+
+  | Part | Points |
+  |---|---|
+  | Base length (most for 200–399 days, then 400–799) | 25 |
+  | RS rating | 25 |
+  | Uptrend (above a rising 150-day and the 200-day average) | 20 |
+  | Tight right side | 15 |
+  | Built after an advance | 10 |
+  | Little overhead supply | 5 |
+
+- **Three scanners in the Scanners tab, under Bases:**
+  - Long-base breakout (100+ days)
+  - Long base near pivot (200+ days)
+  - Big base with a top score
+  - The first two also feed watchlist alerts and the Telegram digest.
+
+**Checked on 20 years of NSE data** (Oct 2006 – Oct 2026, about 59,000 breakouts, returns 1 year after the breakout against NIFTY 500). The full tables are in the tab under "What 20 years of NSE data say" and in `config/base_evidence.json`.
+
+- **Length alone did not predict a bigger move.** In an uptrend with RS 70+ it did: 200–399-day bases beat the index by about 20% on average against 11% for 25–49-day bases. Outside an uptrend, long bases gave no edge.
+- **The Base Score sorted outcomes in both halves of the period.** It ran from about +3% under 40 to about +17% at 80+.
+- **Caveat.** Only stocks still listed today are included.
+
+**Data.**
+- `fetch_prices.py` now downloads `base_history_calendar_days` (2,300 days, about 6 years) in the same single request per stock. Everything else still uses the usual 760-day window, so all other numbers are unchanged.
+- `fetch_bse_backfill.py` adds the older BSE closes for stocks that moved from BSE to NSE recently, so their bases are not cut at the NSE listing. Stocks with no older BSE data are remembered in `config/bse_skip.csv`.
+- The detection code is `scripts/bases.py`. It uses numba and runs in a few seconds.
+
+## Telegram alerts
+
+Two kinds of message, both sent by your own Telegram bot:
+
+- **Evening digest** (after each daily update, ~6:50 PM): NIFTY 500 and breadth verdict, top themes, every watchlist alert from the Watchlists tab (stop, breakout, buy zone, near pivot, target, warnings, results due, fresh VPCI) and today's key scanner hits, with TradingView links.
+- **Live alerts** (every 15 minutes, 9:15 AM–3:30 PM on weekdays): for each stock in your watchlists, today's live price from Upstox is checked against your levels — **crossed your pivot** (with volume pace vs the 50-day average and an "extended" warning above +5%), **within 1% of pivot**, **below your stop**, **target hit**, and **±5% move today**. Each alert is sent once per stock per day.
+
+Setup (10 minutes, once):
+
+1. In Telegram open **@BotFather** → `/newbot` → give it any name and a username ending in `bot`. Copy the token it gives you.
+2. Open your new bot and press **Start** (or send it "hi") — a bot can only message you after you've messaged it.
+3. Repository → **Settings → Secrets and variables → Actions → New repository secret**:
+   - `TELEGRAM_BOT_TOKEN` = the BotFather token
+   - `GIST_TOKEN` = the same `ghp_…` token you pasted in **Sync devices** (Sync must be on — that's how the bot sees your lists and levels)
+4. **Actions → Telegram live alerts → Run workflow** (mode `test`). Open the run: the log shows `YOUR TELEGRAM_CHAT_ID IS: …`. Add that number as a third secret, `TELEGRAM_CHAT_ID`.
+5. Run it again with mode `test` — you get a "connected" message listing how many lists and levels it found.
+
+Optional: a variable (same page, **Variables** tab) `SITE_URL` with your dashboard address if it isn't `https://<user>.github.io/<repo>/`; `MOVE_PCT` changes the 5% move alert.
+
+Notes: GitHub can start scheduled runs 5–15 minutes late on busy days, so treat these as a heads-up — keep real stop-loss / GTT orders in Kite. Live alerts cover NSE stocks (BSE-only names get the evening digest only). Without the secrets the workflow simply skips. Which alerts were already sent is kept in the same secret gist (`pkc-radar-alert-state.json`).
+
 ## Fundamentals (automatic, from NSE filings)
 
 `scripts/fetch_fundamentals.py` reads the companies' own quarterly filings on NSE every evening — no login, no uploads:
@@ -128,6 +193,7 @@ Kite isn't used here (it needs a fresh token every day). Sector-rotation history
 
 | Setting | Default | Meaning |
 |---|---|---|
+| `base_history_calendar_days` | 2300 | Days of daily candles downloaded for the long-base identifier (everything else uses `history_calendar_days`, 760) |
 | `min_price` | 20 | Ignore stocks below this price |
 | `min_median_turnover_cr` | 1.0 | Median 50-day traded value, ₹ crore |
 | `min_market_cap_cr` | 500 | Used only if `industry_bse.csv` or `mcap.csv` exists |
